@@ -27,6 +27,7 @@ import "./Thread.css";
 interface ThreadProps {
   onToggleSidebar: () => void;
   sidebarOpen: boolean;
+  isStreaming: boolean;
 }
 
 // =============================================================================

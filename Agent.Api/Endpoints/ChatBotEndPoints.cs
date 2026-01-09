@@ -1,28 +1,38 @@
 ﻿using Agent.Api.Models;
+using Agent.Core.Specialists;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace Agent.Api.Endpoints;
 
-public static class ChatBotEndPoints
+public static class ChatBotEndpoints
 {
-	public static IEndpointRouteBuilder MapChatBot(this IEndpointRouteBuilder endpoints) 
+	private static readonly JsonSerializerOptions JsonOptions = new()
 	{
-		endpoints.MapPost("/chat/stream", HandleChatStreamAsync);
-		
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+	};
+
+	public static IEndpointRouteBuilder MapChatBot(this IEndpointRouteBuilder endpoints)
+	{
+		endpoints.MapPost("/chat/stream", HandleChatStreamAsync)
+			.WithTags("Chat")
+			.WithSummary("Stream chat response with SSE")
+			.Produces(StatusCodes.Status200OK, contentType: "text/event-stream")
+			.Produces(StatusCodes.Status400BadRequest);
+
 		return endpoints;
 	}
 
-	private static async Task HandleChatStreamAsync(HttpContext ctx,
+	private static async Task HandleChatStreamAsync(
+		HttpContext ctx,
 		[FromBody] ChatRequest req,
 		[FromServices] AgentManager manager,
 		CancellationToken ct)
 	{
-		// Validate
 		if (string.IsNullOrWhiteSpace(req.Message))
 		{
-			ctx.Response.StatusCode = 400;
-			await ctx.Response.WriteAsJsonAsync(new { error = "Message required" });
+			ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
+			await ctx.Response.WriteAsJsonAsync(new { error = "Message required" }, ct);
 			return;
 		}
 
@@ -33,24 +43,63 @@ public static class ChatBotEndPoints
 
 		try
 		{
-			var agent = manager.GetOrCreate(req.ConversationId);
+			var (agent, thread) = await manager.GetOrCreateAsync(req.ConversationId, req.Message, ct);
+
+			
+			var metadata = new ChatMetadata
+			{
+				ConversationId = thread.ThreadId,
+				Title = thread.Title
+			};
+
+			await WriteEventAsync(ctx.Response, "metadata", metadata, ct);
 
 			await foreach (var update in agent.RunStreamingAsync(req.Message).WithCancellation(ct))
 			{
 				if (!string.IsNullOrEmpty(update.Text))
 				{
-					
-					await ctx.Response.WriteAsync($"data: {JsonSerializer.Serialize(new { text = update.Text })}\n\n", ct);
-					await ctx.Response.Body.FlushAsync(ct);
+					var data = new ChatData
+					{
+						ConversationId = thread.ThreadId,
+						Text = update.Text
+					};
+
+					await WriteEventAsync(ctx.Response, "data", data, ct);
 				}
 			}
 
-			await ctx.Response.WriteAsync("data: [DONE]\n\n", ct);
+			var doneEvent = new ChatDone
+			{
+				ConversationId = thread.ThreadId,
+				Title = thread.Title
+			};
+
+			await WriteEventAsync(ctx.Response, "done", doneEvent, ct);
 		}
-		catch (OperationCanceledException) { /* Client disconnected */ }
+		catch (OperationCanceledException)
+		{
+			// Client disconnected - no action needed
+		}
 		catch (Exception ex)
 		{
-			await ctx.Response.WriteAsync($"data: {JsonSerializer.Serialize(new { error = ex.Message })}\n\n", ct);
+			var error = new ChatError
+			{
+				Error = ex.Message,
+				Code = "INTERNAL_ERROR"
+			};
+			await WriteEventAsync(ctx.Response, "error", error, ct);
 		}
+	}
+
+	private static async Task WriteEventAsync<T>(
+		HttpResponse response,
+		string eventType,
+		T data,
+		CancellationToken ct)
+	{
+		var json = JsonSerializer.Serialize(data, JsonOptions);
+		await response.WriteAsync($"event: {eventType}\n", ct);
+		await response.WriteAsync($"data: {json}\n\n", ct);
+		await response.Body.FlushAsync(ct);
 	}
 }

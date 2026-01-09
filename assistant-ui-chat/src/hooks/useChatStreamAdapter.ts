@@ -1,31 +1,100 @@
 import { useMemo } from "react";
 import type { ChatModelAdapter, ChatModelRunOptions } from "@assistant-ui/react";
+import type {
+  ChatMetadata,
+  ChatData,
+  ChatDone,
+  ChatError,
+} from "../types/Conversation";
 
 // =============================================================================
 // Types
 // =============================================================================
+
 export interface ChatStreamAdapterOptions {
   /** API endpoint URL */
   api: string;
-  /** Current conversation ID */
-  conversationId: string;
+  /** Current conversation ID (null for new conversation) */
+  conversationId: string | null;
   /** Additional headers for the request */
   headers?: Record<string, string>;
+  /** Callback when metadata is received (first event) */
+  onMetadata?: (metadata: ChatMetadata) => void;
   /** Callback when streaming starts */
   onStart?: () => void;
-  /** Callback for each chunk received */
+  /** Callback for each text chunk received */
   onChunk?: (chunk: string) => void;
   /** Callback when streaming completes */
-  onFinish?: (fullText: string) => void;
+  onDone?: (done: ChatDone) => void;
   /** Callback when an error occurs */
-  onError?: (error: Error) => void;
+  onError?: (error: ChatError) => void;
+}
+
+// =============================================================================
+// SSE Event Parser
+// =============================================================================
+
+interface ParsedSSEEvent {
+  event: string;
+  data: string;
+}
+
+function parseSSEEvents(buffer: string): { events: ParsedSSEEvent[]; remaining: string } {
+  const events: ParsedSSEEvent[] = [];
+  const lines = buffer.split("\n");
+  
+  let currentEvent = "message";
+  let currentData = "";
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Empty line = end of event
+    if (line === "") {
+      if (currentData) {
+        events.push({ event: currentEvent, data: currentData });
+        currentEvent = "message";
+        currentData = "";
+      }
+      i++;
+      continue;
+    }
+
+    // Check if this might be an incomplete event at the end
+    if (i === lines.length - 1 && !buffer.endsWith("\n\n")) {
+      // Return remaining buffer for next iteration
+      const remaining = lines.slice(i).join("\n");
+      return { events, remaining };
+    }
+
+    if (line.startsWith("event: ")) {
+      currentEvent = line.slice(7).trim();
+    } else if (line.startsWith("data: ")) {
+      currentData = line.slice(6);
+    }
+
+    i++;
+  }
+
+  return { events, remaining: "" };
 }
 
 // =============================================================================
 // SSE Adapter Factory
 // =============================================================================
+
 function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAdapter {
-  const { api, conversationId, headers = {}, onStart, onChunk, onFinish, onError } = options;
+  const {
+    api,
+    conversationId,
+    headers = {},
+    onMetadata,
+    onStart,
+    onChunk,
+    onDone,
+    onError,
+  } = options;
 
   return {
     async *run({ messages, abortSignal }: ChatModelRunOptions) {
@@ -45,7 +114,11 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
       try {
         const response = await fetch(api, {
           method: "POST",
-          headers: { "Content-Type": "application/json", ...headers },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+            ...headers,
+          },
           body: JSON.stringify({
             message: textContent.text,
             conversationId,
@@ -54,8 +127,10 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
+
         if (!response.body) {
           throw new Error("Response body is null");
         }
@@ -64,6 +139,7 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
         const decoder = new TextDecoder();
         let buffer = "";
         let fullText = "";
+        let receivedConversationId = conversationId;
 
         try {
           while (true) {
@@ -71,31 +147,63 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
             if (done) break;
 
             buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n\n");
-            buffer = lines.pop() || "";
+            const { events, remaining } = parseSSEEvents(buffer);
+            buffer = remaining;
 
-            for (const line of lines) {
-              if (line.startsWith("data: ")) {
-                const data = line.slice(6);
-                if (data === "[DONE]") break;
+            for (const { event, data } of events) {
+              try {
+                const json = JSON.parse(data);
 
-                try {
-                  const json = JSON.parse(data);
-                  if (json.text) {
-                    fullText += json.text;
-                    onChunk?.(json.text);
-                    yield { content: [{ type: "text" as const, text: fullText }] };
+                switch (event) {
+                  case "metadata": {
+                    const metadata = json as ChatMetadata;
+                    receivedConversationId = metadata.conversationId;
+                    onMetadata?.(metadata);
+                    break;
                   }
-                  if (json.error) {
-                    throw new Error(json.error);
+
+                  case "data": {
+                    const chatData = json as ChatData;
+                    fullText += chatData.text;
+                    onChunk?.(chatData.text);
+                    yield {
+                      content: [{ type: "text" as const, text: fullText }],
+                    };
+                    break;
                   }
-                } catch (e) {
-                  // Only warn for actual parse errors, not [DONE]
-                  if (e instanceof SyntaxError) {
-                    console.warn("SSE parse error:", data);
-                  } else {
-                    throw e;
+
+                  case "done": {
+                    const doneData = json as ChatDone;
+                    onDone?.(doneData);
+                    break;
                   }
+
+                  case "error": {
+                    const errorData = json as ChatError;
+                    onError?.(errorData);
+                    throw new Error(errorData.error);
+                  }
+
+                  default:
+                    // Handle legacy format (no event type, just data)
+                    if (json.text) {
+                      fullText += json.text;
+                      onChunk?.(json.text);
+                      yield {
+                        content: [{ type: "text" as const, text: fullText }],
+                      };
+                    }
+                    if (json.error) {
+                      onError?.({ error: json.error, code: "UNKNOWN" });
+                      throw new Error(json.error);
+                    }
+                    break;
+                }
+              } catch (e) {
+                if (e instanceof SyntaxError) {
+                  console.warn("SSE parse error:", data);
+                } else {
+                  throw e;
                 }
               }
             }
@@ -104,38 +212,48 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
           reader.releaseLock();
         }
 
-        onFinish?.(fullText);
         return { content: [{ type: "text" as const, text: fullText }] };
-
       } catch (error) {
         const err = error instanceof Error ? error : new Error("Unknown error");
-        onError?.(err);
+        onError?.({ error: err.message, code: "CLIENT_ERROR" });
         throw err;
       }
     },
   };
 }
 
-export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAdapter {
-  const { api, conversationId, headers, onStart, onChunk, onFinish, onError } = options;
+// =============================================================================
+// React Hook
+// =============================================================================
 
-  // Memoize adapter to prevent unnecessary re-creation
-  // Only recreate when api or conversationId changes
+export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAdapter {
+  const { api, conversationId, headers, onMetadata, onStart, onChunk, onDone, onError } = options;
+
+  // Memoize adapter - recreate when api or conversationId changes
   const adapter = useMemo(
-    () => createChatStreamAdapter({
-      api,
-      conversationId,
-      headers,
-      onStart,
-      onChunk,
-      onFinish,
-      onError,
-    }),
-    [api, conversationId] // Callbacks are intentionally excluded to avoid churn
+    () =>
+      createChatStreamAdapter({
+        api,
+        conversationId,
+        headers,
+        onMetadata,
+        onStart,
+        onChunk,
+        onDone,
+        onError,
+      }),
+    [api, conversationId] // Callbacks intentionally excluded to avoid churn
   );
 
   return adapter;
 }
 
-// Export factory for advanced use cases
+// =============================================================================
+// Exports
+// =============================================================================
+
 export { createChatStreamAdapter };
+export type { ChatModelAdapter, ChatModelRunOptions };
+
+// Re-export types from Conversation for convenience
+export type { ChatMetadata, ChatData, ChatDone, ChatError } from "../types/Conversation";
