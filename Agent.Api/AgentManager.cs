@@ -1,4 +1,5 @@
 ﻿using Agent.Core.Abstractions;
+using Agent.Core.Implementations;
 using Agent.Core.Specialists;
 using Microsoft.Agents.AI;
 using StackExchange.Redis;
@@ -10,26 +11,25 @@ public class AgentManager
 {
 	private readonly IConnectionMultiplexer _redis;
 	private readonly ISemanticKernelBuilder _kernelBuilder;
+	private readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
 	private readonly ConcurrentDictionary<string, GeneralAgent> _agents = new();
-
-	public AgentManager(IConnectionMultiplexer redis, ISemanticKernelBuilder kernelBuilder)
+	private readonly ILoggerFactory _loggerFactory;
+	public AgentManager(IConnectionMultiplexer redis,
+		ILoggerFactory loggerFactory,
+		ISemanticKernelBuilder kernelBuilder,
+		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
 	{
 		_redis = redis;
+		_loggerFactory = loggerFactory;
 		_kernelBuilder = kernelBuilder;
-	}
-
-	public AIAgent GetAIAgent()
-	{
-		var agent = new GeneralAgent(null, _redis, _kernelBuilder);
-
-		return agent.GetAIAgent();
+		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 	}
 
 	public GeneralAgent GetOrCreate(string conversationId)
 	{
 		return _agents.GetOrAdd(conversationId, id =>
 		{
-			var agent = new GeneralAgent(null, _redis, _kernelBuilder);
+			var agent = new GeneralAgent(_loggerFactory.CreateLogger<GeneralAgent>(), _redis, _kernelBuilder, _postgresChatMessageStoreFactory);
 			agent.SetConversationId(id);
 			return agent;
 		});

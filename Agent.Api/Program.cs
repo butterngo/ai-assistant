@@ -1,10 +1,12 @@
 using Agent.Api;
+using Agent.Api.Endpoints;
 using Agent.Api.Extensions;
+using Agent.Core;
 using Agent.Core.Abstractions;
 using Agent.Core.Implementations;
 using Agent.Core.Options;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
-using Agent.Api.Endpoints;
 
 internal class Program
 {
@@ -29,8 +31,12 @@ internal class Program
 		services.AddOptions(configuration);
 
 		builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-			ConnectionMultiplexer.Connect(
-				builder.Configuration.GetValue<string>("Redis:Connection") ?? "localhost:6379"));
+			ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+
+		builder.Services.AddPostgresChatMessageStore(
+		 connectionString: configuration.GetConnectionString("Postgresql"),
+		 maxMessages: 50
+	 );
 
 		builder.Services.AddSingleton<ISemanticKernelBuilder>(sp =>
 		{

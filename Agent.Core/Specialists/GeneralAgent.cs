@@ -14,12 +14,15 @@ public class GeneralAgent : BaseAgent<GeneralAgent>
 	
 	private AgentThread _thread;
 
+	private readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
+
 	public GeneralAgent(ILogger<GeneralAgent> logger,
 		IConnectionMultiplexer redis,
-		ISemanticKernelBuilder semanticKernelBuilder) 
+		ISemanticKernelBuilder semanticKernelBuilder,
+		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
 		: base(logger, redis, semanticKernelBuilder)
 	{
-
+		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 	}
 
 	private ChatClientAgent CreateAgent() 
@@ -46,7 +49,9 @@ public class GeneralAgent : BaseAgent<GeneralAgent>
 
 			_agent = new ChatClientAgent(chatClient, Options);
 
-			var store = new RedisChatMessageStore(redis: _redis, threadId: ConversationId, maxMessages: 100);
+			//var store = new RedisChatMessageStore(redis: _redis, threadId: ConversationId, maxMessages: 100);
+
+			var store = _postgresChatMessageStoreFactory.Create();
 
 			_thread = _agent.GetNewThread(store);
 		}
