@@ -1,0 +1,123 @@
+/* src/components/rich-content/ToolCallUI.css */
+
+.tool-call {
+  margin: 12px 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #10b981;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f1f5f9;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.tool-header:hover {
+  background: #e2e8f0;
+}
+
+.tool-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-icon {
+  font-size: 16px;
+}
+
+.tool-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1e293b;
+  font-family: "Fira Code", monospace;
+}
+
+.tool-status {
+  font-size: 14px;
+}
+
+.expand-btn {
+  padding: 4px 8px;
+  font-size: 10px;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.expand-btn:hover {
+  color: #1e293b;
+}
+
+.tool-details {
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.tool-section {
+  margin-bottom: 16px;
+}
+
+.tool-section:last-child {
+  margin-bottom: 0;
+}
+
+.tool-section-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.tool-json {
+  margin: 0;
+  padding: 12px;
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 6px;
+  font-family: "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Status-based border colors */
+.tool-call[data-status="pending"] {
+  border-left-color: #f59e0b;
+}
+
+.tool-call[data-status="running"] {
+  border-left-color: #3b82f6;
+}
+
+.tool-call[data-status="success"] {
+  border-left-color: #10b981;
+}
+
+.tool-call[data-status="error"] {
+  border-left-color: #ef4444;
+}
+
+/* Running animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.tool-call[data-status="running"] .tool-status {
+  animation: pulse 1.5s infinite;
+}

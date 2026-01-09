@@ -1,0 +1,88 @@
+/* src/components/rich-content/CodeBlock.css */
+
+.code-block-wrapper {
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #404040;
+}
+
+.code-language {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #9ca3af;
+  background: transparent;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  background: #404040;
+  color: #ffffff;
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
+/* Syntax highlighter overrides */
+.syntax-highlighter {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #1e1e1e !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+.syntax-highlighter code {
+  font-family: "Fira Code", "Monaco", "Consolas", monospace !important;
+}
+
+/* Line numbers */
+.syntax-highlighter .linenumber {
+  min-width: 2.5em !important;
+  padding-right: 1em !important;
+  color: #6b7280 !important;
+  user-select: none;
+}
+
+/* Scrollbar for code blocks */
+.syntax-highlighter::-webkit-scrollbar {
+  height: 8px;
+}
+
+.syntax-highlighter::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+.syntax-highlighter::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.syntax-highlighter::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
