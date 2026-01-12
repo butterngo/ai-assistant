@@ -1,15 +1,14 @@
 ﻿using Agent.Core.Abstractions;
 using Agent.Core.Domains;
-using Agent.Core.Implementations;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace Agent.Api;
+namespace Agent.Core.Implementations;
 
-public class AgentManager
+public class AgentManager : IAgentManager
 {
-	private readonly IConnectionMultiplexer _redis;
 	private readonly ISemanticKernelBuilder _kernelBuilder;
 	private readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
 	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
@@ -21,7 +20,6 @@ public class AgentManager
 		IDbContextFactory<ChatDbContext> dbContextFactory,
 		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
 	{
-		_redis = redis;
 		_loggerFactory = loggerFactory;
 		_kernelBuilder = kernelBuilder;
 		_dbContextFactory = dbContextFactory;
@@ -35,6 +33,10 @@ public class AgentManager
 	{
 		var dbContext = _dbContextFactory.CreateDbContext();
 
+		if (string.IsNullOrEmpty(conversationId))
+		{
+			conversationId = Guid.NewGuid().ToString("n");
+		}
 		var thread = await dbContext.ChatThreads.AsNoTracking()
 			.FirstOrDefaultAsync(t => t.ThreadId == conversationId);
 
@@ -43,7 +45,7 @@ public class AgentManager
 			thread = new ChatThreadEntity
 			{
 				Id = Guid.NewGuid(),
-				ThreadId = Guid.NewGuid().ToString("n"),
+				ThreadId = conversationId,
 				Title = GenerateTitle(userMessage),
 				CreatedAt = DateTimeOffset.UtcNow,
 				UpdatedAt = DateTimeOffset.UtcNow
@@ -54,7 +56,9 @@ public class AgentManager
 			await dbContext.SaveChangesAsync(ct);
 		}
 
-		var agent = new GeneralAgent(_loggerFactory.CreateLogger<GeneralAgent>(), _redis, _kernelBuilder, _postgresChatMessageStoreFactory);
+		var agent = new GeneralAgent(_loggerFactory.CreateLogger<GeneralAgent>(),
+			_kernelBuilder,
+			_postgresChatMessageStoreFactory);
 
 		agent.SetConversationId(thread.ThreadId);
 

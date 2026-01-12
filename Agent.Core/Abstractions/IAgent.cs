@@ -4,7 +4,6 @@ namespace Agent.Core.Abstractions;
 
 public interface IAgent
 {
-	public AIAgent GetAIAgent();
 	public string Id { get; }
 	public string Name { get; }
 	void SetConversationId(string conversationId);

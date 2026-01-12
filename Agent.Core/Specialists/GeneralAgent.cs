@@ -3,26 +3,20 @@ using Agent.Core.Implementations;
 using Agent.Core.Models;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace Agent.Core.Specialists;
 
 public class GeneralAgent : BaseAgent<GeneralAgent>
 {
-	
 	private ChatClientAgent? _agent;
 	
 	private AgentThread _thread;
 
-	private readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
-
 	public GeneralAgent(ILogger<GeneralAgent> logger,
-		IConnectionMultiplexer redis,
 		ISemanticKernelBuilder semanticKernelBuilder,
 		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
-		: base(logger, redis, semanticKernelBuilder)
+		: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder)
 	{
-		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 	}
 
 	private ChatClientAgent CreateAgent() 
@@ -49,17 +43,13 @@ public class GeneralAgent : BaseAgent<GeneralAgent>
 
 			_agent = new ChatClientAgent(chatClient, Options);
 
-			//var store = new RedisChatMessageStore(redis: _redis, threadId: ConversationId, maxMessages: 100);
-
-			var store = _postgresChatMessageStoreFactory.Create();
+			var store = _postgresChatMessageStoreFactory.Create(GetState());
 
 			_thread = _agent.GetNewThread(store);
 		}
 		
 		return _agent;
 	}
-
-	public override AIAgent GetAIAgent() => _agent;
 
 	public override Task<AgentRunResponse> RunAsync(string userMessage, CancellationToken cancellationToken = default)
 	{

@@ -224,7 +224,7 @@ const ConversationGroup: FC<ConversationGroupProps> = ({
           key={conv.id}
           conversation={conv}
           isActive={conv.id === activeId || conv.threadId === activeId}
-          onSelect={() => onSelect(conv.threadId || conv.id)}
+          onSelect={() => onSelect(conv.id)}
           onDelete={() => onDelete(conv.id)}
         />
       ))}

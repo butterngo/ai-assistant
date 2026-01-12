@@ -1,4 +1,5 @@
 ﻿using Agent.Core.Implementations;
+using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -55,6 +56,14 @@ public static class ConfigurationServices
 			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<ChatDbContext>>();
 			return new PostgresChatMessageStoreFactory(dbContextFactory, maxMessages);
 		});
+
+		return services;
+	}
+
+	public static IServiceCollection AddAgents(
+		this IServiceCollection services)
+	{
+		services.AddTransient<GeneralAgent>();
 
 		return services;
 	}

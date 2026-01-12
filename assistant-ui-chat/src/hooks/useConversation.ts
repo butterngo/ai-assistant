@@ -1,17 +1,9 @@
 ﻿import { useState, useEffect, useCallback } from "react";
+import type { Conversation, Message } from "../types/Conversation";
 
 // =============================================================================
 // Types
 // =============================================================================
-
-export interface Conversation {
-  id: string;
-  threadId: string;
-  title: string | null;
-  createdAt: string;
-  updatedAt: string;
-  userId?: string;
-}
 
 export interface PagedResult<T> {
   items: T[];
@@ -19,6 +11,11 @@ export interface PagedResult<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface ConversationDetail extends Conversation {
+  messages: Message[];
+  messageCount: number;
 }
 
 export interface UseConversationsReturn {
@@ -33,6 +30,7 @@ export interface UseConversationsReturn {
   deleteConversation: (id: string) => Promise<void>;
   addConversation: (conversation: Conversation) => void;
   getConversation: (id: string) => Conversation | undefined;
+  loadConversationMessages: (id: string) => Promise<Message[]>;
 }
 
 // =============================================================================
@@ -72,6 +70,24 @@ export function useConversations(apiBase: string): UseConversationsReturn {
     fetchAll();
   }, [fetchAll]);
 
+  // Load messages for a specific conversation
+  const loadConversationMessages = useCallback(
+    async (id: string): Promise<Message[]> => {
+      const response = await fetch(`${apiBase}/conversations/${id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return [];
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data: ConversationDetail = await response.json();
+      return data.messages || [];
+    },
+    [apiBase]
+  );
+
   // Create a new conversation (via API - optional, since server creates on first message)
   const createConversation = useCallback(
     async (title?: string): Promise<Conversation> => {
@@ -98,7 +114,9 @@ export function useConversations(apiBase: string): UseConversationsReturn {
   const addConversation = useCallback((conversation: Conversation) => {
     setConversations((prev) => {
       // Check if already exists
-      const exists = prev.some((c) => c.id === conversation.id || c.threadId === conversation.threadId);
+      const exists = prev.some(
+        (c) => c.id === conversation.id || c.threadId === conversation.threadId
+      );
       if (exists) {
         return prev;
       }
@@ -164,5 +182,6 @@ export function useConversations(apiBase: string): UseConversationsReturn {
     deleteConversation,
     addConversation,
     getConversation,
+    loadConversationMessages,
   };
 }

@@ -1,5 +1,4 @@
 ﻿using Agent.Api.Models;
-using Agent.Core.Specialists;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -45,7 +44,6 @@ public static class ChatBotEndpoints
 		{
 			var (agent, thread) = await manager.GetOrCreateAsync(req.ConversationId, req.Message, ct);
 
-			
 			var metadata = new ChatMetadata
 			{
 				ConversationId = thread.ThreadId,

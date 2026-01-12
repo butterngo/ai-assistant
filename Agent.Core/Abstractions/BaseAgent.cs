@@ -1,6 +1,8 @@
-﻿using Microsoft.Agents.AI;
+﻿using Agent.Core.Implementations;
+using Microsoft.Agents.AI;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using System.Text.Json;
 
 namespace Agent.Core.Abstractions;
 
@@ -15,21 +17,32 @@ public abstract class BaseAgent<T> : IAgent
 
 	protected readonly ISemanticKernelBuilder _semanticKernelBuilder;
 
-	protected readonly IConnectionMultiplexer _redis;
+	protected readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
+
 	protected string ConversationId { get; set; }
+
+	private JsonElement? _state;
+
+	protected JsonElement GetState() 
+	{
+		if (!_state.HasValue)
+		{
+			_state = JsonSerializer.SerializeToElement(new { threadId = ConversationId });
+		}
+
+		return _state.Value;
+	}
 
 	protected ChatClientAgentOptions Options { get; set; }
 
-	public abstract AIAgent GetAIAgent();
-
 	public BaseAgent(ILogger<T> logger,
-		IConnectionMultiplexer redis,
+		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
 		ISemanticKernelBuilder semanticKernelBuilder) 
 	{
 		Id = Guid.NewGuid().ToString("N");
 		Name = typeof(T).Name;
 		_logger = logger;
-		_redis = redis;
+		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 		_semanticKernelBuilder = semanticKernelBuilder;
 		Options = new ChatClientAgentOptions
 		{
