@@ -1,11 +1,11 @@
-using Agent.Api;
 using Agent.Api.Endpoints;
 using Agent.Api.Extensions;
 using Agent.Core;
 using Agent.Core.Abstractions;
+using Agent.Core.Abstractions.LLM;
 using Agent.Core.Implementations;
+using Agent.Core.Implementations.LLM;
 using Agent.Core.Options;
-using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 internal class Program
@@ -46,7 +46,7 @@ internal class Program
 			return new SemanticKernelBuilder(options);
 		});
 
-		builder.Services.AddSingleton<AgentManager>();
+		builder.Services.AddSingleton<IAgentManager, AgentManager>();
 
 		var app = builder.Build();
 

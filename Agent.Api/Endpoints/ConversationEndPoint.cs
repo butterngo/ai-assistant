@@ -1,5 +1,5 @@
 ﻿using Agent.Api.DTOs;
-using Agent.Core.Implementations;
+using Agent.Core.Implementations.Persistents;
 using Microsoft.EntityFrameworkCore;
 
 namespace Agent.Api.Endpoints;

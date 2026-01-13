@@ -1,4 +1,5 @@
 ﻿using Agent.Api.Models;
+using Agent.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -25,7 +26,7 @@ public static class ChatBotEndpoints
 	private static async Task HandleChatStreamAsync(
 		HttpContext ctx,
 		[FromBody] ChatRequest req,
-		[FromServices] AgentManager manager,
+		[FromServices] IAgentManager manager,
 		CancellationToken ct)
 	{
 		if (string.IsNullOrWhiteSpace(req.Message))

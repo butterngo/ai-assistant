@@ -1,7 +1,7 @@
 ﻿using Agent.Core.Domains;
 using Microsoft.EntityFrameworkCore;
 
-namespace Agent.Core.Implementations;
+namespace Agent.Core.Implementations.Persistents;
 
 public class ChatDbContext : DbContext
 {

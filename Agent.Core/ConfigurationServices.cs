@@ -1,6 +1,8 @@
-﻿using Agent.Core.Implementations;
+﻿using Agent.Core.Implementations.Persistents;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Agent.Core;
@@ -56,6 +58,23 @@ public static class ConfigurationServices
 			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<ChatDbContext>>();
 			return new PostgresChatMessageStoreFactory(dbContextFactory, maxMessages);
 		});
+
+		return services;
+	}
+
+	public static IServiceCollection AddEmbeddings(
+		this IServiceCollection services)
+	{
+		//services.AddSingleton<ITextEmbeddingGenerationService>(sp =>
+		//{
+		//	var config = sp.GetRequiredService<IConfiguration>();
+
+		//	return new AzureOpenAITextEmbeddingGenerationService(
+		//		deploymentName: "text-embedding-ada-002", // or text-embedding-3-small
+		//		endpoint: config["AzureOpenAI:Endpoint"]!,
+		//		apiKey: config["AzureOpenAI:ApiKey"]!
+		//	);
+		//});
 
 		return services;
 	}

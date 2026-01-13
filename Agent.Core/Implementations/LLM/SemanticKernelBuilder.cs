@@ -1,11 +1,11 @@
-﻿using Agent.Core.Abstractions;
+﻿using Agent.Core.Abstractions.LLM;
 using Agent.Core.Options;
 using Anthropic.SDK;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Extensions.AI;
 
-namespace Agent.Core.Implementations;
+namespace Agent.Core.Implementations.LLM;
 
 public class SemanticKernelBuilder(LLMProviderOptions options) : ISemanticKernelBuilder
 {
@@ -48,5 +48,20 @@ public class SemanticKernelBuilder(LLMProviderOptions options) : ISemanticKernel
 			.Build();
 
 		return chatClient;
+	}
+
+	public IEmbeddingGenerator<string, Embedding<float>> GetEmbeddingGenerator(LLMProviderType provider = LLMProviderType.AzureOpenAI)
+	{
+
+		var azureClient = new AzureOpenAIClient(
+		   new Uri(options.AzureOpenAI.Endpoint),
+		   new Azure.AzureKeyCredential(options.AzureOpenAI.ApiKey)
+		);
+		
+		var embeddingClient = azureClient
+			.GetEmbeddingClient("text-embedding-3-small")
+			.AsIEmbeddingGenerator();
+		
+		return embeddingClient;
 	}
 }

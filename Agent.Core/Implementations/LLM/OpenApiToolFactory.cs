@@ -1,12 +1,12 @@
-﻿
-using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
 using System.Text.Json;
 using System.ComponentModel;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 
 
-namespace Agent.Core.Implementations;
+namespace Agent.Core.Implementations.LLM;
+
 public sealed class OpenApiToolFactory : IDisposable
 {
 	private readonly HttpClient _httpClient;

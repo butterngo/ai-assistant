@@ -1,11 +1,10 @@
 ﻿using Agent.Core.Domains;
-using Agent.Core.Implementations;
 using Microsoft.Agents.AI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using System.Text.Json;
 
-namespace Agent.Core.Implementations;
+namespace Agent.Core.Implementations.Persistents;
 
 public sealed class PostgresChatMessageStore : ChatMessageStore
 {

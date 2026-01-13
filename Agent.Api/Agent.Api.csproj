@@ -10,4 +10,10 @@
     <ProjectReference Include="..\Agent.Core\Agent.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\intent_classification.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

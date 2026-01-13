@@ -1,5 +1,8 @@
 ﻿using Agent.Core.Abstractions;
+using Agent.Core.Abstractions.LLM;
 using Agent.Core.Implementations;
+using Agent.Core.Implementations.LLM;
+using Agent.Core.Implementations.Persistents;
 using Agent.Core.Models;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.Logging;

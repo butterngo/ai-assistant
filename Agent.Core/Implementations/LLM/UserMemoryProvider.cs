@@ -4,7 +4,7 @@ using Microsoft.Extensions.AI;
 using System.Text;
 using System.Text.Json;
 
-namespace Agent.Core.Implementations;
+namespace Agent.Core.Implementations.LLM;
 
 public sealed class UserMemoryProvider : AIContextProvider
 {

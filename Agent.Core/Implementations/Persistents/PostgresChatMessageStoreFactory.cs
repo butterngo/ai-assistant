@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace Agent.Core.Implementations;
+namespace Agent.Core.Implementations.Persistents;
 
 public class PostgresChatMessageStoreFactory
 {
