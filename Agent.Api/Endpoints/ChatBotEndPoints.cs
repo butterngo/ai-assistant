@@ -1,5 +1,6 @@
 ﻿using Agent.Api.Models;
 using Agent.Core.Abstractions;
+using Agent.Core.Abstractions.LLM;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -20,8 +21,57 @@ public static class ChatBotEndpoints
 			.Produces(StatusCodes.Status200OK, contentType: "text/event-stream")
 			.Produces(StatusCodes.Status400BadRequest);
 
+		endpoints.MapPost("/chat", HandleChatAsync)
+			.WithTags("Chat")
+			.WithSummary("chat response with json")
+			.Produces(StatusCodes.Status200OK, contentType: "application/json")
+			.Produces(StatusCodes.Status400BadRequest);
+
+		endpoints.MapPost("/test-emmbedded", async (HttpContext ctx,
+		[FromBody] ChatRequest req, 
+		[FromServices] ISemanticKernelBuilder semanticKernelBuilder,
+		[FromServices] IAgentManager manager,
+		CancellationToken ct) =>
+		{
+			//var embedding = semanticKernelBuilder.GetEmbeddingGenerator();
+
+			//return Results.Ok(await embedding.GenerateAsync(new string[] { req.Message }));
+
+			return Results.Ok(await manager.DryRunAsync(req.Message, ct));
+		});
+
 		return endpoints;
 	}
+
+	private static async Task HandleChatAsync(
+		HttpContext ctx,
+		[FromBody] ChatRequest req,
+		[FromServices] IAgentManager manager,
+		CancellationToken ct)
+	{
+		if (string.IsNullOrWhiteSpace(req.Message))
+		{
+			ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
+			await ctx.Response.WriteAsJsonAsync(new { error = "Message required" }, ct);
+			return;
+		}
+
+		try
+		{
+			var (agent, thread) = await manager.GetOrCreateAsync(req.ConversationId, req.Message, ct);
+
+		}
+		catch (Exception ex)
+		{
+			var error = new ChatError
+			{
+				Error = ex.Message,
+				Code = "INTERNAL_ERROR"
+			};
+			await WriteEventAsync(ctx.Response, "error", error, ct);
+		}
+	}
+
 
 	private static async Task HandleChatStreamAsync(
 		HttpContext ctx,

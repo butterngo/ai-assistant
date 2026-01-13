@@ -8,4 +8,6 @@ public interface IAgentManager
 	Task<(GeneralAgent agent, ChatThreadEntity thread)> GetOrCreateAsync(string? conversationId,
 		string userMessage,
 		CancellationToken ct = default);
+
+	Task<object> DryRunAsync(string userMessage, CancellationToken ct = default);
 }

@@ -1,9 +1,15 @@
-﻿using Agent.Core.Implementations.Persistents;
+﻿using Agent.Core.Abstractions;
+using Agent.Core.Abstractions.LLM;
+using Agent.Core.Abstractions.Persistents;
+using Agent.Core.Implementations;
+using Agent.Core.Implementations.LLM;
+using Agent.Core.Implementations.Persistents;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Qdrant.Client;
 
 namespace Agent.Core;
 
@@ -43,9 +49,6 @@ public static class ConfigurationServices
 		return services;
 	}
 
-	/// <summary>
-	/// Adds PostgreSQL-backed ChatMessageStore with custom DbContext configuration.
-	/// </summary>
 	public static IServiceCollection AddPostgresChatMessageStore(
 		this IServiceCollection services,
 		Action<DbContextOptionsBuilder> configureDbContext,
@@ -62,27 +65,48 @@ public static class ConfigurationServices
 		return services;
 	}
 
-	public static IServiceCollection AddEmbeddings(
-		this IServiceCollection services)
+	public static IServiceCollection AddVectorDB(this IServiceCollection services, IConfiguration configuration)
 	{
-		//services.AddSingleton<ITextEmbeddingGenerationService>(sp =>
-		//{
-		//	var config = sp.GetRequiredService<IConfiguration>();
+		var qdrantConnectionString = configuration.GetConnectionString("Qdrant");
 
-		//	return new AzureOpenAITextEmbeddingGenerationService(
-		//		deploymentName: "text-embedding-ada-002", // or text-embedding-3-small
-		//		endpoint: config["AzureOpenAI:Endpoint"]!,
-		//		apiKey: config["AzureOpenAI:ApiKey"]!
-		//	);
-		//});
+		if (string.IsNullOrEmpty(qdrantConnectionString)) 
+		{
+			throw new InvalidOperationException("Qdrant connection string is not configured.");
+		}
+
+		services.AddSingleton(sp => new QdrantClient(new Uri(qdrantConnectionString)));
+
+		services.AddQdrantVectorStore(clientProvider: (p) =>
+		{
+			var qdrantClient = p.GetRequiredService<QdrantClient>();
+			return qdrantClient;
+		},
+			optionsProvider: p =>
+			{
+				var semanticKernelBuilder = p.GetRequiredService<ISemanticKernelBuilder>();
+
+				var embeddingGenerator = semanticKernelBuilder.GetEmbeddingGenerator();
+
+				return new QdrantVectorStoreOptions
+				{
+					EmbeddingGenerator = embeddingGenerator
+				};
+			});
+
+		services.AddScoped<IIntentClassificationRepository, IntentClassificationRepository>();
 
 		return services;
 	}
 
 	public static IServiceCollection AddAgents(
-		this IServiceCollection services)
+		this IServiceCollection services,
+		IConfiguration configuration)
 	{
+
 		services.AddTransient<GeneralAgent>();
+		services.AddScoped<IIntentClassificationService, IntentClassificationService>();
+		services.AddScoped<IAgentManager, AgentManager>();
+		
 
 		return services;
 	}

@@ -30,8 +30,8 @@ internal class Program
 
 		services.AddOptions(configuration);
 
-		builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-			ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+		//builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+		//	ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
 
 		builder.Services.AddPostgresChatMessageStore(
 		 connectionString: configuration.GetConnectionString("Postgresql"),
@@ -46,7 +46,9 @@ internal class Program
 			return new SemanticKernelBuilder(options);
 		});
 
-		builder.Services.AddSingleton<IAgentManager, AgentManager>();
+		builder.Services.AddVectorDB(configuration);
+
+		builder.Services.AddAgents(configuration);
 
 		var app = builder.Build();
 

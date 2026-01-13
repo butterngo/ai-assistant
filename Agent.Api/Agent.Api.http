@@ -1,6 +1,9 @@
-@Agent.Api_HostAddress = http://localhost:5284
+@Agent.Api_HostAddress = http://localhost:5050
 
-GET {{Agent.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
+POST {{Agent.Api_HostAddress}}/test-emmbedded/
+Content-Type: application/json
+{
+    "message": "I want to clearify and create roadmap for 2026",
+    "conversationId": "111"
+}
 ###

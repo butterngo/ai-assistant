@@ -22,13 +22,37 @@
 - Risk management or stakeholder communication
 - Budget planning or project cost estimation
 - Creating or updating project documentation
+- Team coordination and task assignment
+- Progress tracking and reporting
 
 **Examples:**
 - "Help me plan the next sprint"
 - "What's the team capacity for Q2?"
 - "Create a risk assessment for the database migration project"
+- "How do we track progress on the current sprint?"
 
-### 3. SoftwareArchitect
+### 3. ProductOwner
+**Use when:**
+- Product vision and strategy definition
+- Feature prioritization and roadmap planning
+- User story creation and refinement
+- Stakeholder requirements gathering
+- Product backlog management and grooming
+- Acceptance criteria definition
+- Market research and competitive analysis
+- User feedback and product analytics
+- ROI and business value assessment
+- Release planning and go-to-market strategy
+
+**Examples:**
+- "What features should we prioritize for the next release?"
+- "Help me write user stories for the checkout flow"
+- "How do we measure the success of this feature?"
+- "Create a product roadmap for Q2"
+- "What's the business value of implementing this feature?"
+- "Help me define acceptance criteria for the payment integration"
+
+### 4. SoftwareArchitect
 **Use when:**
 - System design patterns or architectural decisions
 - Technology stack selection or evaluation
@@ -44,7 +68,7 @@
 - "Design a high-availability system for our API"
 - "How should we implement database isolation?"
 
-### 4. Developer
+### 5. Developer
 **Use when:**
 - Writing, debugging, or reviewing code
 - Implementation details for specific features
@@ -87,8 +111,26 @@
 ### Edge Cases
 
 **Multi-domain requests**: Route to the specialist handling the PRIMARY concern
+
 - "Design a microservice architecture and estimate the timeline" → SoftwareArchitect (0.7)
   - Reason: Architecture is the core technical challenge; timeline is secondary
+
+- "What features should we build and how long will they take?" → ProductOwner (0.75)
+  - Reason: Feature selection and prioritization is the primary concern; timeline is secondary
+
+**ProductOwner vs ProjectManager distinction**:
+- **ProductOwner**: Focuses on WHAT to build and WHY (features, user value, business goals, prioritization)
+- **ProjectManager**: Focuses on HOW and WHEN to deliver (execution, team coordination, timelines, resources)
+
+Examples:
+- "Help me prioritize features for next quarter" → ProductOwner (0.9)
+  - Reason: Feature prioritization is product management responsibility
+  
+- "Help me schedule the development of these features" → ProjectManager (0.85)
+  - Reason: Scheduling and resource planning is project management responsibility
+
+- "Create a product roadmap with timelines" → ProductOwner (0.7)
+  - Reason: Roadmap is primarily product strategy, though timelines involve both roles
 
 **Vague requests**: Default to None for clarification
 - "Help me with the project" → None (0.6)
@@ -99,21 +141,31 @@
 - Current: "How long will that take?" → ProjectManager (0.8)
   - Reason: Shifts from technical design to timeline estimation
 
+- Previous: "What features are most important?"
+- Current: "How do we implement the top feature?" → Developer (0.75)
+  - Reason: Shifts from product strategy to technical implementation
+
+## Key Distinctions Between Similar Roles
+
+### ProductOwner vs ProjectManager
+| Aspect | ProductOwner | ProjectManager |
+|--------|--------------|----------------|
+| **Focus** | Product vision, features, value | Execution, delivery, coordination |
+| **Questions** | What? Why? For whom? | How? When? With what resources? |
+| **Artifacts** | User stories, roadmap, backlog | Sprint plans, timelines, status reports |
+| **Metrics** | User satisfaction, business value, adoption | Velocity, burndown, on-time delivery |
+
+### ProductOwner vs SoftwareArchitect
+| Aspect | ProductOwner | SoftwareArchitect |
+|--------|--------------|-------------------|
+| **Concern** | User-facing features and value | Technical design and system structure |
+| **Example** | "We need a mobile payment feature" | "How should we integrate the payment gateway?" |
+
 ## Response Format
 
 Return JSON with this exact structure:
-```json
 {
-  "specialist": "SoftwareArchitect",
-  "reason": "Request involves architectural design decisions for system scalability and database patterns, requiring deep technical architecture expertise.",
+  "specialist": "ProductOwner",
+  "reason": "Request involves feature prioritization and product roadmap planning, requiring product management expertise to assess business value and user needs.",
   "confidence": 0.85
 }
-```
-
-## Quality Checklist
-
-Before returning classification:
-- [ ] Is the specialist choice justifiable?
-- [ ] Does the reason clearly explain the decision?
-- [ ] Is confidence score realistic and aligned with ambiguity level?
-- [ ] Would a domain expert agree with this routing?
