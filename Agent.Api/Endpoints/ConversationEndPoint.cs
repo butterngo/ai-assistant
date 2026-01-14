@@ -1,4 +1,4 @@
-﻿using Agent.Api.DTOs;
+﻿using Agent.Api.Models;
 using Agent.Core.Implementations.Persistents;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,18 +8,18 @@ public static class ConversationEndpoints
 {
 	public static IEndpointRouteBuilder MapConversations(this IEndpointRouteBuilder endpoints)
 	{
-		var group = endpoints.MapGroup("/conversations")
+		var group = endpoints.MapGroup("/api/conversations")
 			.WithTags("Conversations");
 
 		group.MapGet("/", GetAllConversationsAsync)
 			.WithName("GetConversations")
 			.WithSummary("Get all conversation threads")
-			.Produces<List<ConversationDto>>(StatusCodes.Status200OK);
+			.Produces<List<ConversationResponse>>(StatusCodes.Status200OK);
 
 		group.MapGet("/{id:guid}", GetConversationByIdAsync)
 			.WithName("GetConversationById")
 			.WithSummary("Get a conversation thread with its messages")
-			.Produces<ConversationDetailDto>(StatusCodes.Status200OK)
+			.Produces<ConversationDetailResponse>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound);
 
 		group.MapDelete("/{id:guid}", DeleteConversationAsync)
@@ -46,7 +46,7 @@ public static class ConversationEndpoints
 			.OrderByDescending(t => t.UpdatedAt)
 			.Skip(skip)
 			.Take(pageSize)
-			.Select(t => new ConversationDto
+			.Select(t => new ConversationResponse
 			{
 				Id = t.Id,
 				ThreadId = t.ThreadId,
@@ -59,7 +59,7 @@ public static class ConversationEndpoints
 
 		var totalCount = await dbContext.ChatThreads.CountAsync(cancellationToken);
 
-		return Results.Ok(new PagedResult<ConversationDto>
+		return Results.Ok(new PagedResult<ConversationResponse>
 		{
 			Items = conversations,
 			TotalCount = totalCount,
@@ -90,7 +90,7 @@ public static class ConversationEndpoints
 			.AsNoTracking()
 			.Where(m => m.ThreadId == thread.ThreadId)
 			.OrderBy(m => m.SequenceNumber)
-			.Select(m => new MessageDto
+			.Select(m => new MessageResponse
 			{
 				Id = m.Id,
 				MessageId = m.MessageId,
@@ -101,7 +101,7 @@ public static class ConversationEndpoints
 			})
 			.ToListAsync(cancellationToken);
 
-		var result = new ConversationDetailDto
+		var result = new ConversationDetailResponse
 		{
 			Id = thread.Id,
 			ThreadId = thread.ThreadId,

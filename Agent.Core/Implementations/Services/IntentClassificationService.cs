@@ -1,19 +1,21 @@
-﻿using Agent.Core.Models;
-using Microsoft.Agents.AI;
-using Agent.Core.Abstractions.LLM;
+﻿using Agent.Core.Abstractions.LLM;
 using Agent.Core.Abstractions.Persistents;
+using Agent.Core.Implementations.Persistents.Vectors;
+using Agent.Core.Models;
+using Agent.Core.VectorRecords;
+using Microsoft.Agents.AI;
 
-namespace Agent.Core.Implementations.LLM
+namespace Agent.Core.Implementations.Services
 {
 	internal class IntentClassificationService(ISemanticKernelBuilder semanticKernelBuilder,
-		IIntentClassificationRepository intentClassificationRepository)
+		IQdrantRepository<IntentClassificationRecord> qdrantRepository)
 		: IIntentClassificationService
 	{
 
 		public async Task<IntentClassificationResult> IntentAsync(string userMessage,
 			CancellationToken cancellationToken)
 		{
-			var records = await intentClassificationRepository.SearchAsync(userMessage, top: 1,
+			var records = await qdrantRepository.SearchAsync(userMessage, top: 1,
 				cancellationToken: cancellationToken);
 
 			if (records.Any()) 
@@ -40,7 +42,7 @@ namespace Agent.Core.Implementations.LLM
 			{ 
 				var record = IntentClassificationRecord.Create(userMessage, intentClassificationResult);
 
-				await intentClassificationRepository.UpsetAsync(record, cancellationToken);
+				await qdrantRepository.UpsertAsync(record, cancellationToken);
 			}
 
 			return intentClassificationResult!;

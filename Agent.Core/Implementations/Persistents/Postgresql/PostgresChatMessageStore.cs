@@ -1,8 +1,8 @@
-﻿using Agent.Core.Domains;
+﻿using System.Text.Json;
+using Agent.Core.Entities;
 using Microsoft.Agents.AI;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Agent.Core.Implementations.Persistents;
 

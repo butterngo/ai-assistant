@@ -1,4 +1,4 @@
-﻿namespace Agent.Api.DTOs;
+﻿namespace Agent.Api.Models;
 
 public class PagedResult<T>
 {

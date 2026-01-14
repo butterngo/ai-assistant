@@ -1,6 +1,6 @@
 ﻿using Agent.Core.Abstractions;
 using Agent.Core.Abstractions.LLM;
-using Agent.Core.Domains;
+using Agent.Core.Entities;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;

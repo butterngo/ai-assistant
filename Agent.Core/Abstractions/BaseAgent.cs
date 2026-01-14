@@ -2,7 +2,6 @@
 using Agent.Core.Implementations.Persistents;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 using System.Text.Json;
 
 namespace Agent.Core.Abstractions;
@@ -34,7 +33,9 @@ public abstract class BaseAgent<T> : IAgent
 		return _state.Value;
 	}
 
-	protected ChatClientAgentOptions Options { get; set; }
+	protected readonly ChatClientAgent _agent;
+
+	protected readonly AgentThread _thread;
 
 	public BaseAgent(ILogger<T> logger,
 		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
@@ -45,17 +46,28 @@ public abstract class BaseAgent<T> : IAgent
 		_logger = logger;
 		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 		_semanticKernelBuilder = semanticKernelBuilder;
-		Options = new ChatClientAgentOptions
+
+		(_agent, _thread) = CreateAgent(new ChatClientAgentOptions
 		{
 			Name = Name
-		};
+		});
 	}
 
-	public abstract IAsyncEnumerable<AgentRunResponseUpdate> RunStreamingAsync(string userMessage,
-		CancellationToken cancellationToken = default);
+	protected abstract (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options);
 
-	public abstract Task<AgentRunResponse> RunAsync(string userMessage,
-		CancellationToken cancellationToken = default);
+	public virtual Task<AgentRunResponse> RunAsync(string userMessage, CancellationToken cancellationToken = default)
+	{
+		return _agent.RunAsync(message: userMessage,
+			thread: _thread,
+			cancellationToken: cancellationToken);
+	}
+
+	public virtual IAsyncEnumerable<AgentRunResponseUpdate> RunStreamingAsync(string userMessage, CancellationToken cancellationToken = default)
+	{
+		return _agent.RunStreamingAsync(message: userMessage,
+			thread: _thread,
+			cancellationToken: cancellationToken);
+	}
 
 	public void SetConversationId(string conversationId)
 	{

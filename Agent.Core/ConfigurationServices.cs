@@ -4,7 +4,9 @@ using Agent.Core.Abstractions.Persistents;
 using Agent.Core.Implementations;
 using Agent.Core.Implementations.LLM;
 using Agent.Core.Implementations.Persistents;
+using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Specialists;
+using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,7 +71,7 @@ public static class ConfigurationServices
 	{
 		var qdrantConnectionString = configuration.GetConnectionString("Qdrant");
 
-		if (string.IsNullOrEmpty(qdrantConnectionString)) 
+		if (string.IsNullOrEmpty(qdrantConnectionString))
 		{
 			throw new InvalidOperationException("Qdrant connection string is not configured.");
 		}
@@ -93,7 +95,21 @@ public static class ConfigurationServices
 				};
 			});
 
-		services.AddScoped<IIntentClassificationRepository, IntentClassificationRepository>();
+		QdrantRepository<T> Create<T>(IServiceProvider p, string vectorName) 
+			where T : QdrantRecordBase, IVectorRecord
+		{
+			QdrantVectorStore vectorStore = p.GetRequiredService<QdrantVectorStore>();
+			ISemanticKernelBuilder semanticKernelBuilder = p.GetRequiredService<ISemanticKernelBuilder>();
+			return new QdrantRepository<T>(vectorStore, semanticKernelBuilder, QdrantCollections.IntentClassifications);
+		}
+
+		services.AddScoped<IQdrantRepository<IntentClassificationRecord>>(p => Create<IntentClassificationRecord>(p, QdrantCollections.IntentClassifications));
+
+		services.AddScoped<IQdrantRepository<SkillRoutingRecord>>(p => Create<SkillRoutingRecord>(p, QdrantCollections.SkillRouting));
+
+		services.AddScoped<IQdrantRepository<KnowledgeBaseRecord>>(p => Create<KnowledgeBaseRecord>(p, QdrantCollections.KnowledgeBase));
+
+		services.AddScoped<IQdrantRepository<CachedAnswerRecord>>(p => Create<CachedAnswerRecord>(p, QdrantCollections.CachedAnswers));
 
 		return services;
 	}

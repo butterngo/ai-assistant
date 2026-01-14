@@ -1,4 +1,4 @@
-﻿using Agent.Core.Domains;
+﻿using Agent.Core.Entities;
 using Agent.Core.Specialists;
 
 namespace Agent.Core.Abstractions;

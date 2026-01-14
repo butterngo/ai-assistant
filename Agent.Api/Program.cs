@@ -1,12 +1,9 @@
+using Agent.Core;
+using Agent.Core.Options;
 using Agent.Api.Endpoints;
 using Agent.Api.Extensions;
-using Agent.Core;
-using Agent.Core.Abstractions;
 using Agent.Core.Abstractions.LLM;
-using Agent.Core.Implementations;
 using Agent.Core.Implementations.LLM;
-using Agent.Core.Options;
-using StackExchange.Redis;
 
 internal class Program
 {
@@ -57,6 +54,8 @@ internal class Program
 		app.MapChatBot();
 
 		app.MapConversations();
+
+		app.MapSkills();
 
 		app.Run();
 	}

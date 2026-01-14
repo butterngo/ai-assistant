@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Agent.Core.Domains;
+namespace Agent.Core.Entities;
 
 [Table("chat_messages")]
 public class ChatMessageEntity
