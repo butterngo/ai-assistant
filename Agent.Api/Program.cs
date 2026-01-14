@@ -45,6 +45,8 @@ internal class Program
 
 		builder.Services.AddVectorDB(configuration);
 
+		builder.Services.AddServices();
+
 		builder.Services.AddAgents(configuration);
 
 		var app = builder.Build();

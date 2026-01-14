@@ -14,10 +14,10 @@ public class SkillService : ISkillService
 	private readonly IQdrantRepository<SkillRoutingRecord> _skillRoutingRepo;
 
 	public SkillService(
-		ChatDbContext dbContext,
+		IDbContextFactory<ChatDbContext> dbContextFactory,
 		IQdrantRepository<SkillRoutingRecord> skillRoutingRepo)
 	{
-		_dbContext = dbContext;
+		_dbContext = dbContextFactory.CreateDbContext();
 		_skillRoutingRepo = skillRoutingRepo;
 	}
 

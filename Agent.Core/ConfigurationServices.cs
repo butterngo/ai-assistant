@@ -2,9 +2,9 @@
 using Agent.Core.Abstractions.LLM;
 using Agent.Core.Abstractions.Persistents;
 using Agent.Core.Implementations;
-using Agent.Core.Implementations.LLM;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.Implementations.Persistents.Vectors;
+using Agent.Core.Implementations.Services;
 using Agent.Core.Specialists;
 using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +113,13 @@ public static class ConfigurationServices
 
 		return services;
 	}
+	public static IServiceCollection AddServices(
+		this IServiceCollection services)
+	{
+		services.AddScoped<IIntentClassificationService, IntentClassificationService>();
+		services.AddScoped<ISkillService, SkillService>();
+		return services;
+	}
 
 	public static IServiceCollection AddAgents(
 		this IServiceCollection services,
@@ -120,7 +127,7 @@ public static class ConfigurationServices
 	{
 
 		services.AddTransient<GeneralAgent>();
-		services.AddScoped<IIntentClassificationService, IntentClassificationService>();
+
 		services.AddScoped<IAgentManager, AgentManager>();
 		
 

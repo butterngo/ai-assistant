@@ -17,7 +17,7 @@ export async function conversationLoader({
   }
 
   try {
-    const response = await fetch(`${API_BASE}/conversations/${conversationId}`);
+    const response = await fetch(`${API_BASE}/api/conversations/${conversationId}`);
 
     if (!response.ok) {
       if (response.status === 404) {

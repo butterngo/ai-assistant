@@ -30,7 +30,6 @@ export interface UseConversationsReturn {
   deleteConversation: (id: string) => Promise<void>;
   addConversation: (conversation: Conversation) => void;
   getConversation: (id: string) => Conversation | undefined;
-  loadConversationMessages: (id: string) => Promise<Message[]>;
 }
 
 // =============================================================================
@@ -49,7 +48,7 @@ export function useConversations(apiBase: string): UseConversationsReturn {
     setError(null);
 
     try {
-      const response = await fetch(`${apiBase}/conversations?pageSize=100`);
+      const response = await fetch(`${apiBase}/api/conversations?pageSize=100`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -70,28 +69,10 @@ export function useConversations(apiBase: string): UseConversationsReturn {
     fetchAll();
   }, [fetchAll]);
 
-  // Load messages for a specific conversation
-  const loadConversationMessages = useCallback(
-    async (id: string): Promise<Message[]> => {
-      const response = await fetch(`${apiBase}/conversations/${id}`);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          return [];
-        }
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data: ConversationDetail = await response.json();
-      return data.messages || [];
-    },
-    [apiBase]
-  );
-
   // Create a new conversation (via API - optional, since server creates on first message)
   const createConversation = useCallback(
     async (title?: string): Promise<Conversation> => {
-      const response = await fetch(`${apiBase}/conversations`, {
+      const response = await fetch(`${apiBase}/api/conversations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title }),
@@ -144,7 +125,7 @@ export function useConversations(apiBase: string): UseConversationsReturn {
   // Delete conversation
   const deleteConversation = useCallback(
     async (id: string) => {
-      const response = await fetch(`${apiBase}/conversations/${id}`, {
+      const response = await fetch(`${apiBase}/api/conversations/${id}`, {
         method: "DELETE",
       });
 
@@ -181,7 +162,6 @@ export function useConversations(apiBase: string): UseConversationsReturn {
     updateConversation,
     deleteConversation,
     addConversation,
-    getConversation,
-    loadConversationMessages,
+    getConversation
   };
 }
