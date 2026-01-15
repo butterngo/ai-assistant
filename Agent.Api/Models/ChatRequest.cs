@@ -17,6 +17,7 @@ public class ChatMetadata
 /// </summary>
 public class ChatData
 {
+	public bool IsStreaming { get; set; } = true;
 	public Guid ThreadId { get; set; }
 	public string Text { get; set; } = string.Empty;
 }
@@ -26,6 +27,7 @@ public class ChatData
 /// </summary>
 public class ChatDone
 {
+	public bool IsStreaming { get; set; } = false;
 	public bool IsNewConversation { get; set; }
 	public Guid ThreadId { get; set; }
 	public string? Title { get; set; }

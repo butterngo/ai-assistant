@@ -33,7 +33,7 @@ interface ThreadProps {
 // =============================================================================
 // Main Thread Component
 // =============================================================================
-export const Thread: FC<ThreadProps> = ({ onToggleSidebar, sidebarOpen }) => {
+export const Thread: FC<ThreadProps> = ({ onToggleSidebar, sidebarOpen, isStreaming }) => {
   return (
     <ThreadPrimitive.Root className="thread-root">
       {/* Header */}
@@ -63,7 +63,7 @@ export const Thread: FC<ThreadProps> = ({ onToggleSidebar, sidebarOpen }) => {
 
         <ThreadPrimitive.ViewportFooter className="viewport-footer">
           <ThreadScrollToBottom />
-          <Composer />
+          <Composer isStreaming={isStreaming} />
           <div className="footer-note">
             AI can make mistakes. Please verify important information.
           </div>
@@ -139,13 +139,18 @@ const ThreadScrollToBottom: FC = () => {
 // =============================================================================
 // Composer
 // =============================================================================
-const Composer: FC = () => {
+interface ComposerProps {
+  isStreaming?: boolean;
+}
+
+const Composer: FC<ComposerProps> = ({ isStreaming = false }) => {
   return (
     <ComposerPrimitive.Root className="composer-root">
       <ComposerPrimitive.Input
         placeholder="Message AI Assistant..."
         className="composer-input"
         autoFocus
+        disabled={isStreaming}
       />
       <ComposerPrimitive.Send className="composer-send">
         <SendIcon size={18} />
@@ -189,6 +194,19 @@ const UserActionBar: FC = () => {
 };
 
 // =============================================================================
+// Loading Indicator - Typing dots animation
+// =============================================================================
+const LoadingIndicator: FC = () => {
+  return (
+    <div className="loading-indicator">
+      <span className="loading-dot" />
+      <span className="loading-dot" />
+      <span className="loading-dot" />
+    </div>
+  );
+};
+
+// =============================================================================
 // Assistant Message - Claude style (left aligned, no bubble)
 // =============================================================================
 const AssistantMessage: FC = () => {
@@ -204,10 +222,15 @@ const AssistantMessage: FC = () => {
         </div>
         <div className="message-content-wrapper">
           <div className="message-header">
-            <span className="message-author">Claude</span>
+            <span className="message-author">Butter Assistant</span>
           </div>
           <div className="message-content">
+          <MessagePrimitive.If hasContent={false}>
+            <LoadingIndicator />
+          </MessagePrimitive.If>
+          <MessagePrimitive.If hasContent>
             <MessagePrimitive.Content components={{ Text: MarkdownText }} />
+          </MessagePrimitive.If>
           </div>
           <div className="message-footer">
             <AssistantActionBar />
