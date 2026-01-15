@@ -3,7 +3,6 @@
 	public class ConversationResponse
 	{
 		public Guid Id { get; set; }
-		public string ThreadId { get; set; } = string.Empty;
 		public string? Title { get; set; }
 		public DateTimeOffset CreatedAt { get; set; }
 		public DateTimeOffset UpdatedAt { get; set; }
@@ -13,7 +12,6 @@
 	public class MessageResponse
 	{
 		public Guid Id { get; set; }
-		public string MessageId { get; set; } = string.Empty;
 		public string Role { get; set; } = string.Empty;
 		public string Content { get; set; } = string.Empty;
 		public DateTimeOffset CreatedAt { get; set; }

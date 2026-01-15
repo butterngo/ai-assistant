@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Agent.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
-using Agent.Core.Abstractions.LLM;
 
 namespace Agent.Api.Endpoints;
 
@@ -45,7 +44,7 @@ public static class ChatBotEndpoints
 
 		try
 		{
-			var (agent, thread) = await manager.GetOrCreateAsync(req.ConversationId, req.Message, ct);
+			var (agent, thread,_) = await manager.GetOrCreateAsync(req.threadId, req.Message, ct);
 
 		}
 		catch (Exception ex)
@@ -80,11 +79,12 @@ public static class ChatBotEndpoints
 
 		try
 		{
-			var (agent, thread) = await manager.GetOrCreateAsync(req.ConversationId, req.Message, ct);
+			var (agent, thread, isNewConversation) = await manager.GetOrCreateAsync(req.threadId, req.Message, ct);
 
 			var metadata = new ChatMetadata
 			{
-				ConversationId = thread.ThreadId,
+				IsNewConversation = isNewConversation,
+				ThreadId = thread.Id,
 				Title = thread.Title
 			};
 
@@ -96,7 +96,7 @@ public static class ChatBotEndpoints
 				{
 					var data = new ChatData
 					{
-						ConversationId = thread.ThreadId,
+						ThreadId = thread.Id,
 						Text = update.Text
 					};
 
@@ -106,7 +106,8 @@ public static class ChatBotEndpoints
 
 			var doneEvent = new ChatDone
 			{
-				ConversationId = thread.ThreadId,
+				IsNewConversation = isNewConversation,
+				ThreadId = thread.Id,
 				Title = thread.Title
 			};
 

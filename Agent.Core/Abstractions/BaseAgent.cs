@@ -21,16 +21,9 @@ public abstract class BaseAgent<T> : IAgent
 
 	protected string ConversationId { get; set; }
 
-	private JsonElement? _state;
-
-	protected JsonElement GetState() 
+	public void SetConversationId(string conversationId)
 	{
-		if (!_state.HasValue)
-		{
-			_state = JsonSerializer.SerializeToElement(new { threadId = ConversationId });
-		}
-
-		return _state.Value;
+		ConversationId = conversationId;
 	}
 
 	protected readonly ChatClientAgent _agent;
@@ -39,7 +32,8 @@ public abstract class BaseAgent<T> : IAgent
 
 	public BaseAgent(ILogger<T> logger,
 		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
-		ISemanticKernelBuilder semanticKernelBuilder) 
+		ISemanticKernelBuilder semanticKernelBuilder,
+		Func<JsonElement> func) 
 	{
 		Id = Guid.NewGuid().ToString("N");
 		Name = typeof(T).Name;
@@ -50,10 +44,10 @@ public abstract class BaseAgent<T> : IAgent
 		(_agent, _thread) = CreateAgent(new ChatClientAgentOptions
 		{
 			Name = Name
-		});
+		}, func);
 	}
 
-	protected abstract (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options);
+	protected abstract (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options, Func<JsonElement> func);
 
 	public virtual Task<AgentRunResponse> RunAsync(string userMessage, CancellationToken cancellationToken = default)
 	{
@@ -67,10 +61,5 @@ public abstract class BaseAgent<T> : IAgent
 		return _agent.RunStreamingAsync(message: userMessage,
 			thread: _thread,
 			cancellationToken: cancellationToken);
-	}
-
-	public void SetConversationId(string conversationId)
-	{
-		ConversationId = conversationId;
 	}
 }

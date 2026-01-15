@@ -15,7 +15,7 @@ export const router = createBrowserRouter([
       },
       {
         // Existing conversation
-        path: "conversation/:conversationId",
+        path: "conversation/:threadId",
         element: <ChatPage />,
         loader: conversationLoader,
       },

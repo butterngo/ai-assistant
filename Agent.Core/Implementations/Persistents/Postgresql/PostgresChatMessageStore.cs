@@ -10,11 +10,11 @@ public sealed class PostgresChatMessageStore : ChatMessageStore
 {
 	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
 	private readonly int _maxMessages;
-	private string? _threadId;
+	private Guid _threadId;
 
-	public string? ThreadId => _threadId;
+	public Guid ThreadId => _threadId;
 
-	public PostgresChatMessageStore(
+	protected PostgresChatMessageStore(
 		IDbContextFactory<ChatDbContext> dbContextFactory,
 		int maxMessages = 50)
 	{
@@ -25,19 +25,20 @@ public sealed class PostgresChatMessageStore : ChatMessageStore
 	public PostgresChatMessageStore(
 		IDbContextFactory<ChatDbContext> dbContextFactory,
 		JsonElement serializedState,
+		int maxMessages = 50,
 		JsonSerializerOptions? options = null)
-		: this(dbContextFactory)
+		: this(dbContextFactory, maxMessages)
 	{
 		if (serializedState.ValueKind == JsonValueKind.String)
 		{
-			_threadId = serializedState.GetString();
+			_threadId = serializedState.GetGuid();
 		}
 		else if (serializedState.ValueKind == JsonValueKind.Object)
 		{
 			// Support for extended state format
 			if (serializedState.TryGetProperty("threadId", out var threadIdElement))
 			{
-				_threadId = threadIdElement.GetString();
+				_threadId = threadIdElement.GetGuid();
 			}
 		}
 	}
@@ -46,11 +47,6 @@ public sealed class PostgresChatMessageStore : ChatMessageStore
 		InvokingContext context,
 		CancellationToken cancellationToken = default)
 	{
-		if (string.IsNullOrEmpty(_threadId))
-		{
-			return Enumerable.Empty<ChatMessage>();
-		}
-
 		await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
 		// Get most recent messages, ordered by sequence descending, then reverse
@@ -75,9 +71,6 @@ public sealed class PostgresChatMessageStore : ChatMessageStore
 		InvokedContext context,
 		CancellationToken cancellationToken = default)
 	{
-		// Generate thread ID if this is the first invocation
-		_threadId ??= Guid.NewGuid().ToString("N");
-
 		// Don't persist if there was an exception (optional: you might want to log failed attempts)
 		if (context.InvokeException is not null)
 		{
@@ -121,8 +114,7 @@ public sealed class PostgresChatMessageStore : ChatMessageStore
 		return new ChatMessageEntity
 		{
 			Id = Guid.NewGuid(),
-			ThreadId = _threadId!,
-			MessageId = Guid.NewGuid().ToString("N"),
+			ThreadId = _threadId,
 			Role = message.Role.Value,
 			Content = ExtractTextContent(message),
 			SerializedMessage = JsonSerializer.Serialize(message),
@@ -160,7 +152,7 @@ public sealed class PostgresChatMessageStore : ChatMessageStore
 
 	private static async Task<long> GetNextSequenceNumberAsync(
 		ChatDbContext dbContext,
-		string threadId,
+		Guid threadId,
 		CancellationToken cancellationToken)
 	{
 		var maxSequence = await dbContext.ChatMessages

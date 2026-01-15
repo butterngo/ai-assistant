@@ -5,7 +5,7 @@ namespace Agent.Core.Abstractions;
 
 public interface IAgentManager
 {
-	Task<(GeneralAgent agent, ChatThreadEntity thread)> GetOrCreateAsync(string? conversationId,
+	Task<(GeneralAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(Guid? threadId,
 		string userMessage,
 		CancellationToken ct = default);
 

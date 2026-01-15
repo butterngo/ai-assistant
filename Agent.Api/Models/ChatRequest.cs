@@ -1,17 +1,14 @@
 ﻿namespace Agent.Api.Models;
 
-public record ChatRequest(string Message, string ConversationId = "")
-{
-	public string ConversationId { get; init; } =
-		string.IsNullOrEmpty(ConversationId) ? Guid.NewGuid().ToString("N") : ConversationId;
-}
+public record ChatRequest(string Message, Guid? threadId);
 
 /// <summary>
 /// SSE event: metadata (sent first)
 /// </summary>
 public class ChatMetadata
 {
-	public string ConversationId { get; set; } = string.Empty;
+	public bool IsNewConversation { get; set; }
+	public Guid ThreadId { get; set; }
 	public string? Title { get; set; }
 }
 
@@ -20,7 +17,7 @@ public class ChatMetadata
 /// </summary>
 public class ChatData
 {
-	public string ConversationId { get; set; } = string.Empty;
+	public Guid ThreadId { get; set; }
 	public string Text { get; set; } = string.Empty;
 }
 
@@ -29,7 +26,8 @@ public class ChatData
 /// </summary>
 public class ChatDone
 {
-	public string ConversationId { get; set; } = string.Empty;
+	public bool IsNewConversation { get; set; }
+	public Guid ThreadId { get; set; }
 	public string? Title { get; set; }
 }
 

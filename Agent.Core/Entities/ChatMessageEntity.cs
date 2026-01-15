@@ -14,17 +14,8 @@ public class ChatMessageEntity
 	/// Groups messages belonging to the same conversation.
 	/// </summary>
 	[Required]
-	[MaxLength(64)]
 	[Column("thread_id")]
-	public string ThreadId { get; set; } = string.Empty;
-
-	/// <summary>
-	/// Unique identifier for this specific message.
-	/// </summary>
-	[Required]
-	[MaxLength(64)]
-	[Column("message_id")]
-	public string MessageId { get; set; } = string.Empty;
+	public Guid ThreadId { get; set; }
 
 	/// <summary>
 	/// The role of the message sender (user, assistant, system, tool).

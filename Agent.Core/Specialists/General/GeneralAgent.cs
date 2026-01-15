@@ -1,10 +1,11 @@
-﻿using Agent.Core.Models;
-using Microsoft.Agents.AI;
-using Agent.Core.Abstractions;
+﻿using Agent.Core.Abstractions;
 using Agent.Core.Abstractions.LLM;
-using Microsoft.Extensions.Logging;
 using Agent.Core.Implementations.LLM;
 using Agent.Core.Implementations.Persistents;
+using Agent.Core.Models;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Agent.Core.Specialists;
 
@@ -12,12 +13,14 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 {
 	public GeneralAgent(ILogger<GeneralAgent> logger,
 		ISemanticKernelBuilder semanticKernelBuilder,
-		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
-		: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder)
+		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
+		Func<JsonElement> func)
+		: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder, func)
 	{
 	}
 
-	protected override (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options) 
+	protected override (ChatClientAgent agent, AgentThread thread) 
+		CreateAgent(ChatClientAgentOptions options, Func<JsonElement> func) 
 	{
 		var chatClient = _semanticKernelBuilder.Build(Options.LLMProviderType.AzureOpenAI);
 
@@ -39,7 +42,7 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 
 		var agent = new ChatClientAgent(chatClient, options);
 
-		var store = _postgresChatMessageStoreFactory.Create(GetState());
+		var store = _postgresChatMessageStoreFactory.Create(func());
 
 		var thread = agent.GetNewThread(store);
 

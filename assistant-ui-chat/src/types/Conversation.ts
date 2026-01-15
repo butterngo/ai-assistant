@@ -8,20 +8,6 @@ export interface Conversation {
   userId?: string | null;
 }
 
-
-export interface PagedResult<T> {
-  items: T[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
-
-export interface ConversationDetail extends Conversation {
-  messages: Message[];
-  messageCount: number;
-}
-
 export interface Message {
   id: string;
   messageId: string;
@@ -31,30 +17,12 @@ export interface Message {
   sequenceNumber: number;
 }
 
-export interface ChatMetadata {
-  conversationId: string;
-  title: string | null;
-  isNewConversation: boolean;
+export interface ConversationDetail extends Conversation {
+  messages: Message[];
+  messageCount: number;
 }
 
-
-export interface ChatData {
-  conversationId: string;
-  text: string;
-}
-
-export interface ChatDone {
-  conversationId: string;
-  title: string | null;
-}
-
-export interface ChatError {
-  error: string;
-  code: string;
-}
-
-
-export interface ChatRequest {
-  conversationId: string | null;
-  message: string;
+export interface GetConversationsParams {
+  page?: number;
+  pageSize?: number;
 }

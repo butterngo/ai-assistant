@@ -128,12 +128,8 @@ public static class ConfigurationServices
 		this IServiceCollection services,
 		IConfiguration configuration)
 	{
-
-		services.AddTransient<GeneralAgent>();
-
 		services.AddScoped<IAgentManager, AgentManager>();
 		
-
 		return services;
 	}
 }

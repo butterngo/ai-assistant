@@ -11,11 +11,6 @@ public class ChatThreadEntity
 	[Column("id")]
 	public Guid Id { get; set; }
 
-	[Required]
-	[MaxLength(64)]
-	[Column("thread_id")]
-	public string ThreadId { get; set; } = string.Empty;
-
 	[MaxLength(256)]
 	[Column("title")]
 	public string? Title { get; set; }

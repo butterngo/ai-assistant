@@ -1,112 +1,22 @@
-﻿import { useState, useCallback, useMemo } from "react";
-import { useParams, useLoaderData, useNavigate } from "react-router-dom";
-import { AssistantRuntimeProvider, useLocalRuntime } from "@assistant-ui/react";
-import { useChatStreamAdapter, type ChatMetadata, type ChatDone } from "../hooks/useChatStreamAdapter";
-import { useLayoutContext } from "../layout/Applayout";
-import { Thread } from "../components/Thread";
-import { API_ENDPOINT } from "../config";
+﻿import { useParams, useLoaderData, useNavigate } from "react-router-dom";
+import { useLayoutContext } from "../layout/useLayoutContext";
+import { ChatRuntime } from "../components/ChatRuntime";
 import type { ConversationLoaderData } from "../loaders/Conversationloader";
 
 export function ChatPage() {
   const navigate = useNavigate();
-  const { conversationId } = useParams();
+  const { threadId } = useParams();
   const loaderData = useLoaderData() as ConversationLoaderData | undefined;
-  
+
   const {
     sidebarOpen,
     onToggleSidebar,
     addConversation,
-    updateConversation,
   } = useLayoutContext();
 
-  const [isStreaming, setIsStreaming] = useState(false);
-
-  // Get initial messages from loader (for existing conversations)
-  const initialMessages = useMemo(() => {
-    if (!loaderData?.conversation?.messages) return [];
-    return loaderData.conversation.messages;
-  }, [loaderData]);
-
-  // ==========================================================================
-  // SSE Event Handlers
-  // ==========================================================================
-
-  const handleMetadata = useCallback(
-    (metadata: ChatMetadata) => {
-      console.log("📩 Metadata received:", metadata);
-
-      if (metadata.isNewConversation) {
-        // Add to sidebar
-        addConversation({
-          id: metadata.conversationId,
-          threadId: metadata.conversationId,
-          title: metadata.title,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-
-        // Navigate to new conversation URL (replaces current history entry)
-        navigate(`/conversation/${metadata.conversationId}`, { replace: true });
-      }
-    },
-    [addConversation, navigate]
-  );
-
-  const handleStart = useCallback(() => {
-    setIsStreaming(true);
-  }, []);
-
-  const handleDone = useCallback(
-    (done: ChatDone) => {
-      console.log("✅ Stream completed:", done);
-      setIsStreaming(false);
-
-      // Update conversation title
-      if (done.title) {
-        updateConversation(done.conversationId, { title: done.title });
-      }
-    },
-    [updateConversation]
-  );
-
-  const handleError = useCallback((error: { error: string; code: string }) => {
-    console.error("❌ Chat stream error:", error);
-    setIsStreaming(false);
-  }, []);
-
-  // ==========================================================================
-  // Adapter & Runtime Setup
-  // ==========================================================================
-
-  const adapter = useChatStreamAdapter({
-    api: API_ENDPOINT,
-    conversationId: conversationId ?? null, // null = new conversation
-    onMetadata: handleMetadata,
-    onStart: handleStart,
-    onDone: handleDone,
-    onError: handleError,
-  });
-
-  // Convert messages to assistant-ui format
-  const formattedInitialMessages = useMemo(
-    () =>
-      initialMessages.map((msg) => ({
-        role: msg.role as "user" | "assistant",
-        content: [{ type: "text" as const, text: msg.content }],
-      })),
-    [initialMessages]
-  );
-
-  const runtime = useLocalRuntime(adapter, {
-    initialMessages: formattedInitialMessages,
-  });
-
-  // Use conversationId as key to force re-mount when switching conversations
-  const runtimeKey = conversationId ?? "new";
-
-  // ==========================================================================
+  // ===========================================================================
   // Error State
-  // ==========================================================================
+  // ===========================================================================
 
   if (loaderData?.error) {
     return (
@@ -118,17 +28,36 @@ export function ChatPage() {
     );
   }
 
-  // ==========================================================================
-  // Render
-  // ==========================================================================
+  // ===========================================================================
+  // Loading State
+  // ===========================================================================
+
+  const isNewConversation = !threadId;
+  const isLoadingExistingConversation = threadId && !loaderData?.conversation;
+
+  if (isLoadingExistingConversation) {
+    return (
+      <div className="chat-loading">
+        <p>Loading conversation...</p>
+      </div>
+    );
+  }
+
+  // ===========================================================================
+  // Ready - Render ChatRuntime
+  // ===========================================================================
+
+  const messages = loaderData?.conversation?.messages ?? [];
+  const runtimeKey = isNewConversation ? "new" : `${threadId}-${messages.length}`;
 
   return (
-    <AssistantRuntimeProvider runtime={runtime} key={runtimeKey}>
-      <Thread
-        onToggleSidebar={onToggleSidebar}
-        sidebarOpen={sidebarOpen}
-        isStreaming={isStreaming}
-      />
-    </AssistantRuntimeProvider>
+    <ChatRuntime
+      key={runtimeKey}
+      threadId={threadId ?? null}
+      initialMessages={messages}
+      sidebarOpen={sidebarOpen}
+      onToggleSidebar={onToggleSidebar}
+      addConversation={addConversation}
+    />
   );
 }

@@ -5,7 +5,7 @@ import type {
   ChatData,
   ChatDone,
   ChatError,
-} from "../types/Conversation";
+} from "../types";
 
 // =============================================================================
 // Types
@@ -15,7 +15,7 @@ export interface ChatStreamAdapterOptions {
   /** API endpoint URL */
   api: string;
   /** Current conversation ID (null for new conversation) */
-  conversationId: string | null;
+  threadId: string | null;
   /** Additional headers for the request */
   headers?: Record<string, string>;
   /** Callback when metadata is received (first event) */
@@ -87,7 +87,7 @@ function parseSSEEvents(buffer: string): { events: ParsedSSEEvent[]; remaining: 
 function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAdapter {
   const {
     api,
-    conversationId,
+    threadId,
     headers = {},
     onMetadata,
     onStart,
@@ -121,7 +121,7 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
           },
           body: JSON.stringify({
             message: textContent.text,
-            conversationId,
+            threadId,
           }),
           signal: abortSignal,
         });
@@ -139,7 +139,7 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
         const decoder = new TextDecoder();
         let buffer = "";
         let fullText = "";
-        let receivedConversationId = conversationId;
+        let receivedthreadId = threadId;
 
         try {
           while (true) {
@@ -157,7 +157,7 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
                 switch (event) {
                   case "metadata": {
                     const metadata = json as ChatMetadata;
-                    receivedConversationId = metadata.conversationId;
+                    receivedthreadId = metadata.threadId;
                     onMetadata?.(metadata);
                     break;
                   }
@@ -227,14 +227,14 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
 // =============================================================================
 
 export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAdapter {
-  const { api, conversationId, headers, onMetadata, onStart, onChunk, onDone, onError } = options;
+  const { api, threadId, headers, onMetadata, onStart, onChunk, onDone, onError } = options;
 
-  // Memoize adapter - recreate when api or conversationId changes
+  // Memoize adapter - recreate when api or threadId changes
   const adapter = useMemo(
     () =>
       createChatStreamAdapter({
         api,
-        conversationId,
+        threadId,
         headers,
         onMetadata,
         onStart,
@@ -242,7 +242,7 @@ export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatMod
         onDone,
         onError,
       }),
-    [api, conversationId] // Callbacks intentionally excluded to avoid churn
+    [api, threadId] // Callbacks intentionally excluded to avoid churn
   );
 
   return adapter;

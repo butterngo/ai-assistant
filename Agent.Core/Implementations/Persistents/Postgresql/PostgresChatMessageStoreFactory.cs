@@ -18,24 +18,10 @@ public class PostgresChatMessageStoreFactory
 	}
 
 	/// <summary>
-	/// Creates a new ChatMessageStore for a new conversation.
-	/// Use this as the chat_message_store_factory delegate for ChatClientAgent.
-	/// </summary>
-	public ChatMessageStore Create()
-	{
-		return new PostgresChatMessageStore(_dbContextFactory, _maxMessages);
-	}
-
-	/// <summary>
 	/// Creates a ChatMessageStore from serialized state (for resuming threads).
 	/// </summary>
 	public ChatMessageStore Create(JsonElement serializedState, JsonSerializerOptions? options = null)
 	{
-		return new PostgresChatMessageStore(_dbContextFactory, serializedState, options);
+		return new PostgresChatMessageStore(_dbContextFactory, serializedState, _maxMessages, options);
 	}
-
-	/// <summary>
-	/// Returns a Func delegate suitable for ChatClientAgentOptions.ChatMessageStoreFactory
-	/// </summary>
-	public Func<ChatMessageStore> AsFactory() => Create;
 }

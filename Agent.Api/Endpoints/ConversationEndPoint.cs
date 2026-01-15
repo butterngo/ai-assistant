@@ -49,7 +49,6 @@ public static class ConversationEndpoints
 			.Select(t => new ConversationResponse
 			{
 				Id = t.Id,
-				ThreadId = t.ThreadId,
 				Title = t.Title,
 				CreatedAt = t.CreatedAt,
 				UpdatedAt = t.UpdatedAt,
@@ -78,7 +77,7 @@ public static class ConversationEndpoints
 
 		var thread = await dbContext.ChatThreads
 			.AsNoTracking()
-			.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+			.FirstOrDefaultAsync(t => t.Id == id);
 
 		if (thread is null)
 		{
@@ -88,23 +87,21 @@ public static class ConversationEndpoints
 		// Get all messages for this thread
 		var messages = await dbContext.ChatMessages
 			.AsNoTracking()
-			.Where(m => m.ThreadId == thread.ThreadId)
+			.Where(m => m.ThreadId == id)
 			.OrderBy(m => m.SequenceNumber)
 			.Select(m => new MessageResponse
 			{
 				Id = m.Id,
-				MessageId = m.MessageId,
 				Role = m.Role,
 				Content = m.Content,
 				CreatedAt = m.CreatedAt,
 				SequenceNumber = m.SequenceNumber
 			})
-			.ToListAsync(cancellationToken);
+			.ToListAsync();
 
 		var result = new ConversationDetailResponse
 		{
 			Id = thread.Id,
-			ThreadId = thread.ThreadId,
 			Title = thread.Title,
 			CreatedAt = thread.CreatedAt,
 			UpdatedAt = thread.UpdatedAt,
@@ -133,7 +130,7 @@ public static class ConversationEndpoints
 
 		// Delete all messages first (cascade)
 		await dbContext.ChatMessages
-			.Where(m => m.ThreadId == thread.ThreadId)
+			.Where(m => m.ThreadId == id)
 			.ExecuteDeleteAsync(cancellationToken);
 
 		// Delete the thread

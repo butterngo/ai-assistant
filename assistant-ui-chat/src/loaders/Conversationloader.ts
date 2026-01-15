@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "react-router-dom";
-import { API_BASE } from "../config";
-import type { ConversationDetail } from "../types/Conversation";
+import { conversationsClient } from "../api";
+import type { ConversationDetail } from "../types";
+import { AxiosError } from "axios";
 
 export interface ConversationLoaderData {
   conversation: ConversationDetail | null;
@@ -10,27 +11,25 @@ export interface ConversationLoaderData {
 export async function conversationLoader({
   params,
 }: LoaderFunctionArgs): Promise<ConversationLoaderData> {
-  const { conversationId } = params;
+  const { threadId } = params;
 
-  if (!conversationId) {
+  if (!threadId) {
     return { conversation: null, error: null };
   }
 
   try {
-    const response = await fetch(`${API_BASE}/api/conversations/${conversationId}`);
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return { conversation: null, error: "Conversation not found" };
-      }
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const conversation: ConversationDetail = await response.json();
+    const conversation = await conversationsClient.getById(threadId);
     return { conversation, error: null };
   } catch (e) {
+    if (e instanceof AxiosError) {
+      if (e.response?.status === 404) {
+        return { conversation: null, error: "Conversation not found" };
+      }
+      const message = e.response?.data?.message || e.message;
+      return { conversation: null, error: message };
+    }
+
     const message = e instanceof Error ? e.message : "Failed to load conversation";
-    console.error("Conversation loader error:", e);
     return { conversation: null, error: message };
   }
 }

@@ -5,6 +5,7 @@ using Agent.Core.Implementations.Persistents;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Agent.Core.Implementations;
 
@@ -29,26 +30,30 @@ public class AgentManager : IAgentManager
 		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 	}
 
-	public async Task<(GeneralAgent agent, ChatThreadEntity thread)> GetOrCreateAsync(
-		string? conversationId,
+	public async Task<(GeneralAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(
+		Guid? threadId,
 		string userMessage,
 		CancellationToken ct = default)
 	{
 		var dbContext = _dbContextFactory.CreateDbContext();
+		
+		bool isNewConversation = false;
 
-		if (string.IsNullOrEmpty(conversationId))
+		if (!threadId.HasValue)
 		{
-			conversationId = Guid.NewGuid().ToString("n");
+			threadId = Guid.NewGuid();
 		}
+
 		var thread = await dbContext.ChatThreads.AsNoTracking()
-			.FirstOrDefaultAsync(t => t.ThreadId == conversationId);
+			.FirstOrDefaultAsync(t => t.Id == threadId);
 
 		if (thread == null)
 		{
+			isNewConversation = true;
+
 			thread = new ChatThreadEntity
 			{
-				Id = Guid.NewGuid(),
-				ThreadId = conversationId,
+				Id = threadId.Value,
 				Title = GenerateTitle(userMessage),
 				CreatedAt = DateTimeOffset.UtcNow,
 				UpdatedAt = DateTimeOffset.UtcNow
@@ -61,11 +66,12 @@ public class AgentManager : IAgentManager
 
 		var agent = new GeneralAgent(_loggerFactory.CreateLogger<GeneralAgent>(),
 			_kernelBuilder,
-			_postgresChatMessageStoreFactory);
+			_postgresChatMessageStoreFactory, () => 
+			{
+				return JsonSerializer.SerializeToElement(new { threadId = thread.Id });
+			});
 
-		agent.SetConversationId(thread.ThreadId);
-
-		return (agent, thread);
+		return (agent, thread, isNewConversation);
 	}
 
 	public async Task<object> DryRunAsync(string userMessage, CancellationToken ct = default)

@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {
   "message": "Hello!",
-  "conversationId": "uuid-here"
+  "threadId": "uuid-here"
 }
 ```
 
