@@ -289,3 +289,8 @@
 .conversation-list::-webkit-scrollbar-thumb:hover {
   background: #525252;
 }
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid #2f2f2f;
+}

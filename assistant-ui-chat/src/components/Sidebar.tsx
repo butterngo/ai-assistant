@@ -11,13 +11,13 @@ import {
   PanelLeftOpenIcon,
 } from "lucide-react";
 import type { Conversation } from "../types/Conversation";
+import { Settings } from "./Settings";
 import "./Sidebar.css";
 
 interface SidebarProps {
   conversations: Conversation[];
   activeId: string | null;
   isOpen: boolean;
-  loading?: boolean;
   onToggle: () => void;
   onNewConversation: () => void;
   onSelectConversation: (id: string) => void;
@@ -97,26 +97,6 @@ function groupConversationsByDate(conversations: Conversation[]): GroupedConvers
 }
 
 // =============================================================================
-// Loading Skeleton Component
-// =============================================================================
-
-const LoadingSkeleton: FC = () => {
-  return (
-    <div className="loading-skeleton">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="skeleton-item">
-          <div className="skeleton-icon" />
-          <div className="skeleton-content">
-            <div className="skeleton-title" />
-            <div className="skeleton-preview" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// =============================================================================
 // Sidebar Component
 // =============================================================================
 
@@ -124,7 +104,6 @@ export const Sidebar: FC<SidebarProps> = ({
   conversations,
   activeId,
   isOpen,
-  loading,
   onToggle,
   onNewConversation,
   onSelectConversation,
@@ -137,6 +116,39 @@ export const Sidebar: FC<SidebarProps> = ({
   );
 
   const hasConversations = conversations.length > 0;
+
+  // ---------------------------------------------------------------------------
+  // Settings Handlers
+  // ---------------------------------------------------------------------------
+  const handleOpenCategories = () => {
+    console.log("Open Categories");
+    // TODO: Navigate or open modal
+  };
+
+  const handleOpenSkills = () => {
+    console.log("Open Skills");
+    // TODO: Navigate or open modal
+  };
+
+  const handleOpenTools = () => {
+    console.log("Open Tools");
+    // TODO: Navigate or open modal
+  };
+
+  const handleOpenKnowledgeBase = () => {
+    console.log("Open Knowledge Base");
+    // TODO: Navigate or open modal
+  };
+
+  const handleOpenProfile = () => {
+    console.log("Open Profile");
+    // TODO: Navigate or open modal
+  };
+
+  const handleLogout = () => {
+    console.log("Logout");
+    // TODO: Implement logout
+  };
 
   return (
     <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
@@ -154,69 +166,69 @@ export const Sidebar: FC<SidebarProps> = ({
       {/* Conversation List */}
       {isOpen && (
         <nav className="conversation-list">
-          {loading ? (
-            <LoadingSkeleton />
-          ) : (
-            <>
-              <ConversationGroup
-                label="Today"
-                conversations={groupedConversations.today}
-                activeId={activeId}
-                onSelect={onSelectConversation}
-                onDelete={onDeleteConversation}
-              />
+          <ConversationGroup
+            label="Today"
+            conversations={groupedConversations.today}
+            activeId={activeId}
+            onSelect={onSelectConversation}
+            onDelete={onDeleteConversation}
+          />
 
-              <ConversationGroup
-                label="Yesterday"
-                conversations={groupedConversations.yesterday}
-                activeId={activeId}
-                onSelect={onSelectConversation}
-                onDelete={onDeleteConversation}
-              />
+          <ConversationGroup
+            label="Yesterday"
+            conversations={groupedConversations.yesterday}
+            activeId={activeId}
+            onSelect={onSelectConversation}
+            onDelete={onDeleteConversation}
+          />
 
-              <ConversationGroup
-                label="Previous 7 days"
-                conversations={groupedConversations.lastWeek}
-                activeId={activeId}
-                onSelect={onSelectConversation}
-                onDelete={onDeleteConversation}
-              />
+          <ConversationGroup
+            label="Previous 7 days"
+            conversations={groupedConversations.lastWeek}
+            activeId={activeId}
+            onSelect={onSelectConversation}
+            onDelete={onDeleteConversation}
+          />
 
-              <ConversationGroup
-                label="Previous 30 days"
-                conversations={groupedConversations.lastMonth}
-                activeId={activeId}
-                onSelect={onSelectConversation}
-                onDelete={onDeleteConversation}
-              />
+          <ConversationGroup
+            label="Previous 30 days"
+            conversations={groupedConversations.lastMonth}
+            activeId={activeId}
+            onSelect={onSelectConversation}
+            onDelete={onDeleteConversation}
+          />
 
-              <ConversationGroup
-                label="Older"
-                conversations={groupedConversations.older}
-                activeId={activeId}
-                onSelect={onSelectConversation}
-                onDelete={onDeleteConversation}
-              />
+          <ConversationGroup
+            label="Older"
+            conversations={groupedConversations.older}
+            activeId={activeId}
+            onSelect={onSelectConversation}
+            onDelete={onDeleteConversation}
+          />
 
-              {!hasConversations && (
-                <div className="empty-state">
-                  <MessageSquareIcon size={32} />
-                  <p>No conversations yet</p>
-                  <span>Start a new chat to begin</span>
-                </div>
-              )}
-            </>
+          {!hasConversations && (
+            <div className="empty-state">
+              <MessageSquareIcon size={32} />
+              <p>No conversations yet</p>
+              <span>Start a new chat to begin</span>
+            </div>
           )}
         </nav>
       )}
 
       {/* Footer */}
       {isOpen && (
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <div className="user-avatar">V</div>
-            <span>Vu Ngo</span>
-          </div>
+       <div className="sidebar-footer">
+          <Settings
+            userName="Vu Ngo"
+            userAvatar="V"
+            onOpenCategories={handleOpenCategories}
+            onOpenSkills={handleOpenSkills}
+            onOpenTools={handleOpenTools}
+            onOpenKnowledgeBase={handleOpenKnowledgeBase}
+            onOpenProfile={handleOpenProfile}
+            onLogout={handleLogout}
+          />
         </div>
       )}
     </aside>
