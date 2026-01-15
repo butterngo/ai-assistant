@@ -10,7 +10,6 @@ namespace Agent.Core.Specialists;
 
 public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 {
-	
 	public GeneralAgent(ILogger<GeneralAgent> logger,
 		ISemanticKernelBuilder semanticKernelBuilder,
 		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
@@ -42,7 +41,7 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 
 		var store = _postgresChatMessageStoreFactory.Create(GetState());
 
-		var thread = _agent.GetNewThread(store);
+		var thread = agent.GetNewThread(store);
 
 		return (agent, thread);
 	}

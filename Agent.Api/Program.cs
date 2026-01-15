@@ -4,6 +4,7 @@ using Agent.Api.Endpoints;
 using Agent.Api.Extensions;
 using Agent.Core.Abstractions.LLM;
 using Agent.Core.Implementations.LLM;
+using Microsoft.OpenApi;
 
 internal class Program
 {
@@ -49,15 +50,43 @@ internal class Program
 
 		builder.Services.AddAgents(configuration);
 
+		builder.Services.AddOpenApi(options =>
+		{
+			options.AddDocumentTransformer((document, context, ct) =>
+			{
+				document.Info = new OpenApiInfo
+				{
+					Title = "Skill Management API",
+					Version = "v1",
+					Description = "API for managing coding assistant skills"
+				};
+				return Task.CompletedTask;
+			});
+		});
+
 		var app = builder.Build();
+
+		app.MapOpenApi();
+
+		//if (app.Environment.IsDevelopment())
+		//{
+		//	app.UseSwaggerUI(options =>
+		//	{
+		//		options.SwaggerEndpoint("/openapi/v1.json", "Skill Management API v1");
+		//	});
+		//}
 
 		app.UseCors();
 
-		app.MapChatBot();
+		app.MapChatBotEndPoints();
 
-		app.MapConversations();
+		app.MapConversationEndPoints();
 
-		app.MapSkills();
+		app.MapSkillEndPoints();
+
+		app.MapCategoryEndPoints();
+
+		app.MapToolEndPoints();
 
 		app.Run();
 	}

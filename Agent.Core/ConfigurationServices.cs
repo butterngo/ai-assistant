@@ -1,6 +1,7 @@
 ﻿using Agent.Core.Abstractions;
 using Agent.Core.Abstractions.LLM;
 using Agent.Core.Abstractions.Persistents;
+using Agent.Core.Abstractions.Services;
 using Agent.Core.Implementations;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.Implementations.Persistents.Vectors;
@@ -117,6 +118,8 @@ public static class ConfigurationServices
 		this IServiceCollection services)
 	{
 		services.AddScoped<IIntentClassificationService, IntentClassificationService>();
+		services.AddScoped<ICategoryService, CategoryService>();
+		services.AddScoped<IToolService, ToolService>();
 		services.AddScoped<ISkillService, SkillService>();
 		return services;
 	}

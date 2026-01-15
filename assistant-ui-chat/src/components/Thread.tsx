@@ -21,7 +21,7 @@ import {
   PanelLeftIcon,
 } from "lucide-react";
 import type { FC } from "react";
-import { MarkdownText } from "./MarkdownText";
+import { MarkdownText } from "./rich-content/MarkdownText";
 import "./Thread.css";
 
 interface ThreadProps {

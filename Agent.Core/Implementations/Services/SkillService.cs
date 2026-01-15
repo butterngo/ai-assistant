@@ -1,5 +1,5 @@
-﻿using Agent.Core.Abstractions;
-using Agent.Core.Abstractions.Persistents;
+﻿using Agent.Core.Abstractions.Persistents;
+using Agent.Core.Abstractions.Services;
 using Agent.Core.Entities;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.VectorRecords;
@@ -21,75 +21,7 @@ public class SkillService : ISkillService
 		_skillRoutingRepo = skillRoutingRepo;
 	}
 
-	#region Category
-
-	public async Task<CategoryEntity> CreateCategoryAsync(
-		string name,
-		string? description = null,
-		CancellationToken ct = default)
-	{
-		var entity = new CategoryEntity
-		{
-			Id = Guid.NewGuid(),
-			Name = name,
-			Description = description,
-			CreatedAt = DateTime.UtcNow,
-			UpdatedAt = DateTime.UtcNow
-		};
-
-		_dbContext.Categories.Add(entity);
-		await _dbContext.SaveChangesAsync(ct);
-
-		return entity;
-	}
-
-	public async Task<CategoryEntity?> GetCategoryByIdAsync(Guid id, CancellationToken ct = default)
-	{
-		return await _dbContext.Categories
-			.FirstOrDefaultAsync(c => c.Id == id, ct);
-	}
-
-	public async Task<IEnumerable<CategoryEntity>> GetAllCategoriesAsync(CancellationToken ct = default)
-	{
-		return await _dbContext.Categories
-			.OrderBy(c => c.Name)
-			.ToListAsync(ct);
-	}
-
-	public async Task<CategoryEntity> UpdateCategoryAsync(
-		Guid id,
-		string? name = null,
-		string? description = null,
-		CancellationToken ct = default)
-	{
-		var entity = await _dbContext.Categories
-			.FirstOrDefaultAsync(c => c.Id == id, ct)
-			?? throw new InvalidOperationException($"Category {id} not found");
-
-		if (name is not null) entity.Name = name;
-		if (description is not null) entity.Description = description;
-		entity.UpdatedAt = DateTime.UtcNow;
-
-		await _dbContext.SaveChangesAsync(ct);
-
-		return entity;
-	}
-
-	public async Task DeleteCategoryAsync(Guid id, CancellationToken ct = default)
-	{
-		var entity = await _dbContext.Categories
-			.FirstOrDefaultAsync(c => c.Id == id, ct)
-			?? throw new InvalidOperationException($"Category {id} not found");
-
-		_dbContext.Categories.Remove(entity);
-		await _dbContext.SaveChangesAsync(ct);
-	}
-
-	#endregion
-
-	#region Skill
-
-	public async Task<SkillEntity> CreateSkillAsync(
+	public async Task<SkillEntity> CreateAsync(
 		Guid categoryId,
 		string name,
 		string systemPrompt,
@@ -110,7 +42,6 @@ public class SkillService : ISkillService
 			UpdatedAt = DateTime.UtcNow
 		};
 
-		// Insert to PostgreSQL
 		_dbContext.Skills.Add(entity);
 		await _dbContext.SaveChangesAsync(ct);
 
@@ -129,7 +60,7 @@ public class SkillService : ISkillService
 		return entity;
 	}
 
-	public async Task<SkillEntity?> GetSkillByIdAsync(Guid id, CancellationToken ct = default)
+	public async Task<SkillEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
 	{
 		return await _dbContext.Skills
 			.Include(s => s.Category)
@@ -137,7 +68,7 @@ public class SkillService : ISkillService
 			.FirstOrDefaultAsync(s => s.Id == id, ct);
 	}
 
-	public async Task<IEnumerable<SkillEntity>> GetSkillsByCategoryAsync(Guid categoryId, CancellationToken ct = default)
+	public async Task<IEnumerable<SkillEntity>> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default)
 	{
 		return await _dbContext.Skills
 			.Include(s => s.Tools)
@@ -146,7 +77,7 @@ public class SkillService : ISkillService
 			.ToListAsync(ct);
 	}
 
-	public async Task<SkillEntity> UpdateSkillAsync(
+	public async Task<SkillEntity> UpdateAsync(
 		Guid id,
 		string? name = null,
 		string? systemPrompt = null,
@@ -182,7 +113,7 @@ public class SkillService : ISkillService
 		return entity;
 	}
 
-	public async Task DeleteSkillAsync(Guid id, CancellationToken ct = default)
+	public async Task DeleteAsync(Guid id, CancellationToken ct = default)
 	{
 		var entity = await _dbContext.Skills
 			.FirstOrDefaultAsync(s => s.Id == id, ct)
@@ -191,106 +122,12 @@ public class SkillService : ISkillService
 		// Delete from Qdrant first
 		await _skillRoutingRepo.DeleteAsync(id, ct);
 
-		// Delete from PostgreSQL (cascade deletes tools)
+		// Delete from PostgreSQL
 		_dbContext.Skills.Remove(entity);
 		await _dbContext.SaveChangesAsync(ct);
 	}
 
-	#endregion
-
-	#region Tool
-
-	public async Task<ToolEntity> CreateToolAsync(
-		Guid skillId,
-		string name,
-		string type,
-		string endpoint,
-		string? description = null,
-		JsonDocument? config = null,
-		bool isPrefetch = false,
-		CancellationToken ct = default)
-	{
-		var skillExists = await _dbContext.Skills.AnyAsync(s => s.Id == skillId, ct);
-		if (!skillExists)
-			throw new InvalidOperationException($"Skill {skillId} not found");
-
-		var entity = new ToolEntity
-		{
-			Id = Guid.NewGuid(),
-			SkillId = skillId,
-			Name = name,
-			Type = type,
-			Endpoint = endpoint,
-			Description = description,
-			Config = config,
-			IsPrefetch = isPrefetch,
-			CreatedAt = DateTime.UtcNow,
-			UpdatedAt = DateTime.UtcNow
-		};
-
-		_dbContext.Tools.Add(entity);
-		await _dbContext.SaveChangesAsync(ct);
-
-		return entity;
-	}
-
-	public async Task<ToolEntity?> GetToolByIdAsync(Guid id, CancellationToken ct = default)
-	{
-		return await _dbContext.Tools
-			.Include(t => t.Skill)
-			.FirstOrDefaultAsync(t => t.Id == id, ct);
-	}
-
-	public async Task<IEnumerable<ToolEntity>> GetToolsBySkillAsync(Guid skillId, CancellationToken ct = default)
-	{
-		return await _dbContext.Tools
-			.Where(t => t.SkillId == skillId)
-			.OrderBy(t => t.Name)
-			.ToListAsync(ct);
-	}
-
-	public async Task<ToolEntity> UpdateToolAsync(
-		Guid id,
-		string? name = null,
-		string? type = null,
-		string? endpoint = null,
-		string? description = null,
-		JsonDocument? config = null,
-		bool? isPrefetch = null,
-		CancellationToken ct = default)
-	{
-		var entity = await _dbContext.Tools
-			.FirstOrDefaultAsync(t => t.Id == id, ct)
-			?? throw new InvalidOperationException($"Tool {id} not found");
-
-		if (name is not null) entity.Name = name;
-		if (type is not null) entity.Type = type;
-		if (endpoint is not null) entity.Endpoint = endpoint;
-		if (description is not null) entity.Description = description;
-		if (config is not null) entity.Config = config;
-		if (isPrefetch.HasValue) entity.IsPrefetch = isPrefetch.Value;
-		entity.UpdatedAt = DateTime.UtcNow;
-
-		await _dbContext.SaveChangesAsync(ct);
-
-		return entity;
-	}
-
-	public async Task DeleteToolAsync(Guid id, CancellationToken ct = default)
-	{
-		var entity = await _dbContext.Tools
-			.FirstOrDefaultAsync(t => t.Id == id, ct)
-			?? throw new InvalidOperationException($"Tool {id} not found");
-
-		_dbContext.Tools.Remove(entity);
-		await _dbContext.SaveChangesAsync(ct);
-	}
-
-	#endregion
-
-	#region Routing
-
-	public async Task<SkillEntity?> RouteToSkillAsync(string query, CancellationToken ct = default)
+	public async Task<SkillEntity?> RouteAsync(string query, CancellationToken ct = default)
 	{
 		var results = await _skillRoutingRepo.SearchAsync(query, top: 1, cancellationToken: ct);
 		var topResult = results.FirstOrDefault();
@@ -298,8 +135,6 @@ public class SkillService : ISkillService
 		if (topResult is null)
 			return null;
 
-		return await GetSkillByIdAsync(topResult.SkillId, ct);
+		return await GetByIdAsync(topResult.SkillId, ct);
 	}
-
-	#endregion
 }

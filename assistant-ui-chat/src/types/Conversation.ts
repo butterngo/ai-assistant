@@ -1,28 +1,11 @@
 
 export interface Conversation {
-  /** Unique identifier (UUID) */
   id: string;
-
-  /** Thread ID used for chat persistence */
   threadId: string;
-
-  /** Conversation title (generated from first message) */
   title: string | null;
-
-  /** ISO date string when conversation was created */
   createdAt: string;
-
-  /** ISO date string when conversation was last updated */
   updatedAt: string;
-
-  /** Optional user ID for multi-tenant scenarios */
-  userId?: string;
-
-  /** Optional preview text (last message snippet) */
-  preview?: string;
-
-  /** Number of messages in conversation */
-  messageCount?: number;
+  userId?: string | null;
 }
 
 
@@ -36,6 +19,7 @@ export interface PagedResult<T> {
 
 export interface ConversationDetail extends Conversation {
   messages: Message[];
+  messageCount: number;
 }
 
 export interface Message {

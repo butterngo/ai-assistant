@@ -6,7 +6,7 @@ namespace Agent.Api.Endpoints;
 
 public static class ConversationEndpoints
 {
-	public static IEndpointRouteBuilder MapConversations(this IEndpointRouteBuilder endpoints)
+	public static IEndpointRouteBuilder MapConversationEndPoints(this IEndpointRouteBuilder endpoints)
 	{
 		var group = endpoints.MapGroup("/api/conversations")
 			.WithTags("Conversations");

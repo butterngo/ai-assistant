@@ -13,32 +13,19 @@ public static class ChatBotEndpoints
 		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 	};
 
-	public static IEndpointRouteBuilder MapChatBot(this IEndpointRouteBuilder endpoints)
+	public static IEndpointRouteBuilder MapChatBotEndPoints(this IEndpointRouteBuilder endpoints)
 	{
 		endpoints.MapPost("/chat/stream", HandleChatStreamAsync)
-			.WithTags("Chat")
+			.WithTags("ChatBot")
 			.WithSummary("Stream chat response with SSE")
 			.Produces(StatusCodes.Status200OK, contentType: "text/event-stream")
 			.Produces(StatusCodes.Status400BadRequest);
 
 		endpoints.MapPost("/chat", HandleChatAsync)
-			.WithTags("Chat")
+			.WithTags("ChatBot")
 			.WithSummary("chat response with json")
 			.Produces(StatusCodes.Status200OK, contentType: "application/json")
 			.Produces(StatusCodes.Status400BadRequest);
-
-		endpoints.MapPost("/test-emmbedded", async (HttpContext ctx,
-		[FromBody] ChatRequest req, 
-		[FromServices] ISemanticKernelBuilder semanticKernelBuilder,
-		[FromServices] IAgentManager manager,
-		CancellationToken ct) =>
-		{
-			//var embedding = semanticKernelBuilder.GetEmbeddingGenerator();
-
-			//return Results.Ok(await embedding.GenerateAsync(new string[] { req.Message }));
-
-			return Results.Ok(await manager.DryRunAsync(req.Message, ct));
-		});
 
 		return endpoints;
 	}

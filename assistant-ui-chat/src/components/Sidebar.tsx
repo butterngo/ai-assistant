@@ -17,6 +17,7 @@ interface SidebarProps {
   conversations: Conversation[];
   activeId: string | null;
   isOpen: boolean;
+  loading?: boolean;
   onToggle: () => void;
   onNewConversation: () => void;
   onSelectConversation: (id: string) => void;
@@ -96,6 +97,26 @@ function groupConversationsByDate(conversations: Conversation[]): GroupedConvers
 }
 
 // =============================================================================
+// Loading Skeleton Component
+// =============================================================================
+
+const LoadingSkeleton: FC = () => {
+  return (
+    <div className="loading-skeleton">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="skeleton-item">
+          <div className="skeleton-icon" />
+          <div className="skeleton-content">
+            <div className="skeleton-title" />
+            <div className="skeleton-preview" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// =============================================================================
 // Sidebar Component
 // =============================================================================
 
@@ -103,6 +124,7 @@ export const Sidebar: FC<SidebarProps> = ({
   conversations,
   activeId,
   isOpen,
+  loading,
   onToggle,
   onNewConversation,
   onSelectConversation,
@@ -132,52 +154,58 @@ export const Sidebar: FC<SidebarProps> = ({
       {/* Conversation List */}
       {isOpen && (
         <nav className="conversation-list">
-          <ConversationGroup
-            label="Today"
-            conversations={groupedConversations.today}
-            activeId={activeId}
-            onSelect={onSelectConversation}
-            onDelete={onDeleteConversation}
-          />
+          {loading ? (
+            <LoadingSkeleton />
+          ) : (
+            <>
+              <ConversationGroup
+                label="Today"
+                conversations={groupedConversations.today}
+                activeId={activeId}
+                onSelect={onSelectConversation}
+                onDelete={onDeleteConversation}
+              />
 
-          <ConversationGroup
-            label="Yesterday"
-            conversations={groupedConversations.yesterday}
-            activeId={activeId}
-            onSelect={onSelectConversation}
-            onDelete={onDeleteConversation}
-          />
+              <ConversationGroup
+                label="Yesterday"
+                conversations={groupedConversations.yesterday}
+                activeId={activeId}
+                onSelect={onSelectConversation}
+                onDelete={onDeleteConversation}
+              />
 
-          <ConversationGroup
-            label="Previous 7 days"
-            conversations={groupedConversations.lastWeek}
-            activeId={activeId}
-            onSelect={onSelectConversation}
-            onDelete={onDeleteConversation}
-          />
+              <ConversationGroup
+                label="Previous 7 days"
+                conversations={groupedConversations.lastWeek}
+                activeId={activeId}
+                onSelect={onSelectConversation}
+                onDelete={onDeleteConversation}
+              />
 
-          <ConversationGroup
-            label="Previous 30 days"
-            conversations={groupedConversations.lastMonth}
-            activeId={activeId}
-            onSelect={onSelectConversation}
-            onDelete={onDeleteConversation}
-          />
+              <ConversationGroup
+                label="Previous 30 days"
+                conversations={groupedConversations.lastMonth}
+                activeId={activeId}
+                onSelect={onSelectConversation}
+                onDelete={onDeleteConversation}
+              />
 
-          <ConversationGroup
-            label="Older"
-            conversations={groupedConversations.older}
-            activeId={activeId}
-            onSelect={onSelectConversation}
-            onDelete={onDeleteConversation}
-          />
+              <ConversationGroup
+                label="Older"
+                conversations={groupedConversations.older}
+                activeId={activeId}
+                onSelect={onSelectConversation}
+                onDelete={onDeleteConversation}
+              />
 
-          {!hasConversations && (
-            <div className="empty-state">
-              <MessageSquareIcon size={32} />
-              <p>No conversations yet</p>
-              <span>Start a new chat to begin</span>
-            </div>
+              {!hasConversations && (
+                <div className="empty-state">
+                  <MessageSquareIcon size={32} />
+                  <p>No conversations yet</p>
+                  <span>Start a new chat to begin</span>
+                </div>
+              )}
+            </>
           )}
         </nav>
       )}
