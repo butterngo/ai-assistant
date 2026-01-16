@@ -17,6 +17,7 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 		Func<JsonElement> func)
 		: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder, func)
 	{
+		Id = Guid.Parse("00000000-0000-0000-0000-000000000001");
 	}
 
 	protected override (ChatClientAgent agent, AgentThread thread) 

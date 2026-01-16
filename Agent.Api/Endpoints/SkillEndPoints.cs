@@ -57,11 +57,28 @@ public static class SkillEndPoint
 	{
 		var result = await service.CreateAsync(
 			request.CategoryId,
+			request.Code,
 			request.Name,
 			request.SystemPrompt,
 			request.Description,
 			ct);
 		return Results.Created($"/api/skills/{result.Id}", result);
+	}
+
+	private static async Task<IResult> UpdateAsync(
+	Guid id,
+	UpdateSkillRequest request,
+	ISkillService service,
+	CancellationToken ct)
+	{
+		var result = await service.UpdateAsync(
+			id,
+			request.Code,
+			request.Name,
+			request.SystemPrompt,
+			request.Description,
+			ct);
+		return Results.Ok(result);
 	}
 
 	private static async Task<IResult> GetByIdAsync(
@@ -79,21 +96,6 @@ public static class SkillEndPoint
 		CancellationToken ct)
 	{
 		var result = await service.GetByCategoryAsync(categoryId, ct);
-		return Results.Ok(result);
-	}
-
-	private static async Task<IResult> UpdateAsync(
-		Guid id,
-		UpdateSkillRequest request,
-		ISkillService service,
-		CancellationToken ct)
-	{
-		var result = await service.UpdateAsync(
-			id,
-			request.Name,
-			request.SystemPrompt,
-			request.Description,
-			ct);
 		return Results.Ok(result);
 	}
 

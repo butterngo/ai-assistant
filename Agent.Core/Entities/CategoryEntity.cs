@@ -12,6 +12,11 @@ public class CategoryEntity
 
 	[Required]
 	[MaxLength(100)]
+	[Column("cat_code")]
+	public string CatCode { get; set; } = string.Empty;
+
+	[Required]
+	[MaxLength(100)]
 	[Column("name")]
 	public string Name { get; set; } = string.Empty;
 

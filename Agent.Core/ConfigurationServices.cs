@@ -101,7 +101,7 @@ public static class ConfigurationServices
 		{
 			QdrantVectorStore vectorStore = p.GetRequiredService<QdrantVectorStore>();
 			ISemanticKernelBuilder semanticKernelBuilder = p.GetRequiredService<ISemanticKernelBuilder>();
-			return new QdrantRepository<T>(vectorStore, semanticKernelBuilder, QdrantCollections.IntentClassifications);
+			return new QdrantRepository<T>(vectorStore, semanticKernelBuilder, vectorName);
 		}
 
 		services.AddScoped<IQdrantRepository<IntentClassificationRecord>>(p => Create<IntentClassificationRecord>(p, QdrantCollections.IntentClassifications));

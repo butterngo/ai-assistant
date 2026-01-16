@@ -9,8 +9,12 @@ namespace Agent.Core.Specialists;
 
 internal sealed class ProjectManagerAgent : BaseAgent<ProjectManagerAgent>
 {
-	public ProjectManagerAgent(ILogger<ProjectManagerAgent> logger, PostgresChatMessageStoreFactory postgresChatMessageStoreFactory, ISemanticKernelBuilder semanticKernelBuilder, Func<JsonElement> func) : base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder, func)
+	public ProjectManagerAgent(ILogger<ProjectManagerAgent> logger,
+		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
+		ISemanticKernelBuilder semanticKernelBuilder, Func<JsonElement> func) 
+		: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder, func)
 	{
+		Id = Guid.Parse("00000000-0000-0000-0000-000000000002");
 	}
 
 	protected override (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options, Func<JsonElement> func)

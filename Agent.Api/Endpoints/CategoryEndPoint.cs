@@ -41,8 +41,6 @@ public static class CategoryEndPoint
 			.Produces(StatusCodes.Status404NotFound);
 
 		return endpoints;
-
-		return endpoints;
 	}
 
 	private static async Task<IResult> CreateAsync(
@@ -50,8 +48,18 @@ public static class CategoryEndPoint
 		ICategoryService service,
 		CancellationToken ct)
 	{
-		var result = await service.CreateAsync(request.Name, request.Description, ct);
+		var result = await service.CreateAsync(request.Code, request.Name, request.Description, ct);
 		return Results.Created($"/api/categories/{result.Id}", result);
+	}
+
+	private static async Task<IResult> UpdateAsync(
+	Guid id,
+	UpdateCategoryRequest request,
+	ICategoryService service,
+	CancellationToken ct)
+	{
+		var result = await service.UpdateAsync(id, request.Code, request.Name, request.Description, ct);
+		return Results.Ok(result);
 	}
 
 	private static async Task<IResult> GetAllAsync(
@@ -69,16 +77,6 @@ public static class CategoryEndPoint
 	{
 		var result = await service.GetByIdAsync(id, ct);
 		return result is null ? Results.NotFound() : Results.Ok(result);
-	}
-
-	private static async Task<IResult> UpdateAsync(
-		Guid id,
-		UpdateCategoryRequest request,
-		ICategoryService service,
-		CancellationToken ct)
-	{
-		var result = await service.UpdateAsync(id, request.Name, request.Description, ct);
-		return Results.Ok(result);
 	}
 
 	private static async Task<IResult> DeleteAsync(

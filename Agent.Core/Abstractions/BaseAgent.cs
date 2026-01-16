@@ -9,7 +9,7 @@ namespace Agent.Core.Abstractions;
 public abstract class BaseAgent<T> : IAgent
 	where T : class, IAgent
 {
-	public string Id { get; protected set; }
+	public Guid Id { get; protected set; } = Guid.NewGuid();
 
 	public  string Name { get; protected set; }
 
@@ -35,7 +35,6 @@ public abstract class BaseAgent<T> : IAgent
 		ISemanticKernelBuilder semanticKernelBuilder,
 		Func<JsonElement> func) 
 	{
-		Id = Guid.NewGuid().ToString("N");
 		Name = typeof(T).Name;
 		_logger = logger;
 		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;

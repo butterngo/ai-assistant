@@ -16,6 +16,11 @@ public class SkillEntity
 
 	[Required]
 	[MaxLength(100)]
+	[Column("skill_code")]
+	public string SkillCode { get; set; } = string.Empty;
+
+	[Required]
+	[MaxLength(100)]
 	[Column("name")]
 	public string Name { get; set; } = string.Empty;
 

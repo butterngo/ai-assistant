@@ -15,6 +15,7 @@ public class CategoryService : ICategoryService
 	}
 
 	public async Task<CategoryEntity> CreateAsync(
+		string catCode,
 		string name,
 		string? description = null,
 		CancellationToken ct = default)
@@ -22,6 +23,7 @@ public class CategoryService : ICategoryService
 		var entity = new CategoryEntity
 		{
 			Id = Guid.NewGuid(),
+			CatCode = catCode,
 			Name = name,
 			Description = description,
 			CreatedAt = DateTime.UtcNow,
@@ -34,21 +36,9 @@ public class CategoryService : ICategoryService
 		return entity;
 	}
 
-	public async Task<CategoryEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
-	{
-		return await _dbContext.Categories
-			.FirstOrDefaultAsync(c => c.Id == id, ct);
-	}
-
-	public async Task<IEnumerable<CategoryEntity>> GetAllAsync(CancellationToken ct = default)
-	{
-		return await _dbContext.Categories
-			.OrderBy(c => c.Name)
-			.ToListAsync(ct);
-	}
-
 	public async Task<CategoryEntity> UpdateAsync(
 		Guid id,
+		string? catCode,
 		string? name = null,
 		string? description = null,
 		CancellationToken ct = default)
@@ -57,6 +47,7 @@ public class CategoryService : ICategoryService
 			.FirstOrDefaultAsync(c => c.Id == id, ct)
 			?? throw new InvalidOperationException($"Category {id} not found");
 
+		if (catCode is not null) entity.CatCode = catCode;
 		if (name is not null) entity.Name = name;
 		if (description is not null) entity.Description = description;
 		entity.UpdatedAt = DateTime.UtcNow;
@@ -64,6 +55,19 @@ public class CategoryService : ICategoryService
 		await _dbContext.SaveChangesAsync(ct);
 
 		return entity;
+	}
+
+	public async Task<CategoryEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
+	{
+		return await _dbContext.Categories
+			.FirstOrDefaultAsync(c => c.Id == id);
+	}
+
+	public async Task<IEnumerable<CategoryEntity>> GetAllAsync(CancellationToken ct = default)
+	{
+		return await _dbContext.Categories
+			.OrderBy(c => c.Name)
+			.ToListAsync(ct);
 	}
 
 	public async Task DeleteAsync(Guid id, CancellationToken ct = default)

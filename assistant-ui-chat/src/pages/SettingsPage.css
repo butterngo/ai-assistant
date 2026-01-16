@@ -1,0 +1,72 @@
+/* =============================================================================
+   Settings Pages - Shared Styles
+   ============================================================================= */
+
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #171717;
+  color: #ececec;
+}
+
+/* =============================================================================
+   Header
+   ============================================================================= */
+
+.settings-page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #2f2f2f;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #8e8e8e;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.back-btn:hover {
+  background: #2f2f2f;
+  color: #ececec;
+}
+
+.settings-page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-page-title svg {
+  color: #6366f1;
+}
+
+.settings-page-title h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* =============================================================================
+   Content
+   ============================================================================= */
+
+.settings-page-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.settings-page-content p {
+  color: #8e8e8e;
+  font-size: 14px;
+}

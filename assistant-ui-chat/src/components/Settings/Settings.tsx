@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { type FC, useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   SettingsIcon,
   LayersIcon,
@@ -21,11 +22,6 @@ import "./Settings.css";
 export interface SettingsProps {
   userName?: string;
   userAvatar?: string;
-  onOpenCategories?: () => void;
-  onOpenSkills?: () => void;
-  onOpenTools?: () => void;
-  onOpenKnowledgeBase?: () => void;
-  onOpenProfile?: () => void;
   onLogout?: () => void;
 }
 
@@ -36,13 +32,9 @@ export interface SettingsProps {
 export const Settings: FC<SettingsProps> = ({
   userName = "Vu Ngo",
   userAvatar = "V",
-  onOpenCategories,
-  onOpenSkills,
-  onOpenTools,
-  onOpenKnowledgeBase,
-  onOpenProfile,
   onLogout,
 }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -85,11 +77,19 @@ export const Settings: FC<SettingsProps> = ({
   }, [isOpen]);
 
   // ---------------------------------------------------------------------------
-  // Handle menu item click
+  // Handle navigation
   // ---------------------------------------------------------------------------
-  const handleItemClick = (callback?: () => void) => {
+  const handleNavigate = (path: string) => {
     setIsOpen(false);
-    callback?.();
+    navigate(path);
+  };
+
+  // ---------------------------------------------------------------------------
+  // Handle logout
+  // ---------------------------------------------------------------------------
+  const handleLogout = () => {
+    setIsOpen(false);
+    onLogout?.();
   };
 
   // ---------------------------------------------------------------------------
@@ -105,28 +105,21 @@ export const Settings: FC<SettingsProps> = ({
             <div className="popover-section-header">Configuration</div>
             <button
               className="popover-item"
-              onClick={() => handleItemClick(onOpenCategories)}
+              onClick={() => handleNavigate("/settings/categories")}
             >
               <LayersIcon size={16} />
-              <span>Categories</span>
+              <span>Agents</span>
             </button>
             <button
               className="popover-item"
-              onClick={() => handleItemClick(onOpenSkills)}
-            >
-              <BrainIcon size={16} />
-              <span>Skills</span>
-            </button>
-            <button
-              className="popover-item"
-              onClick={() => handleItemClick(onOpenTools)}
+              onClick={() => handleNavigate("/settings/tools")}
             >
               <WrenchIcon size={16} />
               <span>Tools</span>
             </button>
             <button
               className="popover-item"
-              onClick={() => handleItemClick(onOpenKnowledgeBase)}
+              onClick={() => handleNavigate("/settings/knowledge-base")}
             >
               <DatabaseIcon size={16} />
               <span>Knowledge Base</span>
@@ -140,14 +133,14 @@ export const Settings: FC<SettingsProps> = ({
           <div className="popover-section">
             <button
               className="popover-item"
-              onClick={() => handleItemClick(onOpenProfile)}
+              onClick={() => handleNavigate("/settings/profile")}
             >
               <UserIcon size={16} />
               <span>Profile</span>
             </button>
             <button
               className="popover-item popover-item-danger"
-              onClick={() => handleItemClick(onLogout)}
+              onClick={handleLogout}
             >
               <LogOutIcon size={16} />
               <span>Log out</span>

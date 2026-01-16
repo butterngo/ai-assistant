@@ -4,6 +4,7 @@ import type { Tool } from "./Tool";
 export interface Skill {
   id: string;
   categoryId: string;
+  code: string;
   name: string;
   systemPrompt: string;
   description?: string;
@@ -18,12 +19,14 @@ export interface SkillWithRelations extends Skill {
 
 export interface CreateSkillRequest {
   categoryId: string;
+  code: string;
   name: string;
   systemPrompt: string;
   description: string;
 }
 
 export interface UpdateSkillRequest {
+  code?: string | null;
   name?: string | null;
   systemPrompt?: string | null;
   description?: string | null;

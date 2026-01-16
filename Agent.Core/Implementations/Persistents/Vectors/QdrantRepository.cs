@@ -1,13 +1,8 @@
-﻿using Agent.Core.Abstractions.LLM;
-using Agent.Core.Abstractions.Persistents;
-using Agent.Core.VectorRecords;
-using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.AI;
+using Agent.Core.Abstractions.LLM;
 using Microsoft.Extensions.VectorData;
+using Agent.Core.Abstractions.Persistents;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
-using Microsoft.SemanticKernel.Embeddings;
-using System.Linq.Expressions;
-using System.Threading;
 
 namespace Agent.Core.Implementations.Persistents.Vectors;
 

@@ -1,7 +1,8 @@
 -- Categories
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL UNIQUE,
+	code VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -10,13 +11,15 @@ CREATE TABLE categories (
 -- Skills
 CREATE TABLE skills (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	code VARCHAR(100) NOT NULL UNIQUE,
     category_id UUID NOT NULL REFERENCES categories(id),
     name VARCHAR(100) NOT NULL,
+	description TEXT NOT NULL,
     system_prompt TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    
-    UNIQUE(category_id, name)
+	
+    UNIQUE(category_id, code)
 );
 
 -- Tools
@@ -39,3 +42,17 @@ CREATE TABLE tools (
 CREATE INDEX idx_skills_category_id ON skills(category_id);
 CREATE INDEX idx_tools_skill_id ON tools(skill_id);
 CREATE INDEX idx_tools_type ON tools(type);
+
+-- Enable pgcrypto if you are on an older Postgres version and gen_random_uuid() fails
+-- CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+INSERT INTO categories (id, code, name, description, created_at, updated_at)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 'anget-general', 'General', 'General purpose, no specific specialization', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000002', 'anget-po', 'ProductOwner', 'Product ownership, backlog management, user stories, requirements', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000003', 'anget-pm', 'ProjectManager', 'Project planning, scheduling, risk management, stakeholder communication', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000004', 'anget-sa', 'SoftwareArchitect', 'System design, architecture patterns, C4 diagrams, technical decisions', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000005', 'anget-sbd', 'SeniorBackendDeveloper', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
+	('00000000-0000-0000-0000-000000000006', 'anget-sfd', 'SeniorFrontendDeveloper', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
+	('00000000-0000-0000-0000-000000000007', 'anget-devops', 'SeniorDevops', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
+ON CONFLICT (code) DO NOTHING;

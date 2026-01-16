@@ -1,0 +1,79 @@
+/* =============================================================================
+   Confirm Dialog Styles
+   ============================================================================= */
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  animation: modal-fade-in 0.2s ease-out;
+}
+
+.confirm-dialog {
+  background: #1f1f1f;
+  border: 1px solid #2f2f2f;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  text-align: center;
+  animation: modal-slide-up 0.2s ease-out;
+}
+
+.confirm-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  background: rgba(234, 179, 8, 0.1);
+  border-radius: 50%;
+}
+
+.confirm-icon-wrapper svg {
+  color: #eab308;
+}
+
+.confirm-icon-wrapper svg.danger {
+  color: #ef4444;
+}
+
+.confirm-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ececec;
+  margin: 0 0 8px;
+}
+
+.confirm-message {
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* =============================================================================
+   Danger Button
+   ============================================================================= */
+
+.btn-danger {
+  background: #ef4444;
+  border: none;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+}

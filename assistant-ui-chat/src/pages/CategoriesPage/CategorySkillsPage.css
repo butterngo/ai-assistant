@@ -1,0 +1,152 @@
+/* =============================================================================
+   Category Skills Page Styles
+   ============================================================================= */
+
+/* Header with breadcrumb */
+.settings-page-title.with-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #8e8e8e;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.back-btn:hover {
+  background: #2f2f2f;
+  color: #ececec;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumb svg {
+  color: #6366f1;
+}
+
+.breadcrumb-parent {
+  font-size: 16px;
+  color: #8e8e8e;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.breadcrumb-parent:hover {
+  color: #ececec;
+}
+
+.breadcrumb-separator {
+  color: #6b6b6b;
+}
+
+.breadcrumb-current {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ececec;
+}
+
+/* Not Found State */
+.not-found-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.not-found-state svg {
+  color: #6b6b6b;
+  margin-bottom: 16px;
+}
+
+.not-found-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ececec;
+  margin: 0 0 8px;
+}
+
+.not-found-state p {
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 0 0 24px;
+}
+
+.not-found-state .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Skill Name Cell */
+.skill-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skill-name-cell svg {
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+/* Description Cell */
+.description-cell {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #8e8e8e;
+}
+
+/* Date Cell */
+.date-cell {
+  color: #6b6b6b;
+  font-size: 13px;
+}
+
+/* Table Actions */
+.table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #8e8e8e;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.action-btn:hover {
+  background: #2f2f2f;
+  color: #ececec;
+}
+
+.action-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}

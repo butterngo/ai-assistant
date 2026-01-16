@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { Sidebar } from "../components/Sidebar";
+import { Sidebar } from "../components";
 import { useConversations } from "../hooks/useConversation";
 import "./AppLayout.css";
 
@@ -74,7 +74,6 @@ export function AppLayout() {
         conversations={conversations}
         activeId={activethreadId}
         isOpen={sidebarOpen}
-        loading={loading}
         onToggle={handleToggleSidebar}
         onNewConversation={handleNewConversation}
         onSelectConversation={handleSelectConversation}

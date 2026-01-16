@@ -1,7 +1,7 @@
 ﻿import { useParams, useLoaderData, useNavigate } from "react-router-dom";
-import { useLayoutContext } from "../layout/useLayoutContext";
-import { ChatRuntime } from "../components/ChatRuntime";
-import type { ConversationLoaderData } from "../loaders/Conversationloader";
+import { useLayoutContext } from "../../layout/useLayoutContext";
+import { ChatRuntime } from "../../components/ChatRuntime";
+import type { ConversationLoaderData } from "../../loaders/Conversationloader";
 
 export function ChatPage() {
   const navigate = useNavigate();

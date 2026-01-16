@@ -1,7 +1,4 @@
-﻿using Agent.Core.Abstractions.Persistents;
-using Microsoft.Extensions.VectorData;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Agent.Core.Models;
 

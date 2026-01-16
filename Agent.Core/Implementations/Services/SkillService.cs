@@ -23,6 +23,7 @@ public class SkillService : ISkillService
 
 	public async Task<SkillEntity> CreateAsync(
 		Guid categoryId,
+		string skillCode,
 		string name,
 		string systemPrompt,
 		string description,
@@ -36,6 +37,7 @@ public class SkillService : ISkillService
 		{
 			Id = Guid.NewGuid(),
 			CategoryId = categoryId,
+			SkillCode = skillCode,
 			Name = name,
 			SystemPrompt = systemPrompt,
 			CreatedAt = DateTime.UtcNow,
@@ -48,14 +50,52 @@ public class SkillService : ISkillService
 		// Insert to Qdrant
 		var record = new SkillRoutingRecord
 		{
-			SkillId = entity.Id,
+			SkillCode = entity.SkillCode,
 			SkillName = entity.Name,
-			CategoryId = category.Id,
+			CatCode = category.CatCode,
 			CategoryName = category.Name,
 			Description = description
 		};
 
 		await _skillRoutingRepo.UpsertAsync(record, ct);
+
+		return entity;
+	}
+
+	public async Task<SkillEntity> UpdateAsync(
+	Guid id,
+	string? skillCode = null,
+	string? name = null,
+	string? systemPrompt = null,
+	string? description = null,
+	CancellationToken ct = default)
+	{
+		var entity = await _dbContext.Skills
+			.Include(s => s.Category)
+			.FirstOrDefaultAsync(s => s.Id == id, ct)
+			?? throw new InvalidOperationException($"Skill {id} not found");
+
+		if (skillCode is not null) entity.SkillCode = skillCode;
+		if (name is not null) entity.Name = name;
+		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
+		entity.UpdatedAt = DateTime.UtcNow;
+
+		await _dbContext.SaveChangesAsync(ct);
+
+		// Update Qdrant if description changed
+		if (description is not null)
+		{
+			var record = new SkillRoutingRecord
+			{
+				SkillCode = entity.SkillCode,
+				SkillName = entity.Name,
+				CatCode = entity.Category.CatCode,
+				CategoryName = entity.Category.Name,
+				Description = description
+			};
+
+			await _skillRoutingRepo.UpsertAsync(record, ct);
+		}
 
 		return entity;
 	}
@@ -74,43 +114,7 @@ public class SkillService : ISkillService
 			.Include(s => s.Tools)
 			.Where(s => s.CategoryId == categoryId)
 			.OrderBy(s => s.Name)
-			.ToListAsync(ct);
-	}
-
-	public async Task<SkillEntity> UpdateAsync(
-		Guid id,
-		string? name = null,
-		string? systemPrompt = null,
-		string? description = null,
-		CancellationToken ct = default)
-	{
-		var entity = await _dbContext.Skills
-			.Include(s => s.Category)
-			.FirstOrDefaultAsync(s => s.Id == id, ct)
-			?? throw new InvalidOperationException($"Skill {id} not found");
-
-		if (name is not null) entity.Name = name;
-		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
-		entity.UpdatedAt = DateTime.UtcNow;
-
-		await _dbContext.SaveChangesAsync(ct);
-
-		// Update Qdrant if description changed
-		if (description is not null)
-		{
-			var record = new SkillRoutingRecord
-			{
-				SkillId = entity.Id,
-				SkillName = entity.Name,
-				CategoryId = entity.CategoryId,
-				CategoryName = entity.Category.Name,
-				Description = description
-			};
-
-			await _skillRoutingRepo.UpsertAsync(record, ct);
-		}
-
-		return entity;
+			.ToListAsync();
 	}
 
 	public async Task DeleteAsync(Guid id, CancellationToken ct = default)
@@ -135,6 +139,6 @@ public class SkillService : ISkillService
 		if (topResult is null)
 			return null;
 
-		return await GetByIdAsync(topResult.SkillId, ct);
+		return await _dbContext.Skills.FirstOrDefaultAsync(s => s.SkillCode == topResult.SkillCode, ct);
 	}
 }

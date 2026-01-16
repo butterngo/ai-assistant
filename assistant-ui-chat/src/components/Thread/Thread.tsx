@@ -24,7 +24,7 @@ import type { FC } from "react";
 import { MarkdownText } from "./rich-content/MarkdownText";
 import "./Thread.css";
 
-interface ThreadProps {
+export interface ThreadProps {
   onToggleSidebar: () => void;
   sidebarOpen: boolean;
   isStreaming: boolean;

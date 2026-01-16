@@ -10,11 +10,11 @@ import {
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
 } from "lucide-react";
-import type { Conversation } from "../types/Conversation";
-import { Settings } from "./Settings";
+import type { Conversation } from "../../types/Conversation";
+import { Settings } from "../Settings";
 import "./Sidebar.css";
 
-interface SidebarProps {
+export interface SidebarProps {
   conversations: Conversation[];
   activeId: string | null;
   isOpen: boolean;
@@ -117,34 +117,6 @@ export const Sidebar: FC<SidebarProps> = ({
 
   const hasConversations = conversations.length > 0;
 
-  // ---------------------------------------------------------------------------
-  // Settings Handlers
-  // ---------------------------------------------------------------------------
-  const handleOpenCategories = () => {
-    console.log("Open Categories");
-    // TODO: Navigate or open modal
-  };
-
-  const handleOpenSkills = () => {
-    console.log("Open Skills");
-    // TODO: Navigate or open modal
-  };
-
-  const handleOpenTools = () => {
-    console.log("Open Tools");
-    // TODO: Navigate or open modal
-  };
-
-  const handleOpenKnowledgeBase = () => {
-    console.log("Open Knowledge Base");
-    // TODO: Navigate or open modal
-  };
-
-  const handleOpenProfile = () => {
-    console.log("Open Profile");
-    // TODO: Navigate or open modal
-  };
-
   const handleLogout = () => {
     console.log("Logout");
     // TODO: Implement logout
@@ -222,11 +194,6 @@ export const Sidebar: FC<SidebarProps> = ({
           <Settings
             userName="Vu Ngo"
             userAvatar="V"
-            onOpenCategories={handleOpenCategories}
-            onOpenSkills={handleOpenSkills}
-            onOpenTools={handleOpenTools}
-            onOpenKnowledgeBase={handleOpenKnowledgeBase}
-            onOpenProfile={handleOpenProfile}
             onLogout={handleLogout}
           />
         </div>
@@ -313,7 +280,6 @@ const ConversationItem: FC<ConversationItemProps> = ({
       <MessageSquareIcon size={16} className="conv-icon" />
       <div className="conv-content">
         <div className="conv-title">{conversation.title || "New conversation"}</div>
-        {conversation.preview && <div className="conv-preview">{conversation.preview}</div>}
       </div>
       <button
         className="delete-btn"

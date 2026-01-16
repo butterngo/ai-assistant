@@ -2,6 +2,7 @@ import type { Skill } from "./Skill";
 
 export interface Category {
   id: string;
+  code: string;
   name: string;
   description: string | null;
   createdAt: string;
@@ -13,11 +14,13 @@ export interface CategoryWithSkills extends Category {
 }
 
 export interface CreateCategoryRequest {
+  code: string;
   name: string;
   description?: string | null;
 }
 
 export interface UpdateCategoryRequest {
+  code?: string | null;
   name?: string | null;
   description?: string | null;
 }
