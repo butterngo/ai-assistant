@@ -23,7 +23,7 @@ public class CategoryService : ICategoryService
 		var entity = new CategoryEntity
 		{
 			Id = Guid.NewGuid(),
-			CatCode = catCode,
+			Code = catCode,
 			Name = name,
 			Description = description,
 			CreatedAt = DateTime.UtcNow,
@@ -47,7 +47,7 @@ public class CategoryService : ICategoryService
 			.FirstOrDefaultAsync(c => c.Id == id, ct)
 			?? throw new InvalidOperationException($"Category {id} not found");
 
-		if (catCode is not null) entity.CatCode = catCode;
+		if (catCode is not null) entity.Code = catCode;
 		if (name is not null) entity.Name = name;
 		if (description is not null) entity.Description = description;
 		entity.UpdatedAt = DateTime.UtcNow;
@@ -60,6 +60,7 @@ public class CategoryService : ICategoryService
 	public async Task<CategoryEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
 	{
 		return await _dbContext.Categories
+			.Include(x=>x.Skills)
 			.FirstOrDefaultAsync(c => c.Id == id);
 	}
 

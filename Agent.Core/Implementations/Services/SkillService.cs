@@ -3,6 +3,7 @@ using Agent.Core.Abstractions.Services;
 using Agent.Core.Entities;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.VectorRecords;
+using Anthropic.SDK.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -37,8 +38,9 @@ public class SkillService : ISkillService
 		{
 			Id = Guid.NewGuid(),
 			CategoryId = categoryId,
-			SkillCode = skillCode,
+			Code = skillCode,
 			Name = name,
+			Description = description,
 			SystemPrompt = systemPrompt,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
@@ -50,9 +52,9 @@ public class SkillService : ISkillService
 		// Insert to Qdrant
 		var record = new SkillRoutingRecord
 		{
-			SkillCode = entity.SkillCode,
+			SkillCode = entity.Code,
 			SkillName = entity.Name,
-			CatCode = category.CatCode,
+			CatCode = category.Code,
 			CategoryName = category.Name,
 			Description = description
 		};
@@ -75,7 +77,7 @@ public class SkillService : ISkillService
 			.FirstOrDefaultAsync(s => s.Id == id, ct)
 			?? throw new InvalidOperationException($"Skill {id} not found");
 
-		if (skillCode is not null) entity.SkillCode = skillCode;
+		if (skillCode is not null) entity.Code = skillCode;
 		if (name is not null) entity.Name = name;
 		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
 		entity.UpdatedAt = DateTime.UtcNow;
@@ -87,9 +89,9 @@ public class SkillService : ISkillService
 		{
 			var record = new SkillRoutingRecord
 			{
-				SkillCode = entity.SkillCode,
+				SkillCode = entity.Code,
 				SkillName = entity.Name,
-				CatCode = entity.Category.CatCode,
+				CatCode = entity.Category.Code,
 				CategoryName = entity.Category.Name,
 				Description = description
 			};
@@ -108,13 +110,13 @@ public class SkillService : ISkillService
 			.FirstOrDefaultAsync(s => s.Id == id, ct);
 	}
 
-	public async Task<IEnumerable<SkillEntity>> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default)
+	public async Task<CategoryEntity> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default)
 	{
-		return await _dbContext.Skills
-			.Include(s => s.Tools)
-			.Where(s => s.CategoryId == categoryId)
-			.OrderBy(s => s.Name)
-			.ToListAsync();
+		var category = await _dbContext.Categories.Include(x=>x.Skills)
+			.FirstOrDefaultAsync(c => c.Id == categoryId, ct)
+			?? throw new InvalidOperationException($"Category {categoryId} not found");
+
+		return category;
 	}
 
 	public async Task DeleteAsync(Guid id, CancellationToken ct = default)
@@ -139,6 +141,6 @@ public class SkillService : ISkillService
 		if (topResult is null)
 			return null;
 
-		return await _dbContext.Skills.FirstOrDefaultAsync(s => s.SkillCode == topResult.SkillCode, ct);
+		return await _dbContext.Skills.FirstOrDefaultAsync(s => s.Code == topResult.SkillCode, ct);
 	}
 }

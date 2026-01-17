@@ -1,6 +1,7 @@
 import { axiosClient } from "./axiosClient";
 import type {
   Skill,
+  CategoryWithSkills,
   SkillWithRelations,
   CreateSkillRequest,
   UpdateSkillRequest,
@@ -21,8 +22,8 @@ export const skillsClient = {
   /**
    * Get all skills by category
    */
-  async getByCategory(categoryId: string): Promise<Skill[]> {
-    const { data } = await axiosClient.get<Skill[]>(
+  async getByCategory(categoryId: string): Promise<CategoryWithSkills> {
+    const { data } = await axiosClient.get<CategoryWithSkills>(
       `/api/skills/by-category/${categoryId}`
     );
     return data;

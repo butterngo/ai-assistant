@@ -79,9 +79,10 @@
 .sidebar-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   padding: 12px;
-  border-bottom: 1px solid #2f2f2f;
+  border-bottom: 1px solid #d97706;
+  min-height: 70px;
 }
 
 .new-chat-btn {

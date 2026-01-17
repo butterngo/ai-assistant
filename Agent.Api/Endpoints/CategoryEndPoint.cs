@@ -76,6 +76,7 @@ public static class CategoryEndPoint
 		CancellationToken ct)
 	{
 		var result = await service.GetByIdAsync(id, ct);
+
 		return result is null ? Results.NotFound() : Results.Ok(result);
 	}
 

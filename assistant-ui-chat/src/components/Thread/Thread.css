@@ -1,12 +1,12 @@
 /* =============================================================================
-   Thread Component Styles - Claude UI Clone (100% accurate)
+   Thread Component Styles - Dark Mode
    ============================================================================= */
 
 .thread-root {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #ffffff;
+  background: #1f1f1f; /* Updated from #171717 */
 }
 
 /* =============================================================================
@@ -14,13 +14,13 @@
    ============================================================================= */
 
 .thread-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
-  min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid #d97706;
+    background: #212121;
+    min-height: 70px;
 }
 
 .sidebar-toggle {
@@ -28,14 +28,14 @@
   background: transparent;
   border: none;
   border-radius: 8px;
-  color: #6b7280;
+  color: #8e8e8e;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .sidebar-toggle:hover {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: #2f2f2f;
+  color: #ececec;
 }
 
 .header-title {
@@ -47,14 +47,14 @@
 .model-name {
   font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
 }
 
 .model-badge {
   font-size: 11px;
   font-weight: 500;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: #8e8e8e;
+  background: #2f2f2f;
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -69,10 +69,11 @@
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
+  background: #212121; /* Updated */
 }
 
 /* =============================================================================
-   Welcome Screen - Claude style
+   Welcome Screen - Dark Mode
    ============================================================================= */
 
 .thread-welcome {
@@ -100,13 +101,13 @@
 .thread-welcome h1 {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
   margin: 0 0 8px;
 }
 
 .thread-welcome > p {
   font-size: 15px;
-  color: #6b7280;
+  color: #8e8e8e;
   margin: 0 0 32px;
 }
 
@@ -123,17 +124,18 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: #212121; /* Updated */
+  border: 1px solid #2f2f2f;
   border-radius: 12px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 .suggestion-btn:hover {
-  border-color: #d1d5db;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #2a2a2a; /* Slightly lighter on hover */
+  border-color: #424242;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .suggestion-icon {
@@ -150,16 +152,16 @@
 .suggestion-text strong {
   font-size: 13px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
 }
 
 .suggestion-text span {
   font-size: 12px;
-  color: #6b7280;
+  color: #8e8e8e;
 }
 
 /* =============================================================================
-   Viewport Footer - Claude style (centered)
+   Viewport Footer - Dark Mode
    ============================================================================= */
 
 .viewport-footer {
@@ -170,32 +172,33 @@
   align-items: center;
   gap: 8px;
   padding: 16px 24px 20px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%);
+  background: linear-gradient(to bottom, rgba(33,33,33,0) 0%, rgba(33,33,33,1) 20%); /* Updated to #212121 */
   margin-top: auto;
 }
 
 /* =============================================================================
-   Scroll to Bottom - Claude style
+   Scroll to Bottom - Dark Mode
    ============================================================================= */
 
 .scroll-to-bottom {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #212121; /* Updated */
+  border: 1px solid #2f2f2f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
-  color: #6b7280;
+  color: #8e8e8e;
 }
 
 .scroll-to-bottom:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: #2a2a2a; /* Slightly lighter on hover */
+  border-color: #424242;
+  color: #ececec;
 }
 
 .scroll-to-bottom:disabled {
@@ -205,7 +208,7 @@
 }
 
 /* =============================================================================
-   Composer - Claude style (centered, rounded)
+   Composer - Dark Mode
    ============================================================================= */
 
 .composer-root {
@@ -214,10 +217,10 @@
   gap: 0;
   width: 100%;
   max-width: 1024px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: #212121; /* Updated */
+  border: 1px solid #2f2f2f;
   border-radius: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -239,11 +242,16 @@
   font-family: inherit;
   min-height: 24px;
   max-height: 200px;
-  color: #1f2937;
+  color: #ececec;
 }
 
 .composer-input::placeholder {
-  color: #9ca3af;
+  color: #6b6b6b;
+}
+
+.composer-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .composer-send {
@@ -262,28 +270,28 @@
   flex-shrink: 0;
 }
 
-.composer-send:hover {
+.composer-send:hover:not(:disabled) {
   background: #b45309;
 }
 
 .composer-send:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
+  background: #2f2f2f;
+  color: #6b6b6b;
   cursor: not-allowed;
 }
 
 .footer-note {
   font-size: 12px;
-  color: #9ca3af;
+  color: #6b6b6b;
 }
 
 /* =============================================================================
-   Messages - Claude style (left aligned, no bubbles)
+   Messages - Dark Mode
    ============================================================================= */
 
 .message-root {
   padding: 24px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #2f2f2f;
 }
 
 .message-root:last-of-type {
@@ -299,7 +307,7 @@
   align-items: flex-start;
 }
 
-/* Avatar - Claude style (small, rounded square) */
+/* Avatar - Dark Mode */
 .message-avatar {
   width: 24px;
   height: 24px;
@@ -336,14 +344,14 @@
 .message-author {
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
 }
 
-/* Message content - Claude style (no bubble, just text) */
+/* Message content - Dark Mode */
 .message-content {
   font-size: 15px;
   line-height: 1.7;
-  color: #374151;
+  color: #d4d4d4;
 }
 
 .message-footer {
@@ -354,7 +362,7 @@
 }
 
 /* =============================================================================
-   Action Bar - Claude style
+   Action Bar - Dark Mode
    ============================================================================= */
 
 .action-bar {
@@ -374,7 +382,7 @@
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: #9ca3af;
+  color: #6b6b6b;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -383,12 +391,12 @@
 }
 
 .action-button:hover {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: #2a2a2a; /* Slightly lighter on hover */
+  color: #8e8e8e;
 }
 
 /* =============================================================================
-   Branch Picker - Claude style
+   Branch Picker - Dark Mode
    ============================================================================= */
 
 .branch-picker {
@@ -396,7 +404,7 @@
   align-items: center;
   gap: 2px;
   font-size: 12px;
-  color: #9ca3af;
+  color: #6b6b6b;
   margin-left: 8px;
 }
 
@@ -404,34 +412,34 @@
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  border: 1px solid #e5e7eb;
-  background: white;
+  border: 1px solid #2f2f2f;
+  background: #212121; /* Updated */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: #8e8e8e;
   transition: background 0.15s;
 }
 
 .branch-button:hover {
-  background: #f9fafb;
+  background: #2a2a2a; /* Slightly lighter on hover */
 }
 
 .branch-state {
   font-weight: 500;
   min-width: 32px;
   text-align: center;
-  color: #6b7280;
+  color: #8e8e8e;
 }
 
 /* =============================================================================
-   Markdown Styles - Claude style
+   Markdown Styles - Dark Mode
    ============================================================================= */
 
 .aui-md {
   line-height: 1.7;
-  color: #374151;
+  color: #d4d4d4;
 }
 
 .aui-md p {
@@ -450,7 +458,7 @@
   margin-top: 24px;
   margin-bottom: 12px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
   line-height: 1.4;
 }
 
@@ -466,7 +474,7 @@
 
 /* Links */
 .aui-md a {
-  color: #2563eb;
+  color: #60a5fa;
   text-decoration: none;
 }
 
@@ -490,13 +498,13 @@
   margin: 8px 0;
 }
 
-/* Code Header - Claude style */
+/* Code Header - Dark Mode */
 .aui-code-header-root {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #1f2937;
-  color: #9ca3af;
+  background: #212121; /* Updated */
+  color: #6b6b6b;
   padding: 8px 16px;
   border-radius: 8px 8px 0 0;
   margin-top: 16px;
@@ -517,7 +525,7 @@
   background: transparent;
   border: none;
   border-radius: 4px;
-  color: #9ca3af;
+  color: #6b6b6b;
   font-size: 12px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -525,7 +533,7 @@
 
 .aui-code-copy-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #e5e7eb;
+  color: #8e8e8e;
 }
 
 .aui-code-copy-icon {
@@ -533,10 +541,10 @@
   height: 14px;
 }
 
-/* Code blocks - Claude style (dark) */
+/* Code blocks - Dark Mode */
 .aui-md pre {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: #212121; /* Updated */
+  color: #e5e5e5;
   padding: 16px;
   border-radius: 8px;
   margin: 16px 0;
@@ -546,17 +554,17 @@
   line-height: 1.6;
 }
 
-/* Inline code - Claude style */
+/* Inline code - Dark Mode */
 .aui-md code:not(pre code) {
-  background: #f3f4f6;
+  background: #2a2a2a; /* Slightly lighter for contrast */
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Menlo", "Monaco", "Consolas", monospace;
   font-size: 0.875em;
-  color: #1f2937;
+  color: #d4d4d4;
 }
 
-/* Tables - Claude style */
+/* Tables - Dark Mode */
 .aui-md table {
   border-collapse: collapse;
   width: 100%;
@@ -566,29 +574,29 @@
 
 .aui-md th,
 .aui-md td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #2f2f2f;
   padding: 10px 14px;
   text-align: left;
 }
 
 .aui-md th {
-  background: #f9fafb;
+  background: #212121; /* Updated */
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
 }
 
 .aui-md tr:nth-child(even) {
-  background: #f9fafb;
+  background: rgba(47, 47, 47, 0.3);
 }
 
-/* Blockquotes - Claude style */
+/* Blockquotes - Dark Mode */
 .aui-md blockquote {
   border-left: 3px solid #d97706;
   margin: 16px 0;
   padding: 12px 20px;
-  background: #fffbeb;
+  background: rgba(217, 119, 6, 0.1);
   border-radius: 0 8px 8px 0;
-  color: #92400e;
+  color: #d4d4d4;
 }
 
 .aui-md blockquote p:last-child {
@@ -598,13 +606,13 @@
 /* Strong/Bold */
 .aui-md strong {
   font-weight: 600;
-  color: #1f2937;
+  color: #ececec;
 }
 
 /* Horizontal rule */
 .aui-md hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #2f2f2f;
   margin: 24px 0;
 }
 
@@ -629,8 +637,9 @@
     font-size: 20px;
   }
 }
+
 /* =============================================================================
-   Loading Indicator - Typing dots
+   Loading Indicator - Dark Mode
    ============================================================================= */
 
 .loading-indicator {
@@ -643,7 +652,7 @@
 .loading-dot {
   width: 8px;
   height: 8px;
-  background-color: #6366f1;
+  background-color: #d97706;
   border-radius: 50%;
   animation: loading-bounce 1.4s infinite ease-in-out both;
 }

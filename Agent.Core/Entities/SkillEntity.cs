@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Agent.Core.Entities;
 
@@ -16,13 +17,17 @@ public class SkillEntity
 
 	[Required]
 	[MaxLength(100)]
-	[Column("skill_code")]
-	public string SkillCode { get; set; } = string.Empty;
+	[Column("code")]
+	public string Code { get; set; } = string.Empty;
 
 	[Required]
 	[MaxLength(100)]
 	[Column("name")]
 	public string Name { get; set; } = string.Empty;
+
+	[Required]
+	[Column("description")]
+	public string Description { get; set; } = string.Empty;
 
 	[Required]
 	[Column("system_prompt")]
@@ -36,6 +41,7 @@ public class SkillEntity
 
 	// Navigation
 	[ForeignKey(nameof(CategoryId))]
+	[JsonIgnore]
 	public CategoryEntity Category { get; set; } = null!;
 
 	public ICollection<ToolEntity> Tools { get; set; } = [];

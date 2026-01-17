@@ -49,10 +49,10 @@ CREATE INDEX idx_tools_type ON tools(type);
 INSERT INTO categories (id, code, name, description, created_at, updated_at)
 VALUES
     ('00000000-0000-0000-0000-000000000001', 'anget-general', 'General', 'General purpose, no specific specialization', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000000002', 'anget-po', 'ProductOwner', 'Product ownership, backlog management, user stories, requirements', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000000003', 'anget-pm', 'ProjectManager', 'Project planning, scheduling, risk management, stakeholder communication', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000000004', 'anget-sa', 'SoftwareArchitect', 'System design, architecture patterns, C4 diagrams, technical decisions', NOW(), NOW()),
-    ('00000000-0000-0000-0000-000000000005', 'anget-sbd', 'SeniorBackendDeveloper', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
-	('00000000-0000-0000-0000-000000000006', 'anget-sfd', 'SeniorFrontendDeveloper', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
-	('00000000-0000-0000-0000-000000000007', 'anget-devops', 'SeniorDevops', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000002', 'anget-po', 'Product Owner', 'Product ownership, backlog management, user stories, requirements', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000003', 'anget-pm', 'Project Manager', 'Project planning, scheduling, risk management, stakeholder communication', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000004', 'anget-sa', 'Software Architect', 'System design, architecture patterns, C4 diagrams, technical decisions', NOW(), NOW()),
+    ('00000000-0000-0000-0000-000000000005', 'anget-sbd', 'Backend Developer', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
+	('00000000-0000-0000-0000-000000000006', 'anget-sfd', 'Frontend Developer', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
+	('00000000-0000-0000-0000-000000000007', 'anget-devops', 'Devops Engineer', 'Coding, debugging, testing, code review, CI/CD', NOW(), NOW()),
 ON CONFLICT (code) DO NOTHING;

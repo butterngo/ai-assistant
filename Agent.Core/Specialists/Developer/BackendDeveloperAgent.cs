@@ -7,9 +7,9 @@ using System.Text.Json;
 
 namespace Agent.Core.Specialists
 {
-	internal class DeveloperAgent : BaseAgent<DeveloperAgent>
+	internal class BackendDeveloperAgent : BaseAgent<BackendDeveloperAgent>
 	{
-		public DeveloperAgent(ILogger<DeveloperAgent> logger,
+		public BackendDeveloperAgent(ILogger<BackendDeveloperAgent> logger,
 			PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
 			ISemanticKernelBuilder semanticKernelBuilder, Func<JsonElement> func) 
 			: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder, func)

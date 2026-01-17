@@ -1,4 +1,4 @@
-import { type FC, useState, useEffect, useMemo } from "react";
+import { type FC, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -7,8 +7,9 @@ import {
   PencilIcon,
   TrashIcon,
   LayersIcon,
+  MessageSquareIcon,
 } from "lucide-react";
-import { useCategories, useSkills } from "../../hooks";
+import { useSkills } from "../../hooks";
 import { DataTable, SkillModal, ConfirmDialog, type Column } from "../../components";
 import type { Skill, CreateSkillRequest, UpdateSkillRequest } from "../../types";
 import "../SettingsPage.css";
@@ -19,20 +20,19 @@ import "./CategorySkillsPage.css";
 // =============================================================================
 
 export const CategorySkillsPage: FC = () => {
-  const { categoryId } = useParams();
+  const { categoryId } = useParams<string>();
   const navigate = useNavigate();
 
-  // Use existing hooks
-  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
   const {
     skills,
+    category,
     loading: skillsLoading,
     error: skillsError,
     fetchByCategory,
     create,
     update,
     remove,
-  } = useSkills();
+  } = useSkills(categoryId);
 
   // Search state
   const [search, setSearch] = useState("");
@@ -46,26 +46,10 @@ export const CategorySkillsPage: FC = () => {
   const [deleting, setDeleting] = useState(false);
 
   // ---------------------------------------------------------------------------
-  // Get current category
-  // ---------------------------------------------------------------------------
-  const category = useMemo(() => {
-    return categories.find((cat) => cat.id === categoryId) || null;
-  }, [categories, categoryId]);
-
-  // ---------------------------------------------------------------------------
-  // Fetch skills when categoryId changes
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
-    if (categoryId) {
-      fetchByCategory(categoryId);
-    }
-  }, [categoryId, fetchByCategory]);
-
-  // ---------------------------------------------------------------------------
   // Combined loading and error states
   // ---------------------------------------------------------------------------
-  const loading = categoriesLoading || skillsLoading;
-  const error = categoriesError || skillsError;
+  const loading = skillsLoading;
+  const error =  skillsError;
 
   // ---------------------------------------------------------------------------
   // Filtered skills
@@ -118,6 +102,16 @@ export const CategorySkillsPage: FC = () => {
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
+  const handleTestSkill = (skill: Skill, e: React.MouseEvent) => {
+  e.stopPropagation();
+  navigate(`/test-chat?skill=${skill.id}&category=${categoryId}`, {
+    state: { 
+      skillName: skill.name,
+      categoryName: category?.name 
+    }
+  });
+ };
+
   const handleBack = () => {
     navigate("/settings/categories");
   };
@@ -174,6 +168,13 @@ export const CategorySkillsPage: FC = () => {
   // ---------------------------------------------------------------------------
   const renderActions = (skill: Skill) => (
     <div className="table-actions">
+       <button 
+    className="action-btn chat-btn" 
+    onClick={(e) => handleTestSkill(skill, e)}
+    title="Test skill in chat"
+  >
+      <MessageSquareIcon size={16} />
+    </button>
       <button className="action-btn" onClick={() => handleEdit(skill)} title="Edit">
         <PencilIcon size={16} />
       </button>

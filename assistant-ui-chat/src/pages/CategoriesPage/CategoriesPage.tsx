@@ -7,6 +7,7 @@ import {
   TrashIcon,
   ChevronRightIcon,
   BrainIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 import { useCategories } from "../../hooks";
 import { CategoryModal, ConfirmDialog } from "../../components";
@@ -33,6 +34,13 @@ export const CategoriesPage: FC = () => {
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
+
+  const handleChat = (category: Category, e: React.MouseEvent) => {
+  e.stopPropagation();
+  navigate(`/test-chat?category=${category.id}`, {
+    state: { categoryName: category.name }
+    });
+  };
 
   const handleCreate = () => {
     setEditingCategory(null);
@@ -150,6 +158,13 @@ export const CategoriesPage: FC = () => {
                   </div>
                 </div>
                 <div className="category-card-actions">
+                  <button
+                    className="icon-btn chat-btn"
+                    onClick={(e) => handleChat(category, e)}
+                    title="Test in chat"
+                  >
+                    <MessageSquareIcon size={16} />
+                  </button>
                   <button
                     className="action-btn"
                     onClick={(e) => handleEdit(e, category)}

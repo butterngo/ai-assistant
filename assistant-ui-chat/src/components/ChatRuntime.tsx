@@ -79,7 +79,7 @@ export function ChatRuntime({
   // ===========================================================================
   // Adapter & Runtime Setup
   // ===========================================================================
-
+  
   const adapter = useChatStreamAdapter({
     api: API_ENDPOINT,
     threadId,

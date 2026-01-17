@@ -1,6 +1,7 @@
 ﻿using Agent.Api.Models;
 using Agent.Core.Abstractions.Services;
 using Agent.Core.Entities;
+using Anthropic.SDK.Messaging;
 
 namespace Agent.Api.Endpoints;
 
@@ -95,8 +96,9 @@ public static class SkillEndPoint
 		ISkillService service,
 		CancellationToken ct)
 	{
-		var result = await service.GetByCategoryAsync(categoryId, ct);
-		return Results.Ok(result);
+		var category = await service.GetByCategoryAsync(categoryId, ct);
+
+		return Results.Ok(category);
 	}
 
 	private static async Task<IResult> DeleteAsync(

@@ -5,7 +5,7 @@ using Agent.Core.Implementations.Persistents;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
+using System.Collections.Concurrent;
 
 namespace Agent.Core.Implementations;
 
@@ -16,6 +16,8 @@ public class AgentManager : IAgentManager
 	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
 	private readonly ILoggerFactory _loggerFactory;
 	private readonly IIntentClassificationService _intentClassificationService;
+	
+	private readonly ConcurrentDictionary<Guid, Func<IAgent>> _agents = new();
 
 	public AgentManager(ILoggerFactory loggerFactory,
 		ISemanticKernelBuilder kernelBuilder,
@@ -30,13 +32,13 @@ public class AgentManager : IAgentManager
 		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
 	}
 
-	public async Task<(GeneralAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(
+	public async Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(Guid agentId,
 		Guid? threadId,
 		string userMessage,
 		CancellationToken ct = default)
 	{
 		var dbContext = _dbContextFactory.CreateDbContext();
-		
+
 		bool isNewConversation = false;
 
 		if (!threadId.HasValue)
@@ -64,19 +66,58 @@ public class AgentManager : IAgentManager
 			await dbContext.SaveChangesAsync(ct);
 		}
 
-		var agent = new GeneralAgent(_loggerFactory.CreateLogger<GeneralAgent>(),
-			_kernelBuilder,
-			_postgresChatMessageStoreFactory, () => 
-			{
-				return JsonSerializer.SerializeToElement(new { threadId = thread.Id });
-			});
+		var agent = CreateAgent(agentId, thread.Id);
 
 		return (agent, thread, isNewConversation);
 	}
 
+	public Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(
+		Guid? threadId,
+		string userMessage,
+		CancellationToken ct = default)
+	 => GetOrCreateAsync(Guid.Parse("00000000-0000-0000-0000-000000000001"), threadId, userMessage, ct);
+
 	public async Task<object> DryRunAsync(string userMessage, CancellationToken ct = default)
 	{
 		return await _intentClassificationService.IntentAsync(userMessage, ct);
+	}
+
+	private IAgent CreateAgent(Guid categoryId, Guid threadId)
+	{
+		var builder = new AgentBuilder()
+			.WithLogger<GeneralAgent>(_loggerFactory)
+			.WithKernel(_kernelBuilder)
+			.WithMessageStore(_postgresChatMessageStoreFactory)
+			.WithThreadId(threadId);
+
+		IAgent Create<T>() where T : IAgent
+			=> builder.WithLogger<T>(_loggerFactory).Build<T>();
+
+		return categoryId switch
+		{
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000001")
+				=> Create<GeneralAgent>(),
+
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000002")
+				=> Create<ProductOwnerAgent>(),
+
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000003")
+			=> Create<ProjectManagerAgent>(),
+
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000004")
+			=> Create<SoftwareArchitectAgent>(),
+
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000005")
+			=> Create<BackendDeveloperAgent>(),
+
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000006")
+			=> Create<FrontendDeveloperAgent>(),
+
+			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000007")
+			=> Create<DevopsAgent>(),
+
+			_ => builder.WithLogger<GeneralAgent>(_loggerFactory).Build<GeneralAgent>()
+		};
 	}
 
 	private static string GenerateTitle(string message)
@@ -97,6 +138,5 @@ public class AgentManager : IAgentManager
 		}
 
 		return title;
-	}
-
+	}	
 }

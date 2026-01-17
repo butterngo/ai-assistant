@@ -3,6 +3,7 @@ import { AppLayout } from "./layout/Applayout";
 import { SettingsLayout } from "./layout/SettingsLayout";
 import {
   ChatPage,
+  TestChatPage,
   CategoriesPage,
   CategorySkillsPage,
   ToolsPage,
@@ -21,15 +22,20 @@ export const router = createBrowserRouter([
         element: <ChatPage />,
       },
       {
-        path: "conversation/:conversationId",
+        path: "conversation/:threadId",
         element: <ChatPage />,
         loader: conversationLoader,
       },
       {
         path: "conversations",
         element: <Navigate to="/" replace />,
-      },
+      }
     ],
+  },
+  {
+    // Test Chat - Standalone route (outside AppLayout and SettingsLayout)
+    path: "/test-chat",
+    element: <TestChatPage />,
   },
   {
     path: "/settings",
@@ -59,7 +65,7 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         element: <ProfilePage />,
-      },
+      }
     ],
   },
 ]);

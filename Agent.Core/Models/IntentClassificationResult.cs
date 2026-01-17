@@ -1,15 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using Agent.Core.Enums;
+using System.Text.Json.Serialization;
 
 namespace Agent.Core.Models;
-
-public enum Specialist
-{
-	None,
-	ProductOwner,
-	ProjectManager,
-	SoftwareArchitect,
-	Developer,
-}
 
 public class IntentClassificationResult
 {
@@ -32,21 +24,21 @@ public class IntentClassificationResult
 		// Fallback mapping for common variations
 		return Specialist.ToLowerInvariant() switch
 		{
-			"general" => Models.Specialist.None,
-			"pm" => Models.Specialist.ProjectManager,
-			"projectmanager" => Models.Specialist.ProjectManager,
-			"project manager" => Models.Specialist.ProjectManager,
-			"po" => Models.Specialist.ProductOwner,
-			"productowner" => Models.Specialist.ProductOwner,
-			"product owner" => Models.Specialist.ProductOwner,
-			"product" => Models.Specialist.ProductOwner,
-			"architect" => Models.Specialist.SoftwareArchitect,
-			"softwarearchitect" => Models.Specialist.SoftwareArchitect,
-			"software architect" => Models.Specialist.SoftwareArchitect,
-			"dev" => Models.Specialist.Developer,
-			"developer" => Models.Specialist.Developer,
-			"engineer" => Models.Specialist.Developer,
-			_ => Models.Specialist.None
+			"general" => Enums.Specialist.None,
+			"pm" => Enums.Specialist.ProjectManager,
+			"projectmanager" => Enums.Specialist.ProjectManager,
+			"project manager" => Enums.Specialist.ProjectManager,
+			"po" => Enums.Specialist.ProductOwner,
+			"productowner" => Enums.Specialist.ProductOwner,
+			"product owner" => Enums.Specialist.ProductOwner,
+			"product" => Enums.Specialist.ProductOwner,
+			"architect" =>	Enums.Specialist.SoftwareArchitect,
+			"softwarearchitect" => Enums.Specialist.SoftwareArchitect,
+			"software architect" =>	Enums.Specialist.SoftwareArchitect,
+			"dev" =>	Enums.Specialist.Developer,
+			"developer" =>	Enums.Specialist.Developer,
+			"engineer" => Enums.Specialist.Developer,
+			_ => Enums.Specialist.None
 		};
 	}
 }

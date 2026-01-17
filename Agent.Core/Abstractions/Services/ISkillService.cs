@@ -19,7 +19,7 @@ public interface ISkillService
 		CancellationToken ct = default);
 
 	Task<SkillEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
-	Task<IEnumerable<SkillEntity>> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default);
+	Task<CategoryEntity> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default);
 	Task DeleteAsync(Guid id, CancellationToken ct = default);
 	Task<SkillEntity?> RouteAsync(string query, CancellationToken ct = default);
 }

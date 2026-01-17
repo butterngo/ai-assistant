@@ -1,4 +1,5 @@
 export { ChatPage } from "./ChatPage/ChatPage";
+export { TestChatPage } from "./ChatPage/TestChatPage";
 export { CategoriesPage } from "./CategoriesPage/CategoriesPage";
 export { CategorySkillsPage } from "./CategoriesPage/CategorySkillsPage";
 export { ToolsPage } from "./ToolsPage/ToolsPage";

@@ -1,0 +1,124 @@
+/* =============================================================================
+   Test Chat Page - Dedicated testing environment
+   ============================================================================= */
+
+.test-chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #1f1f1f;
+}
+
+/* =============================================================================
+   Test Header Banner
+   ============================================================================= */
+
+.test-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #212121;
+  border-bottom: 2px solid #d97706;
+  min-height: 60px;
+}
+
+.test-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(217, 119, 6, 0.1);
+  border: 1px solid #d97706;
+  border-radius: 8px;
+}
+
+.test-icon {
+  font-size: 20px;
+}
+
+.test-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.test-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8e8e8e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.test-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ececec;
+}
+
+.close-test-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #2f2f2f;
+  border-radius: 8px;
+  color: #8e8e8e;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.close-test-btn:hover {
+  background: #2f2f2f;
+  border-color: #424242;
+  color: #ececec;
+}
+
+/* =============================================================================
+   Chat Content
+   ============================================================================= */
+
+.test-chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Override Thread styles for test mode */
+.test-chat-page .thread-root {
+  background: #1f1f1f;
+}
+
+.test-chat-page .thread-header {
+  display: none; /* Hide original header since we have test banner */
+}
+
+.test-chat-page .thread-viewport {
+  background: #212121;
+}
+
+/* =============================================================================
+   Responsive
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .test-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .close-test-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .test-name {
+    font-size: 13px;
+  }
+}

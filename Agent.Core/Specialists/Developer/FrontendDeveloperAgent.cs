@@ -7,15 +7,14 @@ using System.Text.Json;
 
 namespace Agent.Core.Specialists;
 
-internal class ProductOwnerAgent : BaseAgent<ProductOwnerAgent>
+internal class FrontendDeveloperAgent : BaseAgent<FrontendDeveloperAgent>
 {
-	public ProductOwnerAgent(ILogger<ProductOwnerAgent> logger,
+	public FrontendDeveloperAgent(ILogger<FrontendDeveloperAgent> logger,
 		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
-		ISemanticKernelBuilder semanticKernelBuilder,
-		Func<JsonElement> func) 
+		ISemanticKernelBuilder semanticKernelBuilder, Func<JsonElement> func)
 		: base(logger, postgresChatMessageStoreFactory, semanticKernelBuilder, func)
 	{
-		Id = Guid.Parse("00000000-0000-0000-0000-000000000003");
+		Id = Guid.Parse("00000000-0000-0000-0000-000000000006");
 	}
 
 	protected override (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options, Func<JsonElement> func)
