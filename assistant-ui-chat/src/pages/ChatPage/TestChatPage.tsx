@@ -71,6 +71,10 @@ const handleError = useCallback((error: { error: string; code: string }) => {
   const adapter = useChatStreamAdapter({
     api: API_ENDPOINT,
     threadId,
+    headers: {
+       "X-Agent-Id": categoryId ?? "",
+       "X-Skill-Id": skillId ?? "",
+    },
     onMetadata: handleMetadata,
     onStart: handleStart,
     onDone: handleDone,

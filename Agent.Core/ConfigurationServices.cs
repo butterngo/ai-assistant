@@ -4,9 +4,9 @@ using Agent.Core.Abstractions.Persistents;
 using Agent.Core.Abstractions.Services;
 using Agent.Core.Implementations;
 using Agent.Core.Implementations.Persistents;
+using Agent.Core.Implementations.Persistents.Postgresql;
 using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Implementations.Services;
-using Agent.Core.Specialists;
 using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +43,7 @@ public static class ConfigurationServices
 		});
 
 		// Register the factory as singleton (it's stateless, uses DbContextFactory internally)
-		services.AddSingleton<PostgresChatMessageStoreFactory>(sp =>
+		services.AddSingleton<IChatMessageStoreFactory>(sp =>
 		{
 			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<ChatDbContext>>();
 			return new PostgresChatMessageStoreFactory(dbContextFactory, maxMessages);

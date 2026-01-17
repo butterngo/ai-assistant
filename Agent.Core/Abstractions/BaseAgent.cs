@@ -1,8 +1,7 @@
-﻿using Agent.Core.Abstractions.LLM;
-using Agent.Core.Implementations.Persistents;
-using Microsoft.Agents.AI;
+﻿using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
+using Agent.Core.Abstractions.LLM;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace Agent.Core.Abstractions;
 
@@ -17,7 +16,7 @@ public abstract class BaseAgent<T> : IAgent
 
 	protected readonly ISemanticKernelBuilder _semanticKernelBuilder;
 
-	protected readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
+	protected readonly ChatMessageStore _chatMessageStore;
 
 	protected string ConversationId { get; set; }
 
@@ -31,22 +30,34 @@ public abstract class BaseAgent<T> : IAgent
 	protected readonly AgentThread _thread;
 
 	public BaseAgent(ILogger<T> logger,
-		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory,
-		ISemanticKernelBuilder semanticKernelBuilder,
-		Func<JsonElement> func) 
+		ChatMessageStore chatMessageStore,
+		ISemanticKernelBuilder semanticKernelBuilder) 
 	{
 		Name = typeof(T).Name;
 		_logger = logger;
-		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
+		_chatMessageStore = chatMessageStore;
 		_semanticKernelBuilder = semanticKernelBuilder;
 
 		(_agent, _thread) = CreateAgent(new ChatClientAgentOptions
 		{
 			Name = Name
-		}, func);
+		});
 	}
 
-	protected abstract (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options, Func<JsonElement> func);
+	protected abstract void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions options);
+	
+	protected virtual (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options)
+	{
+		var chatClient = _semanticKernelBuilder.Build(Options.LLMProviderType.AzureOpenAI);
+
+		SetAgentOptions(chatClient, options);
+
+		var agent = new ChatClientAgent(chatClient, options);
+
+		var thread = agent.GetNewThread(_chatMessageStore);
+
+		return (agent, thread);
+	}
 
 	public virtual Task<AgentRunResponse> RunAsync(string userMessage, CancellationToken cancellationToken = default)
 	{

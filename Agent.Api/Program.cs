@@ -68,14 +68,6 @@ internal class Program
 
 		app.MapOpenApi();
 
-		//if (app.Environment.IsDevelopment())
-		//{
-		//	app.UseSwaggerUI(options =>
-		//	{
-		//		options.SwaggerEndpoint("/openapi/v1.json", "Skill Management API v1");
-		//	});
-		//}
-
 		app.UseCors();
 
 		app.MapChatBotEndPoints();

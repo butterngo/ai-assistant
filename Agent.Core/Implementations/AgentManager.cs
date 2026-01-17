@@ -1,18 +1,22 @@
 ﻿using Agent.Core.Abstractions;
 using Agent.Core.Abstractions.LLM;
+using Agent.Core.Abstractions.Persistents;
 using Agent.Core.Entities;
 using Agent.Core.Implementations.Persistents;
+using Agent.Core.Implementations.Persistents.Postgresql;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Threading;
 
 namespace Agent.Core.Implementations;
 
 public class AgentManager : IAgentManager
 {
 	private readonly ISemanticKernelBuilder _kernelBuilder;
-	private readonly PostgresChatMessageStoreFactory _postgresChatMessageStoreFactory;
+	private readonly IChatMessageStoreFactory _chatMessageStoreFactory;
 	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
 	private readonly ILoggerFactory _loggerFactory;
 	private readonly IIntentClassificationService _intentClassificationService;
@@ -23,16 +27,16 @@ public class AgentManager : IAgentManager
 		ISemanticKernelBuilder kernelBuilder,
 		IDbContextFactory<ChatDbContext> dbContextFactory,
 		IIntentClassificationService intentClassificationService,
-		PostgresChatMessageStoreFactory postgresChatMessageStoreFactory)
+		IChatMessageStoreFactory chatMessageStoreFactory)
 	{
 		_loggerFactory = loggerFactory;
 		_kernelBuilder = kernelBuilder;
 		_dbContextFactory = dbContextFactory;
 		_intentClassificationService = intentClassificationService;
-		_postgresChatMessageStoreFactory = postgresChatMessageStoreFactory;
+		_chatMessageStoreFactory = chatMessageStoreFactory;
 	}
 
-	public async Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(Guid agentId,
+	public async Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(Guid? agentId,
 		Guid? threadId,
 		string userMessage,
 		CancellationToken ct = default)
@@ -66,16 +70,17 @@ public class AgentManager : IAgentManager
 			await dbContext.SaveChangesAsync(ct);
 		}
 
-		var agent = CreateAgent(agentId, thread.Id);
+		Guid inferredAgentId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
+		if (agentId.HasValue) 
+		{
+			inferredAgentId = agentId.Value;
+		}
+
+		var agent = CreateAgent(inferredAgentId, thread.Id);
 
 		return (agent, thread, isNewConversation);
 	}
-
-	public Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(
-		Guid? threadId,
-		string userMessage,
-		CancellationToken ct = default)
-	 => GetOrCreateAsync(Guid.Parse("00000000-0000-0000-0000-000000000001"), threadId, userMessage, ct);
 
 	public async Task<object> DryRunAsync(string userMessage, CancellationToken ct = default)
 	{
@@ -84,11 +89,12 @@ public class AgentManager : IAgentManager
 
 	private IAgent CreateAgent(Guid categoryId, Guid threadId)
 	{
+		var state = JsonSerializer.SerializeToElement(new { threadId });
+
 		var builder = new AgentBuilder()
 			.WithLogger<GeneralAgent>(_loggerFactory)
 			.WithKernel(_kernelBuilder)
-			.WithMessageStore(_postgresChatMessageStoreFactory)
-			.WithThreadId(threadId);
+			.WithMessageStore(_chatMessageStoreFactory.Create(state));
 
 		IAgent Create<T>() where T : IAgent
 			=> builder.WithLogger<T>(_loggerFactory).Build<T>();

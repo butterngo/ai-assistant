@@ -12,6 +12,9 @@ public static class ChatBotEndpoints
 		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 	};
 
+	private const string XAgentId = "X-Agent-Id";
+	private const string XSkillId = "X-Skill-Id";
+
 	public static IEndpointRouteBuilder MapChatBotEndPoints(this IEndpointRouteBuilder endpoints)
 	{
 		endpoints.MapPost("/chat/stream", HandleChatStreamAsync)
@@ -20,45 +23,20 @@ public static class ChatBotEndpoints
 			.Produces(StatusCodes.Status200OK, contentType: "text/event-stream")
 			.Produces(StatusCodes.Status400BadRequest);
 
-		endpoints.MapPost("/chat", HandleChatAsync)
-			.WithTags("ChatBot")
-			.WithSummary("chat response with json")
-			.Produces(StatusCodes.Status200OK, contentType: "application/json")
-			.Produces(StatusCodes.Status400BadRequest);
-
 		return endpoints;
 	}
 
-	private static async Task HandleChatAsync(
-		HttpContext ctx,
-		[FromBody] ChatRequest req,
-		[FromServices] IAgentManager manager,
-		CancellationToken ct)
+	private static Guid? GetAgentId(HttpContext ctx) 
 	{
-		if (string.IsNullOrWhiteSpace(req.Message))
+
+		if (ctx.Request.Headers.ContainsKey(XAgentId)) 
 		{
-			ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
-			await ctx.Response.WriteAsJsonAsync(new { error = "Message required" }, ct);
-			return;
+			return Guid.Parse(ctx.Request.Headers[XAgentId].ToString());
 		}
 
-		try
-		{
-			var (agent, thread,_) = await manager.GetOrCreateAsync(req.threadId, req.Message, ct);
-
-		}
-		catch (Exception ex)
-		{
-			var error = new ChatError
-			{
-				Error = ex.Message,
-				Code = "INTERNAL_ERROR"
-			};
-			await WriteEventAsync(ctx.Response, "error", error, ct);
-		}
+		return null;
 	}
-
-
+	
 	private static async Task HandleChatStreamAsync(
 		HttpContext ctx,
 		[FromBody] ChatRequest req,
@@ -79,7 +57,7 @@ public static class ChatBotEndpoints
 
 		try
 		{
-			var (agent, thread, isNewConversation) = await manager.GetOrCreateAsync(req.threadId, req.Message, ct);
+			var (agent, thread, isNewConversation) = await manager.GetOrCreateAsync(GetAgentId(ctx), req.threadId, req.Message, ct);
 
 			var metadata = new ChatMetadata
 			{

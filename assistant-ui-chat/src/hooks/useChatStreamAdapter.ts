@@ -14,7 +14,7 @@ import type {
 export interface ChatStreamAdapterOptions {
   /** API endpoint URL */
   api: string;
-  /** Current conversation ID (null for new conversation) */
+  /** Current threadId ID (null for new thread) */
   threadId: string | null;
   /** Additional headers for the request */
   headers?: Record<string, string>;

@@ -1,10 +1,11 @@
-﻿using Microsoft.Agents.AI;
+﻿using System.Text.Json;
+using Microsoft.Agents.AI;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
+using Agent.Core.Abstractions.Persistents;
 
-namespace Agent.Core.Implementations.Persistents;
+namespace Agent.Core.Implementations.Persistents.Postgresql;
 
-public class PostgresChatMessageStoreFactory
+internal class PostgresChatMessageStoreFactory : IChatMessageStoreFactory
 {
 	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
 	private readonly int _maxMessages;
