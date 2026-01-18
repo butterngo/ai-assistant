@@ -1,6 +1,5 @@
 ﻿using Agent.Core.Entities;
 using Agent.Core.Enums;
-using Microsoft.Agents.AI;
 
 namespace Agent.Core.Abstractions;
 

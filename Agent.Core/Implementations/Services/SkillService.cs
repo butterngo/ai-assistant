@@ -52,6 +52,7 @@ public class SkillService : ISkillService
 		// Insert to Qdrant
 		var record = new SkillRoutingRecord
 		{
+			Id = entity.Id,
 			SkillCode = entity.Code,
 			SkillName = entity.Name,
 			CatCode = category.Code,
@@ -80,6 +81,7 @@ public class SkillService : ISkillService
 		if (skillCode is not null) entity.Code = skillCode;
 		if (name is not null) entity.Name = name;
 		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
+		if (description is not null) entity.Description = description;
 		entity.UpdatedAt = DateTime.UtcNow;
 
 		await _dbContext.SaveChangesAsync(ct);
@@ -89,6 +91,7 @@ public class SkillService : ISkillService
 		{
 			var record = new SkillRoutingRecord
 			{
+				Id = entity.Id,
 				SkillCode = entity.Code,
 				SkillName = entity.Name,
 				CatCode = entity.Category.Code,
@@ -135,7 +138,10 @@ public class SkillService : ISkillService
 
 	public async Task<SkillEntity?> RouteAsync(string query, CancellationToken ct = default)
 	{
-		var results = await _skillRoutingRepo.SearchAsync(query, top: 1, cancellationToken: ct);
+		var results = await _skillRoutingRepo.SearchAsync(query, top: 1, 
+			similarityThreshold: null,
+			cancellationToken: ct);
+
 		var topResult = results.FirstOrDefault();
 
 		if (topResult is null)

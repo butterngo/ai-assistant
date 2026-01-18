@@ -1,7 +1,8 @@
-﻿using Microsoft.Agents.AI;
+﻿using Agent.Core.Abstractions.LLM;
+using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using Agent.Core.Abstractions.LLM;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Agent.Core.Abstractions;
 
@@ -18,12 +19,7 @@ public abstract class BaseAgent<T> : IAgent
 
 	protected readonly ChatMessageStore _chatMessageStore;
 
-	protected string ConversationId { get; set; }
-
-	public void SetConversationId(string conversationId)
-	{
-		ConversationId = conversationId;
-	}
+	protected readonly AIContextProvider _aIContextProvider;
 
 	protected readonly ChatClientAgent _agent;
 
@@ -31,21 +27,27 @@ public abstract class BaseAgent<T> : IAgent
 
 	public BaseAgent(ILogger<T> logger,
 		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider,
 		ISemanticKernelBuilder semanticKernelBuilder) 
 	{
 		Name = typeof(T).Name;
 		_logger = logger;
 		_chatMessageStore = chatMessageStore;
+		_aIContextProvider = aIContextProvider;
 		_semanticKernelBuilder = semanticKernelBuilder;
 
 		(_agent, _thread) = CreateAgent(new ChatClientAgentOptions
 		{
-			Name = Name
+			Name = Name,
+			AIContextProviderFactory = (_) => aIContextProvider
 		});
 	}
 
-	protected abstract void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions options);
-	
+	protected virtual void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions options) 
+	{
+		// Override in derived classes to set specific options
+	}
+
 	protected virtual (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options)
 	{
 		var chatClient = _semanticKernelBuilder.Build(Options.LLMProviderType.AzureOpenAI);

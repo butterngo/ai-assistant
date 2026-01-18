@@ -6,12 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Agent.Core.Specialists;
 
-internal class SoftwareArchitectAgent : BaseAgent<SoftwareArchitectAgent>
+public sealed class SoftwareArchitectAgent : BaseAgent<SoftwareArchitectAgent>
 {
 	public SoftwareArchitectAgent(ILogger<SoftwareArchitectAgent> logger,
 		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider,
 		ISemanticKernelBuilder semanticKernelBuilder) 
-		: base(logger, chatMessageStore, semanticKernelBuilder)
+		: base(logger, chatMessageStore, aIContextProvider, semanticKernelBuilder)
 	{
 		Id = Guid.Parse("00000000-0000-0000-0000-000000000004");
 	}

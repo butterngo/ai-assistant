@@ -5,10 +5,12 @@ namespace Agent.Core.Abstractions.Persistents;
 public abstract class QdrantRecordBase
 {
 	[VectorStoreKey]
-	public ulong Id { get; set; } = (ulong)DateTime.UtcNow.Ticks;
+	public Guid Id { get; set; } = Guid.NewGuid();
 
 	[VectorStoreData(StorageName = "created_at")]
 	public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+	public double? Score { get; set; }
 
 	public abstract string GetTextToEmbed();
 }
@@ -27,11 +29,13 @@ public interface IQdrantRepository<TRecord> where TRecord : QdrantRecordBase
 	Task<IEnumerable<TRecord>> SearchAsync(
 		string query,
 		int top = 5,
+		float? similarityThreshold = null,
 		CancellationToken cancellationToken = default);
 
 	Task<IEnumerable<TRecord>> SearchAsync(
 		string query,
 		int top = 5,
+		float? similarityThreshold = null,
 		VectorSearchOptions<TRecord>? options = null,
 		CancellationToken cancellationToken = default);
 

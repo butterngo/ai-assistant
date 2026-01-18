@@ -6,6 +6,7 @@ using Agent.Core.Implementations;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Implementations.Services;
+using Agent.Core.Specialists;
 using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -117,7 +118,15 @@ public static class ConfigurationServices
 		IConfiguration configuration)
 	{
 		services.AddScoped<IAgentManager, AgentManager>();
-		
+
+		//services.AddScoped<IAgent, GeneralAgent>();
+		//services.AddScoped<IAgent, BackendDeveloperAgent>();
+		//services.AddScoped<IAgent, FrontendDeveloperAgent>();
+		//services.AddScoped<IAgent, DevopsAgent>();
+		//services.AddScoped<IAgent, ProductOwnerAgent>();
+		//services.AddScoped<IAgent, ProjectManagerAgent>();
+		//services.AddScoped<IAgent, SoftwareArchitectAgent>();
+
 		return services;
 	}
 }

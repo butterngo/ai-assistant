@@ -6,12 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Agent.Core.Specialists;
 
-internal sealed class ProjectManagerAgent : BaseAgent<ProjectManagerAgent>
+public sealed class ProjectManagerAgent : BaseAgent<ProjectManagerAgent>
 {
 	public ProjectManagerAgent(ILogger<ProjectManagerAgent> logger,
 		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider,
 		ISemanticKernelBuilder semanticKernelBuilder) 
-		: base(logger, chatMessageStore, semanticKernelBuilder)
+		: base(logger, chatMessageStore, aIContextProvider, semanticKernelBuilder)
 	{
 		Id = Guid.Parse("00000000-0000-0000-0000-000000000002");
 	}

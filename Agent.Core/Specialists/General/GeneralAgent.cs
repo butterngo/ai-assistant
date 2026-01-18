@@ -1,8 +1,8 @@
-﻿using Agent.Core.Models;
+﻿using Agent.Core.Abstractions;
+using Agent.Core.Abstractions.LLM;
+using Agent.Core.Models;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using Agent.Core.Abstractions;
-using Agent.Core.Abstractions.LLM;
 using Microsoft.Extensions.Logging;
 
 namespace Agent.Core.Specialists;
@@ -11,8 +11,9 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 {
 	public GeneralAgent(ILogger<GeneralAgent> logger,
 		ISemanticKernelBuilder semanticKernelBuilder,
-		ChatMessageStore chatMessageStore)
-		: base(logger, chatMessageStore, semanticKernelBuilder)
+		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider)
+		: base(logger, chatMessageStore, aIContextProvider, semanticKernelBuilder)
 	{
 		Id = Guid.Parse("00000000-0000-0000-0000-000000000001");
 	}
@@ -33,6 +34,6 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 			}
 		};
 
-		//options.AIContextProviderFactory = (_) => new UserMemoryProvider(chatClient, userInfo);
+		options.AIContextProviderFactory = (_) => _aIContextProvider;
 	}
 }

@@ -4,21 +4,21 @@ using Agent.Core.Abstractions;
 using Agent.Core.Abstractions.LLM;
 using Microsoft.Extensions.Logging;
 
-namespace Agent.Core.Specialists
-{
-	internal class BackendDeveloperAgent : BaseAgent<BackendDeveloperAgent>
-	{
-		public BackendDeveloperAgent(ILogger<BackendDeveloperAgent> logger,
-			ChatMessageStore chatMessageStore,
-			ISemanticKernelBuilder semanticKernelBuilder) 
-			: base(logger, chatMessageStore, semanticKernelBuilder)
-		{
-			Id = Guid.Parse("00000000-0000-0000-0000-000000000005");
-		}
+namespace Agent.Core.Specialists;
 
-		protected override void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions options)
-		{
-			throw new NotImplementedException();
-		}
+public sealed class BackendDeveloperAgent : BaseAgent<BackendDeveloperAgent>
+{
+	public BackendDeveloperAgent(ILogger<BackendDeveloperAgent> logger,
+		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider,
+		ISemanticKernelBuilder semanticKernelBuilder) 
+		: base(logger, chatMessageStore, aIContextProvider, semanticKernelBuilder)
+	{
+		Id = Guid.Parse("00000000-0000-0000-0000-000000000005");
+	}
+
+	protected override void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions options)
+	{
+		throw new NotImplementedException();
 	}
 }

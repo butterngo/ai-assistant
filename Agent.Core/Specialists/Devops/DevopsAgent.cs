@@ -6,12 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Agent.Core.Specialists;
 
-internal class DevopsAgent : BaseAgent<DevopsAgent>
+public sealed class DevopsAgent : BaseAgent<DevopsAgent>
 {
 	public DevopsAgent(ILogger<DevopsAgent> logger,
 		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider,
 		ISemanticKernelBuilder semanticKernelBuilder)
-		: base(logger, chatMessageStore, semanticKernelBuilder)
+		: base(logger, chatMessageStore, aIContextProvider, semanticKernelBuilder)
 	{
 		Id = Guid.Parse("00000000-0000-0000-0000-000000000007");
 	}

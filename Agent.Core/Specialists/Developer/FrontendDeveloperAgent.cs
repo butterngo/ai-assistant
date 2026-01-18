@@ -6,12 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Agent.Core.Specialists;
 
-internal class FrontendDeveloperAgent : BaseAgent<FrontendDeveloperAgent>
+public sealed class FrontendDeveloperAgent : BaseAgent<FrontendDeveloperAgent>
 {
 	public FrontendDeveloperAgent(ILogger<FrontendDeveloperAgent> logger,
 		ChatMessageStore chatMessageStore,
+		AIContextProvider aIContextProvider,
 		ISemanticKernelBuilder semanticKernelBuilder)
-		: base(logger, chatMessageStore, semanticKernelBuilder)
+		: base(logger, chatMessageStore, aIContextProvider, semanticKernelBuilder)
 	{
 		Id = Guid.Parse("00000000-0000-0000-0000-000000000006");
 	}

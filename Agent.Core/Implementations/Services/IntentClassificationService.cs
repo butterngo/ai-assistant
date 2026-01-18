@@ -1,6 +1,5 @@
 ﻿using Agent.Core.Abstractions.LLM;
 using Agent.Core.Abstractions.Persistents;
-using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Models;
 using Agent.Core.VectorRecords;
 using Microsoft.Agents.AI;
@@ -16,6 +15,7 @@ namespace Agent.Core.Implementations.Services
 			CancellationToken cancellationToken)
 		{
 			var records = await qdrantRepository.SearchAsync(userMessage, top: 1,
+				similarityThreshold: null,
 				cancellationToken: cancellationToken);
 
 			if (records.Any()) 

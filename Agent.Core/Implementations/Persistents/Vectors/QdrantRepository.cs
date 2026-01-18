@@ -9,7 +9,7 @@ namespace Agent.Core.Implementations.Persistents.Vectors;
 public class QdrantRepository<TRecord> : IQdrantRepository<TRecord>
 	where TRecord : QdrantRecordBase, IVectorRecord
 {
-	protected readonly VectorStoreCollection<ulong, TRecord> _collection;
+	protected readonly VectorStoreCollection<Guid, TRecord> _collection;
 
 	protected readonly IEmbeddingGenerator<string, Embedding<float>> _embeddingGenerator;
 
@@ -36,11 +36,12 @@ public class QdrantRepository<TRecord> : IQdrantRepository<TRecord>
 		_collection.EnsureCollectionExistsAsync().Wait();
 	}
 
-	protected virtual VectorStoreCollection<ulong, TRecord> GetCollection(VectorStore vectorStore, string vectorName)
-		=> vectorStore.GetCollection<ulong, TRecord>(vectorName);
+	protected virtual VectorStoreCollection<Guid, TRecord> GetCollection(VectorStore vectorStore, string vectorName)
+		=> vectorStore.GetCollection<Guid, TRecord>(vectorName);
 
 	public async Task UpsertAsync(TRecord record, CancellationToken ct = default)
 	{
+		
 		record.Embedding = await GenerateVectorAsync(record, ct);
 
 		await _collection.UpsertAsync(record, ct);
@@ -48,21 +49,22 @@ public class QdrantRepository<TRecord> : IQdrantRepository<TRecord>
 
 	public async Task DeleteAsync(Guid id, CancellationToken ct = default)
 	{
-		var key = (ulong)id.GetHashCode();
-		await _collection.DeleteAsync(key, cancellationToken: ct);
+		await _collection.DeleteAsync(id, cancellationToken: ct);
 	}
 
 	public async Task<IEnumerable<TRecord>> SearchAsync(
 		string query,
 		int top = 5,
+		float? similarityThreshold = null,
 		CancellationToken ct = default)
 	{
-		return await SearchAsync(query, top, options: null, ct);
+		return await SearchAsync(query, top, similarityThreshold, options: null, ct);
 	}
 
 	public async Task<IEnumerable<TRecord>> SearchAsync(
 		string query,
 		int top = 5,
+		float? similarityThreshold = null,
 		VectorSearchOptions<TRecord>? options = null,
 		CancellationToken ct = default)
 	{
@@ -70,11 +72,15 @@ public class QdrantRepository<TRecord> : IQdrantRepository<TRecord>
 
 		var records = new List<TRecord>();
 
+		var actualThreshold = similarityThreshold ?? _scoreThreshold;
+
 		await foreach (var item in results)
 		{
 			if (item is null) continue;
 
-			if (item.Score >= _scoreThreshold)
+			item.Record.Score = item.Score;
+
+			if (item.Score >= actualThreshold)
 			{
 				records.Add(item.Record);
 			}
@@ -85,8 +91,7 @@ public class QdrantRepository<TRecord> : IQdrantRepository<TRecord>
 
 	public async Task<TRecord?> GetByIdAsync(Guid id, CancellationToken ct = default)
 	{
-		var key = (ulong)id.GetHashCode();
-		return await _collection.GetAsync(key, cancellationToken: ct);
+		return await _collection.GetAsync(id, cancellationToken: ct);
 	}
 
 	private Task<ReadOnlyMemory<float>> GenerateVectorAsync(TRecord record, CancellationToken cancellationToken)

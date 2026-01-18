@@ -8,14 +8,11 @@ namespace Agent.Core.Implementations.LLM;
 
 public sealed class UserMemoryProvider : AIContextProvider
 {
-	private readonly IChatClient _chatClient;
-
 	public UserInfo UserInfo { get; set; }
 
 	// Constructor for new threads
-	public UserMemoryProvider(IChatClient chatClient, UserInfo? userInfo = null)
+	public UserMemoryProvider(UserInfo? userInfo = null)
 	{
-		_chatClient = chatClient;
 		UserInfo = userInfo ?? new UserInfo();
 	}
 
@@ -25,8 +22,6 @@ public sealed class UserMemoryProvider : AIContextProvider
 		JsonElement serializedState,
 		JsonSerializerOptions? jsonSerializerOptions = null)
 	{
-		_chatClient = chatClient;
-
 		// Restore state from serialized data
 		UserInfo = serializedState.ValueKind == JsonValueKind.Object
 			? serializedState.Deserialize<UserInfo>(jsonSerializerOptions) ?? new UserInfo()
