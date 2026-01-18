@@ -31,7 +31,7 @@ internal class Program
 		//builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 		//	ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
 
-		builder.Services.AddPostgresChatMessageStore(
+		builder.Services.AddChatMessageStore(
 		 connectionString: configuration.GetConnectionString("Postgresql"),
 		 maxMessages: 50
 	 );

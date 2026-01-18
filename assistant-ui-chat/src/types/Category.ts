@@ -5,6 +5,7 @@ export interface Category {
   code: string;
   name: string;
   description: string | null;
+  skillCount: number;
   createdAt: string;
   updatedAt: string;
 }

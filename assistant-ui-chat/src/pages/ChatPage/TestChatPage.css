@@ -1,5 +1,5 @@
 /* =============================================================================
-   Test Chat Page - Dedicated testing environment
+   Test Chat Page - Main Layout Only
    ============================================================================= */
 
 .test-chat-page {
@@ -21,6 +21,34 @@
   background: #212121;
   border-bottom: 2px solid #d97706;
   min-height: 60px;
+  z-index: 100;
+}
+
+.test-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #2f2f2f;
+  border-radius: 6px;
+  color: #8e8e8e;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: #2f2f2f;
+  border-color: #424242;
+  color: #ececec;
 }
 
 .test-badge {
@@ -79,10 +107,20 @@
 }
 
 /* =============================================================================
-   Chat Content
+   Main Content Layout
    ============================================================================= */
 
-.test-chat-content {
+.test-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* =============================================================================
+   Chat Area
+   ============================================================================= */
+
+.test-chat-area {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -95,7 +133,7 @@
 }
 
 .test-chat-page .thread-header {
-  display: none; /* Hide original header since we have test banner */
+  display: none;
 }
 
 .test-chat-page .thread-viewport {

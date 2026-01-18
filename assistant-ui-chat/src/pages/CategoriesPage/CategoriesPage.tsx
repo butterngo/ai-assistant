@@ -152,7 +152,7 @@ export const CategoriesPage: FC = () => {
                   <div className="category-meta">
                     <div className="skill-count">
                       <BrainIcon size={14} />
-                      <span>{(category as CategoryWithSkillCount).skillCount ?? 0} skills</span>
+                      <span>{category.skillCount} skills</span>
                     </div>
                     <ChevronRightIcon size={20} className="chevron-icon" />
                   </div>
@@ -208,8 +208,3 @@ export const CategoriesPage: FC = () => {
     </div>
   );
 };
-
-// Type extension for skill count
-interface CategoryWithSkillCount extends Category {
-  skillCount?: number;
-}

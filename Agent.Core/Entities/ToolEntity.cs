@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Agent.Core.Entities;
 
@@ -47,5 +48,6 @@ public class ToolEntity
 
 	// Navigation
 	[ForeignKey(nameof(SkillId))]
+	[JsonIgnore]
 	public SkillEntity Skill { get; set; } = null!;
 }

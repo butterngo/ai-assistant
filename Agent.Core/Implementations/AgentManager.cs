@@ -2,14 +2,13 @@
 using Agent.Core.Abstractions.LLM;
 using Agent.Core.Abstractions.Persistents;
 using Agent.Core.Entities;
+using Agent.Core.Enums;
 using Agent.Core.Implementations.Persistents;
-using Agent.Core.Implementations.Persistents.Postgresql;
 using Agent.Core.Specialists;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Threading;
 
 namespace Agent.Core.Implementations;
 
@@ -21,8 +20,6 @@ public class AgentManager : IAgentManager
 	private readonly ILoggerFactory _loggerFactory;
 	private readonly IIntentClassificationService _intentClassificationService;
 	
-	private readonly ConcurrentDictionary<Guid, Func<IAgent>> _agents = new();
-
 	public AgentManager(ILoggerFactory loggerFactory,
 		ISemanticKernelBuilder kernelBuilder,
 		IDbContextFactory<ChatDbContext> dbContextFactory,
@@ -36,9 +33,11 @@ public class AgentManager : IAgentManager
 		_chatMessageStoreFactory = chatMessageStoreFactory;
 	}
 
-	public async Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> GetOrCreateAsync(Guid? agentId,
+	public async Task<(IAgent agent, ChatThreadEntity thread, bool isNewConversation)> 
+		GetOrCreateAsync(Guid? agentId,
 		Guid? threadId,
 		string userMessage,
+		ChatMessageStoreEnum chatMessageStore = ChatMessageStoreEnum.Postgresql,
 		CancellationToken ct = default)
 	{
 		var dbContext = _dbContextFactory.CreateDbContext();
@@ -77,7 +76,7 @@ public class AgentManager : IAgentManager
 			inferredAgentId = agentId.Value;
 		}
 
-		var agent = CreateAgent(inferredAgentId, thread.Id);
+		var agent = CreateAgent(inferredAgentId, thread.Id, chatMessageStore);
 
 		return (agent, thread, isNewConversation);
 	}
@@ -87,19 +86,21 @@ public class AgentManager : IAgentManager
 		return await _intentClassificationService.IntentAsync(userMessage, ct);
 	}
 
-	private IAgent CreateAgent(Guid categoryId, Guid threadId)
+	private IAgent CreateAgent(Guid agentId,
+		Guid threadId,
+		ChatMessageStoreEnum chatMessageStore)
 	{
 		var state = JsonSerializer.SerializeToElement(new { threadId });
 
 		var builder = new AgentBuilder()
 			.WithLogger<GeneralAgent>(_loggerFactory)
 			.WithKernel(_kernelBuilder)
-			.WithMessageStore(_chatMessageStoreFactory.Create(state));
+			.WithMessageStore(_chatMessageStoreFactory.Create(state, chatMessageStore: chatMessageStore));
 
 		IAgent Create<T>() where T : IAgent
 			=> builder.WithLogger<T>(_loggerFactory).Build<T>();
 
-		return categoryId switch
+		return agentId switch
 		{
 			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000001")
 				=> Create<GeneralAgent>(),

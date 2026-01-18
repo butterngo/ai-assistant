@@ -67,6 +67,7 @@ public class CategoryService : ICategoryService
 	public async Task<IEnumerable<CategoryEntity>> GetAllAsync(CancellationToken ct = default)
 	{
 		return await _dbContext.Categories
+			.Include(x=>x.Skills)
 			.OrderBy(c => c.Name)
 			.ToListAsync(ct);
 	}

@@ -207,7 +207,7 @@ export const CategorySkillsPage: FC = () => {
           <div className="breadcrumb">
             <LayersIcon size={20} />
             <span className="breadcrumb-parent" onClick={handleBack}>
-              Categories
+              Agents
             </span>
             <span className="breadcrumb-separator">/</span>
             <span className="breadcrumb-current">

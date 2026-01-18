@@ -13,6 +13,7 @@ export interface ChatMetadata {
   threadId: string;
   title?: string | null;
   isNewConversation: boolean;
+  isTestMode: boolean;
   isStreaming: boolean;
 }
 
@@ -33,6 +34,7 @@ export interface ChatDone {
   title?: string | null;
   isNewConversation: boolean;
   isStreaming: boolean;
+  isTestMode: boolean;
 }
 
 /**

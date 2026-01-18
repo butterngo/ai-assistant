@@ -19,3 +19,6 @@ export { CategoryModal } from "./CategoryModal";
 export { SkillModal } from "./SkillModal";
 
 export { Thread } from "./Thread";
+
+export { SkillsSidebar } from "./TestChat/SkillsSidebar";
+export { SkillInstructionsModal } from "./TestChat/SkillInstructionsModal";

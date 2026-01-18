@@ -1,7 +1,8 @@
 ﻿using Agent.Api.Models;
-using System.Text.Json;
 using Agent.Core.Abstractions;
+using Agent.Core.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Agent.Api.Endpoints;
 
@@ -14,6 +15,7 @@ public static class ChatBotEndpoints
 
 	private const string XAgentId = "X-Agent-Id";
 	private const string XSkillId = "X-Skill-Id";
+	private const string XTestMode = "X-Test-Mode";
 
 	public static IEndpointRouteBuilder MapChatBotEndPoints(this IEndpointRouteBuilder endpoints)
 	{
@@ -26,17 +28,40 @@ public static class ChatBotEndpoints
 		return endpoints;
 	}
 
-	private static Guid? GetAgentId(HttpContext ctx) 
+	private static (Guid? agentId, bool isTestMode) GetAgentId(HttpContext ctx) 
 	{
 
 		if (ctx.Request.Headers.ContainsKey(XAgentId)) 
 		{
-			return Guid.Parse(ctx.Request.Headers[XAgentId].ToString());
+			return (Guid.Parse(ctx.Request.Headers[XAgentId].ToString()), true);
+		}
+
+		return (null, GetTestMode(ctx));
+	}
+
+	private static Guid? GetSkillId(HttpContext ctx)
+	{
+
+		if (ctx.Request.Headers.ContainsKey(XSkillId))
+		{
+			return Guid.Parse(ctx.Request.Headers[XSkillId].ToString());
 		}
 
 		return null;
 	}
-	
+
+	private static bool GetTestMode(HttpContext ctx)
+	{
+
+		if (ctx.Request.Headers.ContainsKey(XTestMode))
+		{
+			return bool.Parse(ctx.Request.Headers[XTestMode].ToString());
+		}
+
+		return false;
+	}
+
+
 	private static async Task HandleChatStreamAsync(
 		HttpContext ctx,
 		[FromBody] ChatRequest req,
@@ -57,10 +82,25 @@ public static class ChatBotEndpoints
 
 		try
 		{
-			var (agent, thread, isNewConversation) = await manager.GetOrCreateAsync(GetAgentId(ctx), req.threadId, req.Message, ct);
+			ChatMessageStoreEnum chatMessageStore = ChatMessageStoreEnum.Postgresql;
+
+			var (agentId, isTestMode) = GetAgentId(ctx);
+			var skillId = GetSkillId(ctx);
+
+			if (isTestMode)
+			{
+				chatMessageStore = ChatMessageStoreEnum.Memory;
+			}
+
+			var (agent, thread, isNewConversation) = await manager
+				.GetOrCreateAsync(agentId,
+				req.ThreadId,
+				req.Message,
+				chatMessageStore, ct);
 
 			var metadata = new ChatMetadata
 			{
+				IsTestMode = isTestMode,
 				IsNewConversation = isNewConversation,
 				ThreadId = thread.Id,
 				Title = thread.Title
@@ -84,6 +124,7 @@ public static class ChatBotEndpoints
 
 			var doneEvent = new ChatDone
 			{
+				IsTestMode = isTestMode,
 				IsNewConversation = isNewConversation,
 				ThreadId = thread.Id,
 				Title = thread.Title

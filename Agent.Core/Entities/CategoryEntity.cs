@@ -31,4 +31,6 @@ public class CategoryEntity
 
 	// Navigation
 	public ICollection<SkillEntity> Skills { get; set; } = [];
+
+	public int SkillCount => Skills.Count;
 }

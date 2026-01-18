@@ -4,25 +4,28 @@ using Agent.Core.Abstractions.Persistents;
 using Agent.Core.Abstractions.Services;
 using Agent.Core.Implementations;
 using Agent.Core.Implementations.Persistents;
-using Agent.Core.Implementations.Persistents.Postgresql;
 using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Implementations.Services;
 using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Microsoft.SemanticKernel.Memory;
 using Qdrant.Client;
 
 namespace Agent.Core;
 
 public static class ConfigurationServices
 {
-	public static IServiceCollection AddPostgresChatMessageStore(
+	public static IServiceCollection AddChatMessageStore(
 		this IServiceCollection services,
 		string connectionString,
 		int maxMessages = 50)
 	{
+		services.AddMemoryCache();
+
 		// Register DbContext with pooling for better performance
 		services.AddPooledDbContextFactory<ChatDbContext>(options =>
 		{
@@ -46,23 +49,8 @@ public static class ConfigurationServices
 		services.AddSingleton<IChatMessageStoreFactory>(sp =>
 		{
 			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<ChatDbContext>>();
-			return new PostgresChatMessageStoreFactory(dbContextFactory, maxMessages);
-		});
-
-		return services;
-	}
-
-	public static IServiceCollection AddPostgresChatMessageStore(
-		this IServiceCollection services,
-		Action<DbContextOptionsBuilder> configureDbContext,
-		int maxMessages = 50)
-	{
-		services.AddPooledDbContextFactory<ChatDbContext>(configureDbContext);
-
-		services.AddSingleton<PostgresChatMessageStoreFactory>(sp =>
-		{
-			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<ChatDbContext>>();
-			return new PostgresChatMessageStoreFactory(dbContextFactory, maxMessages);
+			var memoryCache = sp.GetRequiredService<IMemoryCache>();
+			return new ChatMessageStoreFactory(dbContextFactory, memoryCache, maxMessages);
 		});
 
 		return services;

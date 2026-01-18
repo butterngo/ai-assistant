@@ -1,12 +1,13 @@
 ﻿namespace Agent.Api.Models;
 
-public record ChatRequest(string Message, Guid? threadId);
+public record ChatRequest(string Message, Guid? ThreadId);
 
 /// <summary>
 /// SSE event: metadata (sent first)
 /// </summary>
 public class ChatMetadata
 {
+	public bool IsTestMode { get; set; } = false;
 	public bool IsNewConversation { get; set; }
 	public Guid ThreadId { get; set; }
 	public string? Title { get; set; }
@@ -27,6 +28,7 @@ public class ChatData
 /// </summary>
 public class ChatDone
 {
+	public bool IsTestMode { get; set; } = false;
 	public bool IsStreaming { get; set; } = false;
 	public bool IsNewConversation { get; set; }
 	public Guid ThreadId { get; set; }

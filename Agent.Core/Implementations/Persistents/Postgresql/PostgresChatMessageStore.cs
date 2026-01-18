@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Agent.Core.Implementations.Persistents;
 
-public sealed class PostgresChatMessageStore : ChatMessageStore
+internal sealed class PostgresChatMessageStore : ChatMessageStore
 {
 	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
 	private readonly int _maxMessages;
