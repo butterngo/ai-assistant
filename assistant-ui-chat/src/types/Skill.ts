@@ -35,3 +35,23 @@ export interface UpdateSkillRequest {
 export interface RouteSkillRequest {
   query: string;
 }
+
+// Skill Router (for Qdrant routing records)
+export interface SkillRouter {
+  id: string;
+  skillCode: string;
+  skillName: string;
+  userQueries: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface CreateSkillRouterRequest {
+  skillCode: string;
+  skillName: string;
+  userQueries: string;
+}
+
+export interface UpdateSkillRouterRequest {
+  userQueries: string;
+}

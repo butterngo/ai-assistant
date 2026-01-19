@@ -1,7 +1,9 @@
 ﻿using Agent.Api.Models;
-using Agent.Core.Abstractions.Services;
 using Agent.Core.Entities;
-using Anthropic.SDK.Messaging;
+using Agent.Core.VectorRecords;
+using Microsoft.AspNetCore.Mvc;
+using Agent.Core.Abstractions.Services;
+using Agent.Core.Abstractions.Persistents;
 
 namespace Agent.Api.Endpoints;
 
@@ -48,6 +50,11 @@ public static class SkillEndPoint
 			.Produces<SkillEntity>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound);
 
+		group.MapPost("/vector-search", HandleVectorSearchAsync)
+			.WithName("VectorSearch")
+			.Produces<SkillEntity>(StatusCodes.Status200OK)
+			.Produces(StatusCodes.Status404NotFound);
+
 		return endpoints;
 	}
 
@@ -61,7 +68,6 @@ public static class SkillEndPoint
 			request.Code,
 			request.Name,
 			request.SystemPrompt,
-			request.Description,
 			ct);
 		return Results.Created($"/api/skills/{result.Id}", result);
 	}
@@ -77,7 +83,6 @@ public static class SkillEndPoint
 			request.Code,
 			request.Name,
 			request.SystemPrompt,
-			request.Description,
 			ct);
 		return Results.Ok(result);
 	}
@@ -117,5 +122,19 @@ public static class SkillEndPoint
 	{
 		var result = await service.RouteAsync(request.Query, ct);
 		return result is null ? Results.NotFound() : Results.Ok(result);
+	}
+
+	private static async Task<IResult> HandleVectorSearchAsync(
+		[FromBody] ChatRequest req,
+		IQdrantRepository<SkillRoutingRecord> qdrantRepository,
+		CancellationToken ct) 
+	{
+		var results = await qdrantRepository.SearchAsync(
+			query: req.Message,
+			top: 5,
+			similarityThreshold: 0,
+			cancellationToken: ct);
+
+		return Results.Ok(results.Select(x=>new { x.SkillCode, x.Score}));
 	}
 }

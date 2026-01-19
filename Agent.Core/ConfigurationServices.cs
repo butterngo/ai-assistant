@@ -6,14 +6,12 @@ using Agent.Core.Implementations;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Implementations.Services;
-using Agent.Core.Specialists;
 using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
-using Microsoft.SemanticKernel.Memory;
 using Qdrant.Client;
 
 namespace Agent.Core;
@@ -110,6 +108,8 @@ public static class ConfigurationServices
 		services.AddScoped<ICategoryService, CategoryService>();
 		services.AddScoped<IToolService, ToolService>();
 		services.AddScoped<ISkillService, SkillService>();
+		services.AddScoped<ISkillRouterService, SkillRouterService>();
+
 		return services;
 	}
 

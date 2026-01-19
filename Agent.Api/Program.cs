@@ -1,9 +1,10 @@
-using Agent.Core;
-using Agent.Core.Options;
 using Agent.Api.Endpoints;
 using Agent.Api.Extensions;
+using Agent.Core;
 using Agent.Core.Abstractions.LLM;
+using Agent.Core.EndPoints;
 using Agent.Core.Implementations.LLM;
+using Agent.Core.Options;
 using Microsoft.OpenApi;
 
 internal class Program
@@ -75,6 +76,8 @@ internal class Program
 		app.MapConversationEndPoints();
 
 		app.MapSkillEndPoints();
+
+		app.MapSkillRouterEndPoints();
 
 		app.MapCategoryEndPoints();
 

@@ -1,4 +1,4 @@
-import { type FC, useState, useMemo } from "react";
+import { type FC, useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -9,7 +9,7 @@ import {
   LayersIcon,
   MessageSquareIcon,
 } from "lucide-react";
-import { useSkills } from "../../hooks";
+import { useSkills, useSkillRouters } from "../../hooks";
 import { DataTable, SkillModal, ConfirmDialog, type Column } from "../../components";
 import type { Skill, CreateSkillRequest, UpdateSkillRequest } from "../../types";
 import "../SettingsPage.css";
@@ -23,6 +23,7 @@ export const CategorySkillsPage: FC = () => {
   const { categoryId } = useParams<string>();
   const navigate = useNavigate();
 
+  // Skills hook
   const {
     skills,
     category,
@@ -33,6 +34,17 @@ export const CategorySkillsPage: FC = () => {
     update,
     remove,
   } = useSkills(categoryId);
+
+  // Routers hook
+  const {
+    routers,
+    loading: routersLoading,
+    error: routersError,
+    fetchBySkillCode,
+    create: createRouter,
+    remove: removeRouter,
+    clear: clearRouters,
+  } = useSkillRouters();
 
   // Search state
   const [search, setSearch] = useState("");
@@ -49,7 +61,41 @@ export const CategorySkillsPage: FC = () => {
   // Combined loading and error states
   // ---------------------------------------------------------------------------
   const loading = skillsLoading;
-  const error =  skillsError;
+  const error = skillsError;
+
+  // ---------------------------------------------------------------------------
+  // Fetch routers when editing skill
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (isModalOpen && editingSkill?.code) {
+      fetchBySkillCode(editingSkill.code);
+    } else {
+      clearRouters();
+    }
+  }, [isModalOpen, editingSkill?.code, fetchBySkillCode, clearRouters]);
+
+  // ---------------------------------------------------------------------------
+  // Router handlers (bridge to hook)
+  // ---------------------------------------------------------------------------
+  const handleAddRouter = async (userQueries: string) => {
+    if (!editingSkill || !category) return;
+
+    await createRouter({
+      skillCode: editingSkill.code,
+      skillName: editingSkill.name,
+      userQueries
+    });
+  };
+
+  const handleRemoveRouter = async (id: string) => {
+    await removeRouter(id);
+  };
+
+  const handleRefreshRouters = () => {
+    if (editingSkill?.code) {
+      fetchBySkillCode(editingSkill.code);
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // Filtered skills
@@ -61,7 +107,7 @@ export const CategorySkillsPage: FC = () => {
     return skills.filter(
       (skill) =>
         skill.name.toLowerCase().includes(searchLower) ||
-        skill.description?.toLowerCase().includes(searchLower)
+        skill.code?.toLowerCase().includes(searchLower)
     );
   }, [skills, search]);
 
@@ -69,6 +115,14 @@ export const CategorySkillsPage: FC = () => {
   // Table columns
   // ---------------------------------------------------------------------------
   const columns: Column<Skill>[] = [
+    {
+      key: "code",
+      header: "Code",
+      width: "180px",
+      render: (skill) => (
+        <span className="code-cell">{skill.code || "-"}</span>
+      ),
+    },
     {
       key: "name",
       header: "Name",
@@ -78,13 +132,6 @@ export const CategorySkillsPage: FC = () => {
           <BrainIcon size={16} />
           <span>{skill.name}</span>
         </div>
-      ),
-    },
-    {
-      key: "description",
-      header: "Description",
-      render: (skill) => (
-        <span className="description-cell">{skill.description || "-"}</span>
       ),
     },
     {
@@ -103,14 +150,14 @@ export const CategorySkillsPage: FC = () => {
   // Handlers
   // ---------------------------------------------------------------------------
   const handleTestSkill = (skill: Skill, e: React.MouseEvent) => {
-  e.stopPropagation();
-  navigate(`/test-chat?skill=${skill.id}&category=${categoryId}`, {
-    state: { 
-      skillName: skill.name,
-      categoryName: category?.name 
-    }
-  });
- };
+    e.stopPropagation();
+    navigate(`/test-chat?skill=${skill.id}&category=${categoryId}`, {
+      state: {
+        skillName: skill.name,
+        categoryName: category?.name,
+      },
+    });
+  };
 
   const handleBack = () => {
     navigate("/settings/categories");
@@ -124,6 +171,12 @@ export const CategorySkillsPage: FC = () => {
   const handleEdit = (skill: Skill) => {
     setEditingSkill(skill);
     setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingSkill(null);
+    clearRouters();
   };
 
   const handleSave = async (data: CreateSkillRequest | UpdateSkillRequest) => {
@@ -168,13 +221,13 @@ export const CategorySkillsPage: FC = () => {
   // ---------------------------------------------------------------------------
   const renderActions = (skill: Skill) => (
     <div className="table-actions">
-       <button 
-    className="action-btn chat-btn" 
-    onClick={(e) => handleTestSkill(skill, e)}
-    title="Test skill in chat"
-  >
-      <MessageSquareIcon size={16} />
-    </button>
+      <button
+        className="action-btn chat-btn"
+        onClick={(e) => handleTestSkill(skill, e)}
+        title="Test skill in chat"
+      >
+        <MessageSquareIcon size={16} />
+      </button>
       <button className="action-btn" onClick={() => handleEdit(skill)} title="Edit">
         <PencilIcon size={16} />
       </button>
@@ -227,7 +280,6 @@ export const CategorySkillsPage: FC = () => {
 
       {/* Content */}
       <div className="settings-page-content">
-        {/* Category Not Found */}
         {categoryNotFound && (
           <div className="not-found-state">
             <LayersIcon size={48} />
@@ -240,7 +292,6 @@ export const CategorySkillsPage: FC = () => {
           </div>
         )}
 
-        {/* Data Table */}
         {!categoryNotFound && (
           <DataTable
             columns={columns}
@@ -251,7 +302,7 @@ export const CategorySkillsPage: FC = () => {
             emptyIcon={<BrainIcon size={48} />}
             emptyTitle="No skills yet"
             emptyDescription={`Create your first skill in "${category?.name || "this category"}".`}
-            searchPlaceholder="Search skills..."
+            searchPlaceholder="Search by code or name..."
             searchValue={search}
             onSearchChange={setSearch}
             onRetry={handleRetry}
@@ -266,8 +317,14 @@ export const CategorySkillsPage: FC = () => {
           isOpen={isModalOpen}
           skill={editingSkill}
           categories={[category]}
-          onClose={() => setIsModalOpen(false)}
+          routers={routers}
+          routersLoading={routersLoading}
+          routersError={routersError}
+          onClose={handleCloseModal}
           onSave={handleSave}
+          onAddRouter={handleAddRouter}
+          onRemoveRouter={handleRemoveRouter}
+          onRefreshRouters={handleRefreshRouters}
         />
       )}
 
@@ -275,7 +332,7 @@ export const CategorySkillsPage: FC = () => {
       <ConfirmDialog
         isOpen={!!deleteSkill}
         title="Delete Skill"
-        message={`Are you sure you want to delete "${deleteSkill?.name}"? This will also delete all associated tools.`}
+        message={`Are you sure you want to delete "${deleteSkill?.name}"? This will also delete all associated routing queries and tools.`}
         confirmLabel="Delete"
         danger
         loading={deleting}

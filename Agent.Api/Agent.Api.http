@@ -7,3 +7,11 @@ Content-Type: application/json
     "conversationId": "111"
 }
 ###
+
+POST {{Agent.Api_HostAddress}}/api/skills/vector-search
+Content-Type: application/json
+{
+    "message": "fintech?",
+    "conversationId": "111"
+}
+###

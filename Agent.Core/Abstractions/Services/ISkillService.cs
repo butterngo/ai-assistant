@@ -8,14 +8,12 @@ public interface ISkillService
 		string skillCode,
 		string name,
 		string systemPrompt,
-		string description,
 		CancellationToken ct = default);
 
 	Task<SkillEntity> UpdateAsync(Guid id,
 		string? skillCode = null,
 		string? name = null,
 		string? systemPrompt = null,
-		string? description = null,
 		CancellationToken ct = default);
 
 	Task<SkillEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);

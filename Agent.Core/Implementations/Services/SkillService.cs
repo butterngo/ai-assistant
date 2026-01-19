@@ -3,9 +3,7 @@ using Agent.Core.Abstractions.Services;
 using Agent.Core.Entities;
 using Agent.Core.Implementations.Persistents;
 using Agent.Core.VectorRecords;
-using Anthropic.SDK.Messaging;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace Agent.Core.Implementations.Services;
 
@@ -27,7 +25,6 @@ public class SkillService : ISkillService
 		string skillCode,
 		string name,
 		string systemPrompt,
-		string description,
 		CancellationToken ct = default)
 	{
 		var category = await _dbContext.Categories
@@ -40,7 +37,6 @@ public class SkillService : ISkillService
 			CategoryId = categoryId,
 			Code = skillCode,
 			Name = name,
-			Description = description,
 			SystemPrompt = systemPrompt,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
@@ -48,19 +44,6 @@ public class SkillService : ISkillService
 
 		_dbContext.Skills.Add(entity);
 		await _dbContext.SaveChangesAsync(ct);
-
-		// Insert to Qdrant
-		var record = new SkillRoutingRecord
-		{
-			Id = entity.Id,
-			SkillCode = entity.Code,
-			SkillName = entity.Name,
-			CatCode = category.Code,
-			CategoryName = category.Name,
-			Description = description
-		};
-
-		await _skillRoutingRepo.UpsertAsync(record, ct);
 
 		return entity;
 	}
@@ -70,7 +53,6 @@ public class SkillService : ISkillService
 	string? skillCode = null,
 	string? name = null,
 	string? systemPrompt = null,
-	string? description = null,
 	CancellationToken ct = default)
 	{
 		var entity = await _dbContext.Skills
@@ -81,26 +63,10 @@ public class SkillService : ISkillService
 		if (skillCode is not null) entity.Code = skillCode;
 		if (name is not null) entity.Name = name;
 		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
-		if (description is not null) entity.Description = description;
+
 		entity.UpdatedAt = DateTime.UtcNow;
 
 		await _dbContext.SaveChangesAsync(ct);
-
-		// Update Qdrant if description changed
-		if (description is not null)
-		{
-			var record = new SkillRoutingRecord
-			{
-				Id = entity.Id,
-				SkillCode = entity.Code,
-				SkillName = entity.Name,
-				CatCode = entity.Category.Code,
-				CategoryName = entity.Category.Name,
-				Description = description
-			};
-
-			await _skillRoutingRepo.UpsertAsync(record, ct);
-		}
 
 		return entity;
 	}

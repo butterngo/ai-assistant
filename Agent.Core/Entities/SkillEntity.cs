@@ -26,10 +26,6 @@ public class SkillEntity
 	public string Name { get; set; } = string.Empty;
 
 	[Required]
-	[Column("description")]
-	public string Description { get; set; } = string.Empty;
-
-	[Required]
 	[Column("system_prompt")]
 	public string SystemPrompt { get; set; } = string.Empty;
 

@@ -7,9 +7,12 @@ import {
   EditIcon,
   MaximizeIcon,
   MinimizeIcon,
+  FileTextIcon,
+  RouteIcon,
 } from "lucide-react";
 import { FormField } from "../Form";
-import type { Skill, Category, CreateSkillRequest, UpdateSkillRequest } from "../../types";
+import { SkillRoutersSection } from "./SkillRoutersSection";
+import type { Skill, Category, CreateSkillRequest, UpdateSkillRequest, SkillRouter } from "../../types";
 import "./SkillModal.css";
 
 // =============================================================================
@@ -20,11 +23,18 @@ interface SkillModalProps {
   isOpen: boolean;
   skill?: Skill | null;
   categories: Category[];
+  routers: SkillRouter[];
+  routersLoading: boolean;
+  routersError: string | null;
   onClose: () => void;
   onSave: (data: CreateSkillRequest | UpdateSkillRequest) => Promise<void>;
+  onAddRouter: (userQuery: string) => Promise<void>;
+  onRemoveRouter: (id: string) => Promise<void>;
+  onRefreshRouters: () => void;
 }
 
 type EditorMode = "edit" | "preview" | "split";
+type TabType = "prompt" | "routing";
 
 // =============================================================================
 // Component
@@ -34,19 +44,26 @@ export const SkillModal: FC<SkillModalProps> = ({
   isOpen,
   skill,
   categories,
+  routers,
+  routersLoading,
+  routersError,
   onClose,
   onSave,
+  onAddRouter,
+  onRemoveRouter,
+  onRefreshRouters,
 }) => {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [editorMode, setEditorMode] = useState<EditorMode>("split");
   const [isFullscreen, setIsFullscreen] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabType>("prompt");
 
   const isEdit = !!skill;
+  const isNewSkill = !skill;
   const singleCategory = categories.length === 1;
 
   // ---------------------------------------------------------------------------
@@ -56,11 +73,11 @@ export const SkillModal: FC<SkillModalProps> = ({
     if (isOpen) {
       setCode(skill?.code || "");
       setName(skill?.name || "");
-      setDescription(skill?.description || "");
       setSystemPrompt(skill?.systemPrompt || "");
       setErrors({});
       setEditorMode("split");
       setIsFullscreen(true);
+      setActiveTab("prompt");
     }
   }, [isOpen, skill]);
 
@@ -95,11 +112,17 @@ export const SkillModal: FC<SkillModalProps> = ({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    if (!code.trim()) newErrors.code = "Code is required";
     if (!name.trim()) newErrors.name = "Name is required";
-    if (!description.trim()) newErrors.description = "Description is required";
     if (!systemPrompt.trim()) newErrors.systemPrompt = "System prompt is required";
 
     setErrors(newErrors);
+    
+    // Switch to prompt tab if there's a system prompt error
+    if (newErrors.systemPrompt) {
+      setActiveTab("prompt");
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
@@ -115,7 +138,6 @@ export const SkillModal: FC<SkillModalProps> = ({
       await onSave({
         code: code.trim(),
         name: name.trim(),
-        description: description.trim(),
         systemPrompt: systemPrompt.trim(),
       });
       onClose();
@@ -143,29 +165,34 @@ export const SkillModal: FC<SkillModalProps> = ({
             )}
           </div>
           <div className="skill-modal-actions">
-            <button
-              className={`mode-btn ${editorMode === "edit" ? "active" : ""}`}
-              onClick={() => setEditorMode("edit")}
-              title="Edit mode"
-            >
-              <EditIcon size={18} />
-            </button>
-            <button
-              className={`mode-btn ${editorMode === "split" ? "active" : ""}`}
-              onClick={() => setEditorMode("split")}
-              title="Split mode"
-            >
-              <EditIcon size={14} />
-              <EyeIcon size={14} />
-            </button>
-            <button
-              className={`mode-btn ${editorMode === "preview" ? "active" : ""}`}
-              onClick={() => setEditorMode("preview")}
-              title="Preview mode"
-            >
-              <EyeIcon size={18} />
-            </button>
-            <div className="action-divider" />
+            {/* Editor mode buttons - only show on prompt tab */}
+            {activeTab === "prompt" && (
+              <>
+                <button
+                  className={`mode-btn ${editorMode === "edit" ? "active" : ""}`}
+                  onClick={() => setEditorMode("edit")}
+                  title="Edit mode"
+                >
+                  <EditIcon size={18} />
+                </button>
+                <button
+                  className={`mode-btn ${editorMode === "split" ? "active" : ""}`}
+                  onClick={() => setEditorMode("split")}
+                  title="Split mode"
+                >
+                  <EditIcon size={14} />
+                  <EyeIcon size={14} />
+                </button>
+                <button
+                  className={`mode-btn ${editorMode === "preview" ? "active" : ""}`}
+                  onClick={() => setEditorMode("preview")}
+                  title="Preview mode"
+                >
+                  <EyeIcon size={18} />
+                </button>
+                <div className="action-divider" />
+              </>
+            )}
             <button
               className="icon-btn"
               onClick={() => setIsFullscreen(!isFullscreen)}
@@ -181,10 +208,9 @@ export const SkillModal: FC<SkillModalProps> = ({
 
         {/* Body */}
         <div className="skill-modal-body">
-          {/* Form Error */}
           {errors.form && <div className="form-error">{errors.form}</div>}
 
-          {/* Basic Info Section */}
+          {/* Basic Info Section - Always visible */}
           <div className="skill-modal-info">
             <FormField label="Code" htmlFor="skill-code" required error={errors.code}>
               <input
@@ -192,7 +218,8 @@ export const SkillModal: FC<SkillModalProps> = ({
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter skill code"
+                placeholder="e.g., ecommerce-search"
+                disabled={isEdit}
               />
             </FormField>
             <FormField label="Name" htmlFor="skill-name" required error={errors.name}>
@@ -204,51 +231,54 @@ export const SkillModal: FC<SkillModalProps> = ({
                 placeholder="Enter skill name"
               />
             </FormField>
-
-            <FormField
-              label="Description"
-              htmlFor="skill-description"
-              required
-              error={errors.description}
-              hint="Used for embedding vector generation and skill routing"
-            >
-              <textarea
-                id="skill-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe what this skill does, what queries it handles, and its capabilities. This text will be used to generate embeddings for semantic search and skill routing."
-                rows={4}
-                className="description-textarea"
-              />
-              <div className="textarea-footer">
-                <span className="char-count">{description.length} characters</span>
-              </div>
-            </FormField>
           </div>
 
-          {/* System Prompt Editor */}
-          <div className="skill-modal-editor">
-            <div className="editor-header">
-              <label>
-                System Prompt (Instructions) <span className="required-mark">*</span>
-              </label>
-              {errors.systemPrompt && (
-                <span className="editor-error">{errors.systemPrompt}</span>
-              )}
-            </div>
+          {/* Tabs */}
+          <div className="skill-modal-tabs">
+            <button
+              className={`tab-btn ${activeTab === "prompt" ? "active" : ""}`}
+              onClick={() => setActiveTab("prompt")}
+            >
+              <FileTextIcon size={16} />
+              <span>System Prompt</span>
+              {errors.systemPrompt && <span className="tab-error-dot" />}
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "routing" ? "active" : ""}`}
+              onClick={() => setActiveTab("routing")}
+            >
+              <RouteIcon size={16} />
+              <span>Routing Queries</span>
+              <span className="tab-count">{routers.length}</span>
+            </button>
+          </div>
 
-            <div className={`editor-container mode-${editorMode}`}>
-              {/* Editor Panel */}
-              {(editorMode === "edit" || editorMode === "split") && (
-                <div className="editor-panel">
-                  <div className="panel-header">
-                    <span>Markdown</span>
-                    <span className="char-count">{systemPrompt.length} characters</span>
-                  </div>
-                  <textarea
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                    placeholder="Write your system prompt using Markdown...
+          {/* Tab Content */}
+          <div className="skill-modal-tab-content">
+            {/* Tab 1: System Prompt */}
+            {activeTab === "prompt" && (
+              <div className="skill-modal-editor">
+                <div className="editor-header">
+                  <label>
+                    System Prompt (Instructions) <span className="required-mark">*</span>
+                  </label>
+                  {errors.systemPrompt && (
+                    <span className="editor-error">{errors.systemPrompt}</span>
+                  )}
+                </div>
+
+                <div className={`editor-container mode-${editorMode}`}>
+                  {/* Editor Panel */}
+                  {(editorMode === "edit" || editorMode === "split") && (
+                    <div className="editor-panel">
+                      <div className="panel-header">
+                        <span>Markdown</span>
+                        <span className="char-count">{systemPrompt.length} characters</span>
+                      </div>
+                      <textarea
+                        value={systemPrompt}
+                        onChange={(e) => setSystemPrompt(e.target.value)}
+                        placeholder="Write your system prompt using Markdown...
 
 # Example Structure
 
@@ -264,31 +294,46 @@ You are a helpful assistant that...
 - Keep responses concise
 - Use simple language
 - Avoid technical jargon"
-                    spellCheck={false}
-                  />
-                </div>
-              )}
+                        spellCheck={false}
+                      />
+                    </div>
+                  )}
 
-              {/* Preview Panel */}
-              {(editorMode === "preview" || editorMode === "split") && (
-                <div className="preview-panel">
-                  <div className="panel-header">
-                    <span>Preview</span>
-                  </div>
-                  <div className="preview-content">
-                    {systemPrompt ? (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {systemPrompt}
-                      </ReactMarkdown>
-                    ) : (
-                      <p className="preview-placeholder">
-                        Start typing to see the preview...
-                      </p>
-                    )}
-                  </div>
+                  {/* Preview Panel */}
+                  {(editorMode === "preview" || editorMode === "split") && (
+                    <div className="preview-panel">
+                      <div className="panel-header">
+                        <span>Preview</span>
+                      </div>
+                      <div className="preview-content">
+                        {systemPrompt ? (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {systemPrompt}
+                          </ReactMarkdown>
+                        ) : (
+                          <p className="preview-placeholder">
+                            Start typing to see the preview...
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Tab 2: Routing Queries */}
+            {activeTab === "routing" && (
+              <SkillRoutersSection
+                routers={routers}
+                loading={routersLoading}
+                error={routersError}
+                isNewSkill={isNewSkill}
+                onAdd={onAddRouter}
+                onRemove={onRemoveRouter}
+                onRefresh={onRefreshRouters}
+              />
+            )}
           </div>
         </div>
 
@@ -310,5 +355,3 @@ You are a helpful assistant that...
     </div>
   );
 };
-
-export default SkillModal;

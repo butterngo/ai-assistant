@@ -68,7 +68,7 @@ public class CategoryService : ICategoryService
 	{
 		return await _dbContext.Categories
 			.Include(x=>x.Skills)
-			.OrderBy(c => c.Name)
+			.OrderBy(c => c.CreatedAt)
 			.ToListAsync(ct);
 	}
 

@@ -584,3 +584,109 @@
     display: none;
   }
 }
+
+/* =============================================================================
+   Tabs
+   ============================================================================= */
+
+.skill-modal-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 4px;
+  border-bottom: 1px solid #2f2f2f;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #8e8e8e;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: #ececec;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  color: #ececec;
+  border-bottom-color: #6366f1;
+}
+
+.tab-btn svg {
+  flex-shrink: 0;
+}
+
+/* Tab error indicator (red dot) */
+.tab-error-dot {
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+/* Tab count badge */
+.tab-count {
+  font-size: 12px;
+  color: #6b6b6b;
+  background: #2f2f2f;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+.tab-btn.active .tab-count {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+}
+
+/* =============================================================================
+   Tab Content
+   ============================================================================= */
+
+.skill-modal-tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Make editor fill available space in tab */
+.skill-modal-tab-content .skill-modal-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.skill-modal-tab-content .editor-container {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Routing section in tab */
+.skill-modal-tab-content .skill-routers-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.skill-modal-tab-content .routers-list {
+  flex: 1;
+  max-height: none;
+}
