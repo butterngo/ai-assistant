@@ -4,8 +4,8 @@ import { SettingsLayout } from "./layout/SettingsLayout";
 import {
   ChatPage,
   TestChatPage,
-  CategoriesPage,
-  CategorySkillsPage,
+  AgentsPage,
+  AgentSkillsPage,
   ToolsPage,
   KnowledgeBasePage,
   ProfilePage,
@@ -43,16 +43,16 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="categories" replace />,
+        element: <Navigate to="agents" replace />,
       },
       {
-        path: "categories",
-        element: <CategoriesPage />,
+        path: "agents",
+        element: <AgentsPage />,
       },
       {
-        // Skills inside a category
-        path: "categories/:categoryId/skills",
-        element: <CategorySkillsPage />,
+        // Skills inside an agent
+        path: "agents/:agentId/skills",
+        element: <AgentSkillsPage />,
       },
       {
         path: "tools",

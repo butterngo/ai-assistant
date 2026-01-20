@@ -79,7 +79,7 @@ internal class Program
 
 		app.MapSkillRouterEndPoints();
 
-		app.MapCategoryEndPoints();
+		app.MapAgentEndPoints();
 
 		app.MapToolEndPoints();
 

@@ -1,7 +1,7 @@
 import { axiosClient } from "./axiosClient";
 import type {
   Skill,
-  CategoryWithSkills,
+  AgentWithSkills,
   SkillWithRelations,
   CreateSkillRequest,
   UpdateSkillRequest,
@@ -20,11 +20,11 @@ export const skillsClient = {
   },
 
   /**
-   * Get all skills by category
+   * Get all skills by agent
    */
-  async getByCategory(categoryId: string): Promise<CategoryWithSkills> {
-    const { data } = await axiosClient.get<CategoryWithSkills>(
-      `/api/skills/by-category/${categoryId}`
+  async getByAgent(agentId: string): Promise<AgentWithSkills> {
+    const { data } = await axiosClient.get<AgentWithSkills>(
+      `/api/skills/by-agent/${agentId}`
     );
     return data;
   },

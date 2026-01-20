@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { FormField } from "../Form";
 import { SkillRoutersSection } from "./SkillRoutersSection";
-import type { Skill, Category, CreateSkillRequest, UpdateSkillRequest, SkillRouter } from "../../types";
+import type { Skill, Agent, CreateSkillRequest, UpdateSkillRequest, SkillRouter } from "../../types";
 import "./SkillModal.css";
 
 // =============================================================================
@@ -22,7 +22,7 @@ import "./SkillModal.css";
 interface SkillModalProps {
   isOpen: boolean;
   skill?: Skill | null;
-  categories: Category[];
+  agents: Agent[];
   routers: SkillRouter[];
   routersLoading: boolean;
   routersError: string | null;
@@ -43,7 +43,7 @@ type TabType = "prompt" | "routing";
 export const SkillModal: FC<SkillModalProps> = ({
   isOpen,
   skill,
-  categories,
+  agents,
   routers,
   routersLoading,
   routersError,
@@ -64,7 +64,7 @@ export const SkillModal: FC<SkillModalProps> = ({
 
   const isEdit = !!skill;
   const isNewSkill = !skill;
-  const singleCategory = categories.length === 1;
+  const singleAgent = agents.length === 1;
 
   // ---------------------------------------------------------------------------
   // Reset form when modal opens
@@ -160,8 +160,8 @@ export const SkillModal: FC<SkillModalProps> = ({
         <header className="skill-modal-header">
           <div className="skill-modal-title">
             <h2>{isEdit ? "Edit Skill" : "New Skill"}</h2>
-            {singleCategory && (
-              <span className="category-badge">{categories[0].name}</span>
+            {singleAgent && (
+              <span className="agent-badge">{agents[0].name}</span>
             )}
           </div>
           <div className="skill-modal-actions">

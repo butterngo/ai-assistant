@@ -13,27 +13,27 @@ import { useSkills, useSkillRouters } from "../../hooks";
 import { DataTable, SkillModal, ConfirmDialog, type Column } from "../../components";
 import type { Skill, CreateSkillRequest, UpdateSkillRequest } from "../../types";
 import "../SettingsPage.css";
-import "./CategorySkillsPage.css";
+import "./AgentSkillsPage.css";
 
 // =============================================================================
 // Component
 // =============================================================================
 
-export const CategorySkillsPage: FC = () => {
-  const { categoryId } = useParams<string>();
+export const AgentSkillsPage: FC = () => {
+  const { agentId } = useParams<string>();
   const navigate = useNavigate();
 
   // Skills hook
   const {
     skills,
-    category,
+    agent,
     loading: skillsLoading,
     error: skillsError,
-    fetchByCategory,
+    fetchByAgent,
     create,
     update,
     remove,
-  } = useSkills(categoryId);
+  } = useSkills(agentId);
 
   // Routers hook
   const {
@@ -78,7 +78,7 @@ export const CategorySkillsPage: FC = () => {
   // Router handlers (bridge to hook)
   // ---------------------------------------------------------------------------
   const handleAddRouter = async (userQueries: string) => {
-    if (!editingSkill || !category) return;
+    if (!editingSkill || !agent) return;
 
     await createRouter({
       skillCode: editingSkill.code,
@@ -151,10 +151,10 @@ export const CategorySkillsPage: FC = () => {
   // ---------------------------------------------------------------------------
   const handleTestSkill = (skill: Skill, e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/test-chat?skill=${skill.id}&category=${categoryId}`, {
+    navigate(`/test-chat?skill=${skill.id}&agent=${agentId}`, {
       state: {
         skillName: skill.name,
-        categoryName: category?.name,
+        agentName: agent?.name,
       },
     });
   };
@@ -180,14 +180,14 @@ export const CategorySkillsPage: FC = () => {
   };
 
   const handleSave = async (data: CreateSkillRequest | UpdateSkillRequest) => {
-    if (!categoryId) return;
+    if (!agentId) return;
 
     if (editingSkill) {
       await update(editingSkill.id, data);
     } else {
       await create({
         ...data,
-        categoryId,
+        agentId,
       } as CreateSkillRequest);
     }
   };
@@ -211,8 +211,8 @@ export const CategorySkillsPage: FC = () => {
   };
 
   const handleRetry = () => {
-    if (categoryId) {
-      fetchByCategory(categoryId);
+    if (agentId) {
+      fetchByAgent(agentId);
     }
   };
 
@@ -242,9 +242,9 @@ export const CategorySkillsPage: FC = () => {
   );
 
   // ---------------------------------------------------------------------------
-  // Category not found
+  // Agent not found
   // ---------------------------------------------------------------------------
-  const categoryNotFound = !loading && !category && categoryId;
+  const agentNotFound = !loading && !agent && agentId;
 
   // ---------------------------------------------------------------------------
   // Render
@@ -264,14 +264,14 @@ export const CategorySkillsPage: FC = () => {
             </span>
             <span className="breadcrumb-separator">/</span>
             <span className="breadcrumb-current">
-              {loading ? "Loading..." : category?.name || "Unknown"}
+              {loading ? "Loading..." : agent?.name || "Unknown"}
             </span>
           </div>
         </div>
         <button
           className="btn btn-primary"
           onClick={handleCreate}
-          disabled={loading || categoryNotFound}
+          disabled={loading || agentNotFound}
         >
           <PlusIcon size={18} />
           <span>Add Skill</span>
@@ -280,11 +280,11 @@ export const CategorySkillsPage: FC = () => {
 
       {/* Content */}
       <div className="settings-page-content">
-        {categoryNotFound && (
+        {agentNotFound && (
           <div className="not-found-state">
             <LayersIcon size={48} />
-            <h3>Category not found</h3>
-            <p>The category you're looking for doesn't exist.</p>
+            <h3>Agent not found</h3>
+            <p>The agent you're looking for doesn't exist.</p>
             <button className="btn btn-secondary" onClick={handleBack}>
               <ArrowLeftIcon size={18} />
               <span>Back to Categories</span>
@@ -292,7 +292,7 @@ export const CategorySkillsPage: FC = () => {
           </div>
         )}
 
-        {!categoryNotFound && (
+        {!agentNotFound && (
           <DataTable
             columns={columns}
             data={filteredSkills}
@@ -301,7 +301,7 @@ export const CategorySkillsPage: FC = () => {
             error={error}
             emptyIcon={<BrainIcon size={48} />}
             emptyTitle="No skills yet"
-            emptyDescription={`Create your first skill in "${category?.name || "this category"}".`}
+            emptyDescription={`Create your first skill in "${agent?.name || "this agent"}".`}
             searchPlaceholder="Search by code or name..."
             searchValue={search}
             onSearchChange={setSearch}
@@ -312,11 +312,11 @@ export const CategorySkillsPage: FC = () => {
       </div>
 
       {/* Create/Edit Modal */}
-      {category && (
+      {agent && (
         <SkillModal
           isOpen={isModalOpen}
           skill={editingSkill}
-          categories={[category]}
+          agents={[agent]}
           routers={routers}
           routersLoading={routersLoading}
           routersError={routersError}

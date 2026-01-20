@@ -2,7 +2,7 @@
 
 // Skill
 public record CreateSkillRequest(
-	Guid CategoryId,
+	Guid AgentId,
 	string Code,
 	string Name,
 	string SystemPrompt);

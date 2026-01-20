@@ -1,27 +1,27 @@
 import { type FC, useState, useEffect } from "react";
 import { XIcon } from "lucide-react";
-import type { Category, CreateCategoryRequest, UpdateCategoryRequest } from "../../types";
-import "./CategoryModal.css";
+import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../../types";
+import "./AgentModal.css";
 import { FormField } from "../Form";
 
 // =============================================================================
 // Types
 // =============================================================================
 
-export interface CategoryModalProps {
+export interface AgentModalProps {
   isOpen: boolean;
-  category?: Category | null;
+  agent?: Agent | null;
   onClose: () => void;
-  onSave: (data: CreateCategoryRequest | UpdateCategoryRequest) => Promise<void>;
+  onSave: (data: CreateAgentRequest | UpdateAgentRequest) => Promise<void>;
 }
 
 // =============================================================================
 // Component
 // =============================================================================
 
-export const CategoryModal: FC<CategoryModalProps> = ({
+export const AgentModal: FC<AgentModalProps> = ({
   isOpen,
-  category,
+  agent,
   onClose,
   onSave,
 }) => {
@@ -31,19 +31,19 @@ export const CategoryModal: FC<CategoryModalProps> = ({
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isEdit = !!category;
+  const isEdit = !!agent;
 
   // ---------------------------------------------------------------------------
   // Reset form when modal opens
   // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isOpen) {
-      setCode(category?.code || "");
-      setName(category?.name || "");
-      setDescription(category?.description || "");
+      setCode(agent?.code || "");
+      setName(agent?.name || "");
+      setDescription(agent?.description || "");
       setErrors({});
     }
-  }, [isOpen, category]);
+  }, [isOpen, agent]);
 
   // ---------------------------------------------------------------------------
   // Handle save
@@ -93,7 +93,7 @@ export const CategoryModal: FC<CategoryModalProps> = ({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
-          <h2>{isEdit ? "Edit Category" : "New Category"}</h2>
+          <h2>{isEdit ? "Edit Agent" : "New Agent"}</h2>
           <button className="modal-close-btn" onClick={onClose}>
             <XIcon size={20} />
           </button>
@@ -103,31 +103,31 @@ export const CategoryModal: FC<CategoryModalProps> = ({
         <div className="modal-body">
           <FormField label="Code" htmlFor="skill-code" required error={errors.code}>
               <input
-                id="category-code"
+                id="Agent-code"
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter category code"
+                placeholder="Enter Agent code"
               />
           </FormField>
 
-          <FormField label="Name" htmlFor="category-name" required error={errors.name}>
+          <FormField label="Name" htmlFor="Agent-name" required error={errors.name}>
               <input
-                id="category-name"
+                id="Agent-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter category name"
+                placeholder="Enter Agent name"
               />
           </FormField>
           
           <div className="form-group">
-            <label htmlFor="category-description">Description</label>
+            <label htmlFor="Agent-description">Description</label>
             <textarea
-              id="category-description"
+              id="Agent-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter category description (optional)"
+              placeholder="Enter Agent description (optional)"
               rows={3}
             />
           </div>
@@ -146,5 +146,3 @@ export const CategoryModal: FC<CategoryModalProps> = ({
     </div>
   );
 };
-
-export default CategoryModal;

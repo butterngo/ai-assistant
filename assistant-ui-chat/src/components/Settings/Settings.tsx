@@ -105,7 +105,7 @@ export const Settings: FC<SettingsProps> = ({
             <div className="popover-section-header">Configuration</div>
             <button
               className="popover-item"
-              onClick={() => handleNavigate("/settings/categories")}
+              onClick={() => handleNavigate("/settings/agents")}
             >
               <LayersIcon size={16} />
               <span>Agents</span>

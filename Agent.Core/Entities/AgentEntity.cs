@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Agent.Core.Entities;
 
-[Table("categories")]
-public class CategoryEntity
+[Table("agents")]
+public class AgentEntity
 {
 	[Key]
 	[Column("id")]

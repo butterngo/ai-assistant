@@ -12,7 +12,7 @@ interface SkillsSidebarProps {
   skills: Skill[];
   loading: boolean;
   activeSkillId?: string | null;
-  categoryId?: string | null;
+  agentId?: string | null;
   onViewSkill: (skill: Skill) => void;
 }
 
@@ -20,13 +20,13 @@ export const SkillsSidebar: FC<SkillsSidebarProps> = ({
   skills,
   loading,
   activeSkillId,
-  categoryId,
+  agentId,
   onViewSkill,
 }) => {
   const navigate = useNavigate();
 
   const handleEditSkill = (skill: Skill) => {
-    navigate(`/settings/categories/${categoryId}/skills`, {
+    navigate(`/settings/agents/${agentId}/skills`, {
       state: { editSkillId: skill.id }
     });
   };

@@ -1,6 +1,6 @@
 import type { Skill } from "./Skill";
 
-export interface Category {
+export interface Agent {
   id: string;
   code: string;
   name: string;
@@ -10,17 +10,17 @@ export interface Category {
   updatedAt: string;
 }
 
-export interface CategoryWithSkills extends Category {
+export interface AgentWithSkills extends Agent {
   skills: Skill[];
 }
 
-export interface CreateCategoryRequest {
+export interface CreateAgentRequest {
   code: string;
   name: string;
   description?: string | null;
 }
 
-export interface UpdateCategoryRequest {
+export interface UpdateAgentRequest {
   code?: string | null;
   name?: string | null;
   description?: string | null;

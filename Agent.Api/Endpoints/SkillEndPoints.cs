@@ -27,9 +27,9 @@ public static class SkillEndPoint
 			.Produces<SkillEntity>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound);
 
-		group.MapGet("/by-category/{categoryId:guid}", GetByCategoryAsync)
-			.WithName("GetSkillsByCategory")
-			.WithSummary("Get all skills by category")
+		group.MapGet("/by-agent/{agentId:guid}", GetByAgentAsync)
+			.WithName("GetSkillsByAgent")
+			.WithSummary("Get all skills by agent")
 			.Produces<IEnumerable<SkillEntity>>(StatusCodes.Status200OK);
 
 		group.MapPut("/{id:guid}", UpdateAsync)
@@ -64,7 +64,7 @@ public static class SkillEndPoint
 		CancellationToken ct)
 	{
 		var result = await service.CreateAsync(
-			request.CategoryId,
+			request.AgentId,
 			request.Code,
 			request.Name,
 			request.SystemPrompt,
@@ -96,14 +96,14 @@ public static class SkillEndPoint
 		return result is null ? Results.NotFound() : Results.Ok(result);
 	}
 
-	private static async Task<IResult> GetByCategoryAsync(
-		Guid categoryId,
+	private static async Task<IResult> GetByAgentAsync(
+		Guid agentId,
 		ISkillService service,
 		CancellationToken ct)
 	{
-		var category = await service.GetByCategoryAsync(categoryId, ct);
+		var agent = await service.GetByAgentAsync(agentId, ct);
 
-		return Results.Ok(category);
+		return Results.Ok(agent);
 	}
 
 	private static async Task<IResult> DeleteAsync(

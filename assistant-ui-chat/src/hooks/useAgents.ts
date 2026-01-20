@@ -1,19 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import { AxiosError } from "axios";
-import { categoriesClient } from "../api";
-import type { Category, CreateCategoryRequest, UpdateCategoryRequest } from "../types";
+import { agentsClient } from "../api";
+import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../types";
 
 // =============================================================================
 // Types
 // =============================================================================
 
-export interface UseCategoriesReturn {
-  categories: Category[];
+export interface UseAgentsReturn {
+  agents: Agent[];
   loading: boolean;
   error: string | null;
   fetchAll: () => Promise<void>;
-  create: (request: CreateCategoryRequest) => Promise<Category>;
-  update: (id: string, request: UpdateCategoryRequest) => Promise<Category>;
+  create: (request: CreateAgentRequest) => Promise<Agent>;
+  update: (id: string, request: UpdateAgentRequest) => Promise<Agent>;
   remove: (id: string) => Promise<void>;
 }
 
@@ -21,21 +21,21 @@ export interface UseCategoriesReturn {
 // Hook
 // =============================================================================
 
-export function useCategories(): UseCategoriesReturn {
-  const [categories, setCategories] = useState<Category[]>([]);
+export function useAgents(): UseAgentsReturn {
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
-  // Fetch all categories
+  // Fetch all agents 
   // ---------------------------------------------------------------------------
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await categoriesClient.getAll();
-      setCategories(data);
+      const data = await agentsClient.getAll();
+      setAgents(data);
     } catch (e) {
       if (e instanceof AxiosError) {
         setError(e.response?.data?.message || e.message);
@@ -55,21 +55,21 @@ export function useCategories(): UseCategoriesReturn {
   }, [fetchAll]);
 
   // ---------------------------------------------------------------------------
-  // Create category
+  // Create agent   
   // ---------------------------------------------------------------------------
-  const create = useCallback(async (request: CreateCategoryRequest): Promise<Category> => {
-    const newCategory = await categoriesClient.create(request);
-    setCategories((prev) => [...prev, newCategory]);
-    return newCategory;
+  const create = useCallback(async (request: CreateAgentRequest): Promise<Agent> => {
+    const newAgent = await agentsClient.create(request);
+    setAgents((prev) => [...prev, newAgent]);
+    return newAgent;
   }, []);
 
   // ---------------------------------------------------------------------------
-  // Update category
+  // Update agent
   // ---------------------------------------------------------------------------
-  const update = useCallback(async (id: string, request: UpdateCategoryRequest): Promise<Category> => {
-    const updated = await categoriesClient.update(id, request);
-    setCategories((prev) =>
-      prev.map((cat) => (cat.id === id ? updated : cat))
+  const update = useCallback(async (id: string, request: UpdateAgentRequest): Promise<Agent> => {
+    const updated = await agentsClient.update(id, request);
+    setAgents((prev) =>
+      prev.map((agent) => (agent.id === id ? updated : agent))
     );
     return updated;
   }, []);
@@ -78,12 +78,12 @@ export function useCategories(): UseCategoriesReturn {
   // Delete category
   // ---------------------------------------------------------------------------
   const remove = useCallback(async (id: string): Promise<void> => {
-    await categoriesClient.delete(id);
-    setCategories((prev) => prev.filter((cat) => cat.id !== id));
+    await agentsClient.delete(id);
+    setAgents((prev) => prev.filter((agent) => agent.id !== id));
   }, []);
 
   return {
-    categories,
+    agents,
     loading,
     error,
     fetchAll,

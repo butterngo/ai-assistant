@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { AxiosError } from "axios";
 import { skillsClient } from "../api";
-import type { Skill, Category, CreateSkillRequest, UpdateSkillRequest } from "../types";
+import type { Skill, Agent, CreateSkillRequest, UpdateSkillRequest } from "../types";
 
 // =============================================================================
 // Types
@@ -9,10 +9,10 @@ import type { Skill, Category, CreateSkillRequest, UpdateSkillRequest } from "..
 
 export interface UseSkillsReturn {
   skills: Skill[];
-  category: Category;
+  agent: Agent;
   loading: boolean;
   error: string | null;
-  fetchByCategory: (categoryId: string) => Promise<void>;
+  fetchByAgent: (agentId: string) => Promise<void>;
   create: (request: CreateSkillRequest) => Promise<Skill>;
   update: (id: string, request: UpdateSkillRequest) => Promise<Skill>;
   remove: (id: string) => Promise<void>;
@@ -22,23 +22,23 @@ export interface UseSkillsReturn {
 // Hook
 // =============================================================================
 
-export function useSkills(categoryId: any): UseSkillsReturn {
+export function useSkills(agentId: any): UseSkillsReturn {
   const [skills, setSkills] = useState<Skill[]>([]);
-  const [category, setCategory] = useState<Category>({} as Category);
+  const [agent, setAgent] = useState<Agent>({} as Agent);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
-  // Fetch skills by category
+  // Fetch skills by agent
   // ---------------------------------------------------------------------------
-  const fetchByCategory = useCallback(async (categoryId: string) => {
+  const fetchByAgent = useCallback(async (agentId: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const category = await skillsClient.getByCategory(categoryId);
-      setCategory(category);
-      setSkills(category.skills || []);
+      const data = await skillsClient.getByAgent(agentId);
+      setAgent(data);
+      setSkills(data.skills || []);
     } catch (e) {
       if (e instanceof AxiosError) {
         setError(e.response?.data?.message || e.message);
@@ -54,8 +54,8 @@ export function useSkills(categoryId: any): UseSkillsReturn {
   // Initial fetch
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    fetchByCategory(categoryId);
-  }, [categoryId]);
+    fetchByAgent(agentId);
+  }, [agentId]);
 
   // ---------------------------------------------------------------------------
   // Create skill
@@ -85,10 +85,10 @@ export function useSkills(categoryId: any): UseSkillsReturn {
 
   return {
     skills,
-    category,
+    agent,
     loading,
     error,
-    fetchByCategory,
+    fetchByAgent,
     create,
     update,
     remove,

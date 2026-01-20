@@ -9,70 +9,69 @@ import {
   BrainIcon,
   MessageSquareIcon,
 } from "lucide-react";
-import { useCategories } from "../../hooks";
-import { CategoryModal, ConfirmDialog } from "../../components";
-import type { Category, CreateCategoryRequest, UpdateCategoryRequest } from "../../types";
+import { useAgents } from "../../hooks";
+import { AgentModal, ConfirmDialog } from "../../components";
+import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../../types";
 import "../SettingsPage.css";
-import "./CategoriesPage.css";
+import "./AgentsPage.css";
 
 // =============================================================================
 // Component
 // =============================================================================
 
-export const CategoriesPage: FC = () => {
+export const AgentsPage: FC = () => {
   const navigate = useNavigate();
-  const { categories, loading, error, create, update, remove, fetchAll } = useCategories();
+  const { agents, loading, error, create, update, remove, fetchAll } = useAgents();
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
 
   // Delete confirmation state
-  const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
+  const [deleteAgent, setDeleteAgent] = useState<Agent | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
 
-  const handleChat = (category: Category, e: React.MouseEvent) => {
+  const handleChat = (agent: Agent, e: React.MouseEvent) => {
   e.stopPropagation();
-  navigate(`/test-chat?category=${category.id}`, {
-    state: { categoryName: category.name }
+  navigate(`/test-chat?agents=${agent.id}`, {
+    state: { categoryName: agent.name }
     });
   };
 
   const handleCreate = () => {
-    setEditingCategory(null);
+    setEditingAgent(null);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (e: React.MouseEvent, category: Category) => {
+  const handleEdit = (e: React.MouseEvent, agent: Agent) => {
     e.stopPropagation();
-    setEditingCategory(category);
+    setEditingAgent(agent);
     setIsModalOpen(true);
   };
 
-  const handleSave = async (data: CreateCategoryRequest | UpdateCategoryRequest) => {
-    if (editingCategory) {
-      await update(editingCategory.id, data);
+  const handleSave = async (data: CreateAgentRequest | UpdateAgentRequest) => {
+    if (editingAgent) {
+      await update(editingAgent.id, data);
     } else {
-      await create(data as CreateCategoryRequest);
+      await create(data as CreateAgentRequest);
     }
   };
 
-  const handleDeleteClick = (e: React.MouseEvent, category: Category) => {
+  const handleDeleteClick = (e: React.MouseEvent, agent: Agent) => {
     e.stopPropagation();
-    setDeleteCategory(category);
+    setDeleteAgent(agent);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteCategory) return;
-
+    if (!deleteAgent) return;
     setDeleting(true);
     try {
-      await remove(deleteCategory.id);
-      setDeleteCategory(null);
+      await remove(deleteAgent.id);
+      setDeleteAgent(null);
     } catch (e) {
       console.error("Failed to delete:", e);
     } finally {
@@ -80,8 +79,8 @@ export const CategoriesPage: FC = () => {
     }
   };
 
-  const handleViewSkills = (category: Category) => {
-    navigate(`/settings/categories/${category.id}/skills`);
+  const handleViewSkills = (agent: Agent) => {
+    navigate(`/settings/agents/${agent.id}/skills`);
   };
 
   // ---------------------------------------------------------------------------
@@ -116,16 +115,16 @@ export const CategoriesPage: FC = () => {
         {loading && (
           <div className="loading-state">
             <div className="loading-spinner" />
-            <p>Loading categories...</p>
+            <p>Loading agents...</p>
           </div>
         )}
 
         {/* Empty State */}
-        {!loading && !error && categories.length === 0 && (
+        {!loading && !error && agents.length === 0 && (
           <div className="empty-state">
             <LayersIcon size={48} />
             <h3>No categories yet</h3>
-            <p>Create your first category to organize your skills.</p>
+            <p>Create your first agent to organize your skills.</p>
             <button className="btn btn-primary" onClick={handleCreate}>
               <span>Add Category</span>
             </button>
@@ -133,26 +132,26 @@ export const CategoriesPage: FC = () => {
         )}
 
         {/* Categories List */}
-        {!loading && categories.length > 0 && (
+        {!loading && agents.length > 0 && (
           <div className="categories-list">
-            {categories.map((category) => (
+            {agents.map((agent : Agent) => (
               <div
-                key={category.id}
+                key={agent.id}
                 className="category-card clickable"
-                onClick={() => handleViewSkills(category)}
+                onClick={() => handleViewSkills(agent)}
               >
                 <div className="category-card-main">
                   <div className="category-icon">
                     <LayersIcon size={20} />
                   </div>
                   <div className="category-info">
-                    <h3>{category.name}</h3>
-                    {category.description && <p>{category.description}</p>}
+                    <h3>{agent.name}</h3>
+                    {agent.description && <p>{agent.description}</p>}
                   </div>
                   <div className="category-meta">
                     <div className="skill-count">
                       <BrainIcon size={14} />
-                      <span>{category.skillCount} skills</span>
+                      <span>{agent.skillCount} skills</span>
                     </div>
                     <ChevronRightIcon size={20} className="chevron-icon" />
                   </div>
@@ -160,21 +159,21 @@ export const CategoriesPage: FC = () => {
                 <div className="category-card-actions">
                   <button
                     className="icon-btn chat-btn"
-                    onClick={(e) => handleChat(category, e)}
+                    onClick={(e) => handleChat(agent, e)}
                     title="Test in chat"
                   >
                     <MessageSquareIcon size={16} />
                   </button>
                   <button
                     className="action-btn"
-                    onClick={(e) => handleEdit(e, category)}
+                    onClick={(e) => handleEdit(e, agent)}
                     title="Edit"
                   >
                     <PencilIcon size={16} />
                   </button>
                   <button
                     className="action-btn danger"
-                    onClick={(e) => handleDeleteClick(e, category)}
+                    onClick={(e) => handleDeleteClick(e, agent)}
                     title="Delete"
                   >
                     <TrashIcon size={16} />
@@ -187,23 +186,23 @@ export const CategoriesPage: FC = () => {
       </div>
 
       {/* Create/Edit Modal */}
-      <CategoryModal
+      <AgentModal
         isOpen={isModalOpen}
-        category={editingCategory}
+        agent={editingAgent}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
       />
 
       {/* Delete Confirmation */}
       <ConfirmDialog
-        isOpen={!!deleteCategory}
-        title="Delete Category"
-        message={`Are you sure you want to delete "${deleteCategory?.name}"? This will also delete all skills inside this category.`}
+        isOpen={!!deleteAgent}
+        title="Delete Agent"
+        message={`Are you sure you want to delete "${deleteAgent?.name}"? This will also delete all skills inside this agent.`}
         confirmLabel="Delete"
         danger
         loading={deleting}
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeleteCategory(null)}
+        onCancel={() => setDeleteAgent(null)}
       />
     </div>
   );

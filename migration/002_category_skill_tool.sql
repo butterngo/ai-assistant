@@ -1,5 +1,5 @@
--- Categories
-CREATE TABLE categories (
+-- Agents
+CREATE TABLE agents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	code VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -12,13 +12,13 @@ CREATE TABLE categories (
 CREATE TABLE skills (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	code VARCHAR(100) NOT NULL UNIQUE,
-    category_id UUID NOT NULL REFERENCES categories(id),
+    agent_id UUID NOT NULL REFERENCES agents(id),
     name VARCHAR(100) NOT NULL,
     system_prompt TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
 	
-    UNIQUE(category_id, code)
+    UNIQUE(agent_id, code)
 );
 
 -- Tools
@@ -35,7 +35,7 @@ CREATE TABLE tools (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
-INSERT INTO categories (id, code, name, description, created_at, updated_at)
+INSERT INTO agents (id, code, name, description, created_at, updated_at)
 VALUES
     ('00000000-0000-0000-0000-000000000001', 'agent-general', 'General', 'General purpose, no specific specialization', NOW(), NOW()),
     ('00000000-0000-0000-0000-000000000002', 'agent-po', 'Product Owner', 'Product ownership, backlog management, user stories, requirements', NOW(), NOW()),

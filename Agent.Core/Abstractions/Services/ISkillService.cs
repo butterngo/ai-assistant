@@ -4,7 +4,7 @@ namespace Agent.Core.Abstractions.Services;
 
 public interface ISkillService
 {
-	Task<SkillEntity> CreateAsync(Guid categoryId,
+	Task<SkillEntity> CreateAsync(Guid agentId,
 		string skillCode,
 		string name,
 		string systemPrompt,
@@ -17,7 +17,7 @@ public interface ISkillService
 		CancellationToken ct = default);
 
 	Task<SkillEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
-	Task<CategoryEntity> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default);
+	Task<AgentEntity> GetByAgentAsync(Guid agentId, CancellationToken ct = default);
 	Task DeleteAsync(Guid id, CancellationToken ct = default);
 	Task<SkillEntity?> RouteAsync(string query, CancellationToken ct = default);
 }

@@ -4,39 +4,39 @@ using Agent.Core.Entities;
 
 namespace Agent.Api.Endpoints;
 
-public static class CategoryEndPoint
+public static class AgentEndPoint
 {
-	public static IEndpointRouteBuilder MapCategoryEndPoints(this IEndpointRouteBuilder endpoints)
+	public static IEndpointRouteBuilder MapAgentEndPoints(this IEndpointRouteBuilder endpoints)
 	{
-		var group = endpoints.MapGroup("/api/categories")
-			.WithTags("Categories");
+		var group = endpoints.MapGroup("/api/agents")
+			.WithTags("Agents");
 
 		group.MapPost("/", CreateAsync)
-			.WithName("CreateCategory")
-			.WithSummary("Create a new category")
-			.Produces<CategoryEntity>(StatusCodes.Status201Created)
+			.WithName("CreateAgent")
+			.WithSummary("Create a new agent")
+			.Produces<AgentEntity>(StatusCodes.Status201Created)
 			.Produces(StatusCodes.Status400BadRequest);
 
 		group.MapGet("/", GetAllAsync)
-			.WithName("GetAllCategories")
-			.WithSummary("Get all categories")
-			.Produces<IEnumerable<CategoryEntity>>(StatusCodes.Status200OK);
+			.WithName("GetAllAgents")
+			.WithSummary("Get all agents")
+			.Produces<IEnumerable<AgentEntity>>(StatusCodes.Status200OK);
 
 		group.MapGet("/{id:guid}", GetByIdAsync)
-			.WithName("GetCategoryById")
-			.WithSummary("Get category by ID")
-			.Produces<CategoryEntity>(StatusCodes.Status200OK)
+			.WithName("GetAgentById")
+			.WithSummary("Get agent by ID")
+			.Produces<AgentEntity>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound);
 
 		group.MapPut("/{id:guid}", UpdateAsync)
-			.WithName("UpdateCategory")
-			.WithSummary("Update an existing category")
-			.Produces<CategoryEntity>(StatusCodes.Status200OK)
+			.WithName("UpdateAgent")
+			.WithSummary("Update an existing agent")
+			.Produces<AgentEntity>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound);
 
 		group.MapDelete("/{id:guid}", DeleteAsync)
-			.WithName("DeleteCategory")
-			.WithSummary("Delete a category")
+			.WithName("DeleteAgent")
+			.WithSummary("Delete an agent")
 			.Produces(StatusCodes.Status204NoContent)
 			.Produces(StatusCodes.Status404NotFound);
 
@@ -44,18 +44,18 @@ public static class CategoryEndPoint
 	}
 
 	private static async Task<IResult> CreateAsync(
-		CreateCategoryRequest request,
-		ICategoryService service,
+		CreateAgentRequest request,
+		IAgentService service,
 		CancellationToken ct)
 	{
 		var result = await service.CreateAsync(request.Code, request.Name, request.Description, ct);
-		return Results.Created($"/api/categories/{result.Id}", result);
+		return Results.Created($"/api/agents/{result.Id}", result);
 	}
 
 	private static async Task<IResult> UpdateAsync(
 	Guid id,
-	UpdateCategoryRequest request,
-	ICategoryService service,
+	UpdateAgentRequest request,
+	IAgentService service,
 	CancellationToken ct)
 	{
 		var result = await service.UpdateAsync(id, request.Code, request.Name, request.Description, ct);
@@ -63,7 +63,7 @@ public static class CategoryEndPoint
 	}
 
 	private static async Task<IResult> GetAllAsync(
-		ICategoryService service,
+		IAgentService service,
 		CancellationToken ct)
 	{
 		var result = await service.GetAllAsync(ct);
@@ -72,7 +72,7 @@ public static class CategoryEndPoint
 
 	private static async Task<IResult> GetByIdAsync(
 		Guid id,
-		ICategoryService service,
+		IAgentService service,
 		CancellationToken ct)
 	{
 		var result = await service.GetByIdAsync(id, ct);
@@ -82,7 +82,7 @@ public static class CategoryEndPoint
 
 	private static async Task<IResult> DeleteAsync(
 		Guid id,
-		ICategoryService service,
+		IAgentService service,
 		CancellationToken ct)
 	{
 		await service.DeleteAsync(id, ct);

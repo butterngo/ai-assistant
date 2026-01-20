@@ -15,7 +15,7 @@ export type { FormFieldProps } from "./Form";
 export { ConfirmDialog } from "./ConfirmDialog";
 
 // Feature-specific modals
-export { CategoryModal } from "./CategoryModal";
+export { AgentModal } from "./AgentModal";
 export { SkillModal } from "./SkillModal";
 
 export { Thread } from "./Thread";

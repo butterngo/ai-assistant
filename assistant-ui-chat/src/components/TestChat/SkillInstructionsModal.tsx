@@ -6,19 +6,19 @@ import "./SkillInstructionsModal.css";
 
 interface SkillInstructionsModalProps {
   skill: Skill;
-  categoryId?: string | null;
+  agentId?: string | null;
   onClose: () => void;
 }
 
 export const SkillInstructionsModal: FC<SkillInstructionsModalProps> = ({
   skill,
-  categoryId,
+  agentId,
   onClose,
 }) => {
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(`/settings/categories/${categoryId}/skills`, {
+    navigate(`/settings/agents/${agentId}/skills`, {
       state: { editSkillId: skill.id }
     });
   };

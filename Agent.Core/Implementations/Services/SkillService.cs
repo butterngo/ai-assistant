@@ -21,20 +21,20 @@ public class SkillService : ISkillService
 	}
 
 	public async Task<SkillEntity> CreateAsync(
-		Guid categoryId,
+		Guid agentId,
 		string skillCode,
 		string name,
 		string systemPrompt,
 		CancellationToken ct = default)
 	{
-		var category = await _dbContext.Categories
-			.FirstOrDefaultAsync(c => c.Id == categoryId, ct)
-			?? throw new InvalidOperationException($"Category {categoryId} not found");
+		var agent = await _dbContext.Agents
+			.FirstOrDefaultAsync(c => c.Id == agentId, ct)
+			?? throw new InvalidOperationException($"Agent {agentId} not found");
 
 		var entity = new SkillEntity
 		{
 			Id = Guid.NewGuid(),
-			CategoryId = categoryId,
+			AgentId = agentId,
 			Code = skillCode,
 			Name = name,
 			SystemPrompt = systemPrompt,
@@ -56,7 +56,7 @@ public class SkillService : ISkillService
 	CancellationToken ct = default)
 	{
 		var entity = await _dbContext.Skills
-			.Include(s => s.Category)
+			.Include(s => s.Agent)
 			.FirstOrDefaultAsync(s => s.Id == id, ct)
 			?? throw new InvalidOperationException($"Skill {id} not found");
 
@@ -74,18 +74,18 @@ public class SkillService : ISkillService
 	public async Task<SkillEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
 	{
 		return await _dbContext.Skills
-			.Include(s => s.Category)
+			.Include(s => s.Agent)
 			.Include(s => s.Tools)
 			.FirstOrDefaultAsync(s => s.Id == id, ct);
 	}
 
-	public async Task<CategoryEntity> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default)
+	public async Task<AgentEntity> GetByAgentAsync(Guid agentId, CancellationToken ct = default)
 	{
-		var category = await _dbContext.Categories.Include(x=>x.Skills)
-			.FirstOrDefaultAsync(c => c.Id == categoryId, ct)
-			?? throw new InvalidOperationException($"Category {categoryId} not found");
+		var agent = await _dbContext.Agents.Include(x=>x.Skills)
+			.FirstOrDefaultAsync(c => c.Id == agentId, ct)
+			?? throw new InvalidOperationException($"Agent {agentId} not found");
 
-		return category;
+		return agent;
 	}
 
 	public async Task DeleteAsync(Guid id, CancellationToken ct = default)

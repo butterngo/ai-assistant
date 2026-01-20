@@ -12,8 +12,8 @@ public class SkillEntity
 	public Guid Id { get; set; }
 
 	[Required]
-	[Column("category_id")]
-	public Guid CategoryId { get; set; }
+	[Column("agent_id")]
+	public Guid AgentId { get; set; }
 
 	[Required]
 	[MaxLength(100)]
@@ -36,9 +36,9 @@ public class SkillEntity
 	public DateTime UpdatedAt { get; set; }
 
 	// Navigation
-	[ForeignKey(nameof(CategoryId))]
+	[ForeignKey(nameof(AgentId))]
 	[JsonIgnore]
-	public CategoryEntity Category { get; set; } = null!;
+	public AgentEntity Agent { get; set; } = null!;
 
 	public ICollection<ToolEntity> Tools { get; set; } = [];
 }

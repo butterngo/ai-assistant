@@ -19,7 +19,7 @@ export function TestChatPage() {
   const location = useLocation();
 
   // Get test context from URL/state
-  const categoryId = searchParams.get("category");
+  const agentId = searchParams.get("agent");
   const skillId = searchParams.get("skill");
   const categoryName = location.state?.categoryName || "Agent";
   const skillName = location.state?.skillName;
@@ -35,18 +35,18 @@ export function TestChatPage() {
 
   const {
     skills,
-    category,
+    agent,
     loading: skillsLoading,
     error: skillsError,
-    fetchByCategory,
-  } = useSkills(categoryId);
+    fetchByAgent,
+  } = useSkills(agentId);
 
-  // Load skills when component mounts or categoryId changes
+  // Load skills when component mounts or agentId changes
   useEffect(() => {
-    if (categoryId) {
-      fetchByCategory(categoryId);
+    if (agentId) {
+      fetchByAgent(agentId);
     }
-  }, [categoryId, fetchByCategory]);
+  }, [agentId, fetchByAgent]);
 
   // Build headers with test context
   const headers = useMemo(() => {
@@ -54,8 +54,8 @@ export function TestChatPage() {
       "X-Test-Mode": "true",
     };
 
-    if (categoryId) {
-      hdrs["X-Agent-Id"] = categoryId;
+    if (agentId) {
+      hdrs["X-Agent-Id"] = agentId;
     }
 
     if (skillId) {
@@ -63,7 +63,7 @@ export function TestChatPage() {
     }
 
     return hdrs;
-  }, [categoryId, skillId]);
+  }, [agentId, skillId]);
 
   // ===========================================================================
   // Handlers
@@ -91,9 +91,9 @@ export function TestChatPage() {
 
   const handleClose = () => {
     if (skillId) {
-      navigate(`/settings/categories/${categoryId}/skills`);
+      navigate(`/settings/agents/${agentId}/skills`);
     } else {
-      navigate("/settings/categories");
+      navigate("/settings/agents");
     }
   };
 
@@ -141,15 +141,14 @@ export function TestChatPage() {
         parentName: categoryName,
       };
     }
-    if (categoryName || category?.name) {
+    if (categoryName || agent?.name) {
       return {
         type: "category" as const,
-        name: categoryName || category?.name || "Agent",
+        name: categoryName || agent?.name || "Agent",
       };
     }
     return null;
-  }, [skillName, categoryName, category]);
-
+  }, [skillName, categoryName, agent]);
   // ===========================================================================
   // Error Handling
   // ===========================================================================
@@ -243,7 +242,7 @@ export function TestChatPage() {
               skills={skills}
               loading={skillsLoading}
               activeSkillId={skillId}
-              categoryId={categoryId}
+              agentId={agentId}
               onViewSkill={handleViewSkill}
             />
           )}
@@ -262,7 +261,7 @@ export function TestChatPage() {
         {selectedSkill && (
           <SkillInstructionsModal
             skill={selectedSkill}
-            categoryId={categoryId}
+            agentId={agentId}
             onClose={handleCloseSkillModal}
           />
         )}

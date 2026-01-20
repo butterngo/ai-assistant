@@ -105,7 +105,7 @@ public static class ConfigurationServices
 		this IServiceCollection services)
 	{
 		services.AddScoped<IIntentClassificationService, IntentClassificationService>();
-		services.AddScoped<ICategoryService, CategoryService>();
+		services.AddScoped<IAgentService, AgentService>();
 		services.AddScoped<IToolService, ToolService>();
 		services.AddScoped<ISkillService, SkillService>();
 		services.AddScoped<ISkillRouterService, SkillRouterService>();
