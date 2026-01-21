@@ -1,4 +1,6 @@
-﻿namespace Agent.Api.Models;
+﻿using Agent.Core.Abstractions;
+
+namespace Agent.Api.Models;
 
 public record ChatRequest(string Message, Guid? ThreadId);
 
@@ -33,6 +35,7 @@ public class ChatDone
 	public bool IsNewConversation { get; set; }
 	public Guid ThreadId { get; set; }
 	public string? Title { get; set; }
+	public ICurrentThreadContext? DebugContext { get; set; } = null!;
 }
 
 /// <summary>

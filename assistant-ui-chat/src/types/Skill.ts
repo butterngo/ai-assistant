@@ -1,9 +1,9 @@
-import type { Category } from "./Category";
+import type { Agent } from "./Agent";
 import type { Tool } from "./Tool";
 
 export interface Skill {
   id: string;
-  categoryId: string;
+  agentId: string;
   code: string;
   name: string;
   systemPrompt: string;
@@ -13,12 +13,12 @@ export interface Skill {
 }
 
 export interface SkillWithRelations extends Skill {
-  category?: Category;
+  agent?: Agent;
   tools?: Tool[];
 }
 
 export interface CreateSkillRequest {
-  categoryId: string;
+  agentId: string;
   code: string;
   name: string;
   systemPrompt: string;

@@ -7,6 +7,8 @@ public class ChatDbContext : DbContext
 {
 	public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
 	{
+		AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+		AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 	}
 
 	public DbSet<ChatMessageEntity> ChatMessages => Set<ChatMessageEntity>();

@@ -17,6 +17,7 @@ public class AgentService : IAgentService
 	public async Task<AgentEntity> CreateAsync(
 		string catCode,
 		string name,
+		string systemPrompt,
 		string? description = null,
 		CancellationToken ct = default)
 	{
@@ -25,6 +26,7 @@ public class AgentService : IAgentService
 			Id = Guid.NewGuid(),
 			Code = catCode,
 			Name = name,
+			SystemPrompt = systemPrompt,
 			Description = description,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
@@ -40,6 +42,7 @@ public class AgentService : IAgentService
 		Guid id,
 		string? catCode,
 		string? name = null,
+		string? systemPrompt = null,
 		string? description = null,
 		CancellationToken ct = default)
 	{
@@ -49,8 +52,11 @@ public class AgentService : IAgentService
 
 		if (catCode is not null) entity.Code = catCode;
 		if (name is not null) entity.Name = name;
+		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
 		if (description is not null) entity.Description = description;
 		entity.UpdatedAt = DateTime.UtcNow;
+
+		_dbContext.Update(entity);
 
 		await _dbContext.SaveChangesAsync(ct);
 

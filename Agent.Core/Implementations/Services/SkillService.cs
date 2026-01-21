@@ -56,7 +56,6 @@ public class SkillService : ISkillService
 	CancellationToken ct = default)
 	{
 		var entity = await _dbContext.Skills
-			.Include(s => s.Agent)
 			.FirstOrDefaultAsync(s => s.Id == id, ct)
 			?? throw new InvalidOperationException($"Skill {id} not found");
 
@@ -65,6 +64,8 @@ public class SkillService : ISkillService
 		if (systemPrompt is not null) entity.SystemPrompt = systemPrompt;
 
 		entity.UpdatedAt = DateTime.UtcNow;
+
+		_dbContext.Skills.Update(entity);
 
 		await _dbContext.SaveChangesAsync(ct);
 

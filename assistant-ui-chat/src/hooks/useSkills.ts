@@ -22,7 +22,7 @@ export interface UseSkillsReturn {
 // Hook
 // =============================================================================
 
-export function useSkills(agentId: any): UseSkillsReturn {
+export function useSkills(agentId?: string): UseSkillsReturn {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [agent, setAgent] = useState<Agent>({} as Agent);
   const [loading, setLoading] = useState(true);
@@ -54,6 +54,7 @@ export function useSkills(agentId: any): UseSkillsReturn {
   // Initial fetch
   // ---------------------------------------------------------------------------
   useEffect(() => {
+    if(agentId == null) return;
     fetchByAgent(agentId);
   }, [agentId]);
 

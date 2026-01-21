@@ -1,0 +1,241 @@
+.debug-panel {
+  border-left: 1px solid #e5e5e5;
+  background-color: #fafafa;
+  font-size: 13px;
+  width: 400px;
+  min-width: 350px;
+  max-width: 500px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.debug-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+
+.debug-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.debug-icon {
+  font-size: 16px;
+}
+
+.debug-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 20px;
+  background-color: #0066cc;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0 6px;
+}
+
+.debug-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.debug-clear-btn:hover {
+  background-color: #fee;
+}
+
+/* Content */
+.debug-panel-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Empty State */
+.debug-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #999;
+  text-align: center;
+}
+
+.debug-empty-state p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.debug-empty-hint {
+  font-size: 12px;
+  color: #bbb;
+}
+
+/* Debug Items */
+.debug-item {
+  border-bottom: 1px solid #e5e5e5;
+  background-color: white;
+}
+
+.debug-item:hover {
+  background-color: #fafafa;
+}
+
+.debug-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e5e5e5;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.debug-item-header:hover {
+  background-color: #f5f5f5;
+}
+
+.debug-item-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.debug-item-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 22px;
+  background-color: #333;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.debug-item-message {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.debug-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.debug-item-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.debug-item-toggle:hover {
+  background-color: #e5e5e5;
+  color: #333;
+}
+
+.debug-item-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #999;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.debug-item-remove:hover {
+  background-color: #fee;
+  color: #ef4444;
+}
+
+/* JSON Display */
+.debug-json {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #fafafa;
+  padding: 12px;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .debug-panel {
+    width: 350px;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .debug-panel {
+    position: fixed;
+    right: 0;
+    top: 60px;
+    bottom: 0;
+    width: 100%;
+    max-width: 400px;
+    z-index: 100;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+  }
+
+  .debug-item-message {
+    font-size: 12px;
+  }
+
+  .debug-json {
+    font-size: 10px;
+  }
+}

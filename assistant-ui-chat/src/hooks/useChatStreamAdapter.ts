@@ -5,6 +5,7 @@ import type {
   ChatData,
   ChatDone,
   ChatError,
+  DebugContext
 } from "../types";
 
 // =============================================================================
@@ -18,6 +19,8 @@ export interface ChatStreamAdapterOptions {
   threadId: string | null;
   /** Additional headers for the request */
   headers?: Record<string, string>;
+  /** Callback when DebugContext is received */
+  onDebug?: (debugContext: DebugContext) => void;
   /** Callback when metadata is received (first event) */
   onMetadata?: (metadata: ChatMetadata) => void;
   /** Callback when streaming starts */
@@ -89,6 +92,7 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
     api,
     threadId,
     headers = {},
+    onDebug,
     onMetadata,
     onStart,
     onChunk,
@@ -153,7 +157,6 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
             for (const { event, data } of events) {
               try {
                 const json = JSON.parse(data);
-
                 switch (event) {
                   case "metadata": {
                     const metadata = json as ChatMetadata;
@@ -227,7 +230,7 @@ function createChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAd
 // =============================================================================
 
 export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatModelAdapter {
-  const { api, threadId, headers, onMetadata, onStart, onChunk, onDone, onError } = options;
+  const { api, threadId, headers, onDebug, onMetadata, onStart, onChunk, onDone, onError } = options;
 
   // Memoize adapter - recreate when api or threadId changes
   const adapter = useMemo(
@@ -236,6 +239,7 @@ export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatMod
         api,
         threadId,
         headers,
+        onDebug,
         onMetadata,
         onStart,
         onChunk,
@@ -254,6 +258,3 @@ export function useChatStreamAdapter(options: ChatStreamAdapterOptions): ChatMod
 
 export { createChatStreamAdapter };
 export type { ChatModelAdapter, ChatModelRunOptions };
-
-// Re-export types from Conversation for convenience
-export type { ChatMetadata, ChatData, ChatDone, ChatError } from "../types/Conversation";

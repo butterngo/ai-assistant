@@ -20,8 +20,13 @@ public class AgentEntity
 	[Column("name")]
 	public string Name { get; set; } = string.Empty;
 
+	[Required]
+	[Column("system_prompt")]
+	public string SystemPrompt { get; set; } = string.Empty;
+
 	[Column("description")]
 	public string? Description { get; set; }
+
 
 	[Column("created_at")]
 	public DateTime CreatedAt { get; set; }

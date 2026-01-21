@@ -127,7 +127,8 @@ public static class ChatBotEndpoints
 				IsTestMode = isTestMode,
 				IsNewConversation = isNewConversation,
 				ThreadId = thread.Id,
-				Title = thread.Title
+				Title = thread.Title,
+				DebugContext = manager.CurrentThreadContext
 			};
 
 			await WriteEventAsync(ctx.Response, "done", doneEvent, ct);

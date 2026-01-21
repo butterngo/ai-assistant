@@ -3,9 +3,10 @@ import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { AssistantRuntimeProvider, useLocalRuntime } from "@assistant-ui/react";
 import { useChatStreamAdapter } from "../../hooks/useChatStreamAdapter";
 import { useSkills } from "../../hooks";
-import { Thread, SkillsSidebar, SkillInstructionsModal  } from "../../components";
+import { Thread, SkillsSidebar, SkillInstructionsModal } from "../../components";
+import { DebugPanel } from "../../components/DebugPanel";
 import { API_ENDPOINT } from "../../config";
-import type { ChatMetadata, ChatDone, Skill } from "../../types";
+import type { ChatMetadata, ChatDone, Skill, DebugContext } from "../../types";
 import { 
   XIcon, 
   ChevronLeftIcon, 
@@ -19,8 +20,9 @@ export function TestChatPage() {
   const location = useLocation();
 
   // Get test context from URL/state
-  const agentId = searchParams.get("agent");
+  const agentId = searchParams.get("agents");
   const skillId = searchParams.get("skill");
+  console.log(location.state);
   const categoryName = location.state?.categoryName || "Agent";
   const skillName = location.state?.skillName;
   
@@ -28,10 +30,13 @@ export function TestChatPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [debugContext, setDebugContext] = useState<DebugContext | null>(null);
 
   // ===========================================================================
   // Use Skills Hook
   // ===========================================================================
+
+  console.log("Loading skills for agentId:", agentId);
 
   const {
     skills,
@@ -77,14 +82,22 @@ export function TestChatPage() {
   const handleStart = useCallback(() => {
     console.log("🚀 Test chat stream started");
     setIsStreaming(true);
+    // Clear previous debug context when starting new message
+    setDebugContext(null);
+  }, []);
+
+  const handleDebug = useCallback((debug: DebugContext) => {
+    console.log("🐛 Debug context received:", debug);
+    setDebugContext(debug);
   }, []);
 
   const handleDone = useCallback((done: ChatDone) => {
     console.log("✅ Test chat completed:", done);
+    setDebugContext(done.debugContext as DebugContext || null);
     setIsStreaming(false);
   }, []);
 
- const handleError = useCallback((error: { error: string; code: string }) => {
+  const handleError = useCallback((error: { error: string; code: string }) => {
     console.error("❌ Chat stream error:", error);
     setIsStreaming(false);
   }, []);
@@ -119,6 +132,7 @@ export function TestChatPage() {
     headers,
     onMetadata: handleMetadata,
     onStart: handleStart,
+    onDebug: handleDebug,
     onDone: handleDone,
     onError: handleError,
   });
@@ -149,6 +163,7 @@ export function TestChatPage() {
     }
     return null;
   }, [skillName, categoryName, agent]);
+
   // ===========================================================================
   // Error Handling
   // ===========================================================================
@@ -255,6 +270,9 @@ export function TestChatPage() {
               isStreaming={isStreaming}
             />
           </div>
+
+          {/* Debug Panel - Right Side */}
+          <DebugPanel debugContext={debugContext} />
         </div>
 
         {/* Skill Instructions Modal */}

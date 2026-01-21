@@ -48,6 +48,6 @@ export const agentsClient = {
    * Delete a category
    */
   async delete(id: string): Promise<void> {
-    await axiosClient.delete(`/api/categories/${id}`);
+    await axiosClient.delete(`/api/agents/${id}`);
   },
 };

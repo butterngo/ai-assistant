@@ -1,4 +1,4 @@
-import { type FC, useState, useMemo, useEffect } from "react";
+import { type FC, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -9,9 +9,9 @@ import {
   LayersIcon,
   MessageSquareIcon,
 } from "lucide-react";
-import { useSkills, useSkillRouters } from "../../hooks";
-import { DataTable, SkillModal, ConfirmDialog, type Column } from "../../components";
-import type { Skill, CreateSkillRequest, UpdateSkillRequest } from "../../types";
+import { useSkills } from "../../hooks";
+import { DataTable, ConfirmDialog, type Column } from "../../components";
+import type { Skill } from "../../types";
 import "../SettingsPage.css";
 import "./AgentSkillsPage.css";
 
@@ -27,75 +27,18 @@ export const AgentSkillsPage: FC = () => {
   const {
     skills,
     agent,
-    loading: skillsLoading,
-    error: skillsError,
+    loading,
+    error,
     fetchByAgent,
-    create,
-    update,
     remove,
   } = useSkills(agentId);
-
-  // Routers hook
-  const {
-    routers,
-    loading: routersLoading,
-    error: routersError,
-    fetchBySkillCode,
-    create: createRouter,
-    remove: removeRouter,
-    clear: clearRouters,
-  } = useSkillRouters();
 
   // Search state
   const [search, setSearch] = useState("");
 
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
-
   // Delete confirmation state
   const [deleteSkill, setDeleteSkill] = useState<Skill | null>(null);
   const [deleting, setDeleting] = useState(false);
-
-  // ---------------------------------------------------------------------------
-  // Combined loading and error states
-  // ---------------------------------------------------------------------------
-  const loading = skillsLoading;
-  const error = skillsError;
-
-  // ---------------------------------------------------------------------------
-  // Fetch routers when editing skill
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
-    if (isModalOpen && editingSkill?.code) {
-      fetchBySkillCode(editingSkill.code);
-    } else {
-      clearRouters();
-    }
-  }, [isModalOpen, editingSkill?.code, fetchBySkillCode, clearRouters]);
-
-  // ---------------------------------------------------------------------------
-  // Router handlers (bridge to hook)
-  // ---------------------------------------------------------------------------
-  const handleAddRouter = async (userQueries: string) => {
-    if (!editingSkill || !agent) return;
-
-    await createRouter({
-      skillCode: editingSkill.code,
-      skillName: editingSkill.name,
-      userQueries
-    });
-  };
-
-  const handleRemoveRouter = async (id: string) => {
-    await removeRouter(id);
-  };
-
-  const handleRefreshRouters = () => {
-    if (editingSkill?.code) {
-      fetchBySkillCode(editingSkill.code);
-    }
-  };
 
   // ---------------------------------------------------------------------------
   // Filtered skills
@@ -160,36 +103,15 @@ export const AgentSkillsPage: FC = () => {
   };
 
   const handleBack = () => {
-    navigate("/settings/categories");
+    navigate("/settings/agents");
   };
 
   const handleCreate = () => {
-    setEditingSkill(null);
-    setIsModalOpen(true);
+    navigate(`/settings/agents/${agentId}/skills/new`);
   };
 
   const handleEdit = (skill: Skill) => {
-    setEditingSkill(skill);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingSkill(null);
-    clearRouters();
-  };
-
-  const handleSave = async (data: CreateSkillRequest | UpdateSkillRequest) => {
-    if (!agentId) return;
-
-    if (editingSkill) {
-      await update(editingSkill.id, data);
-    } else {
-      await create({
-        ...data,
-        agentId,
-      } as CreateSkillRequest);
-    }
+    navigate(`/settings/agents/${agentId}/skills/${skill.id}/edit`);
   };
 
   const handleDeleteClick = (skill: Skill) => {
@@ -287,7 +209,7 @@ export const AgentSkillsPage: FC = () => {
             <p>The agent you're looking for doesn't exist.</p>
             <button className="btn btn-secondary" onClick={handleBack}>
               <ArrowLeftIcon size={18} />
-              <span>Back to Categories</span>
+              <span>Back to Agents</span>
             </button>
           </div>
         )}
@@ -310,23 +232,6 @@ export const AgentSkillsPage: FC = () => {
           />
         )}
       </div>
-
-      {/* Create/Edit Modal */}
-      {agent && (
-        <SkillModal
-          isOpen={isModalOpen}
-          skill={editingSkill}
-          agents={[agent]}
-          routers={routers}
-          routersLoading={routersLoading}
-          routersError={routersError}
-          onClose={handleCloseModal}
-          onSave={handleSave}
-          onAddRouter={handleAddRouter}
-          onRemoveRouter={handleRemoveRouter}
-          onRefreshRouters={handleRefreshRouters}
-        />
-      )}
 
       {/* Delete Confirmation */}
       <ConfirmDialog

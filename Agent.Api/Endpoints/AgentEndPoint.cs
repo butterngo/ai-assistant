@@ -48,7 +48,11 @@ public static class AgentEndPoint
 		IAgentService service,
 		CancellationToken ct)
 	{
-		var result = await service.CreateAsync(request.Code, request.Name, request.Description, ct);
+		var result = await service.CreateAsync(request.Code,
+			request.Name,
+			request.SystemPrompt,
+			request.Description, ct);
+
 		return Results.Created($"/api/agents/{result.Id}", result);
 	}
 
@@ -58,7 +62,11 @@ public static class AgentEndPoint
 	IAgentService service,
 	CancellationToken ct)
 	{
-		var result = await service.UpdateAsync(id, request.Code, request.Name, request.Description, ct);
+		var result = await service.UpdateAsync(id, request.Code,
+			request.Name,
+			request.SystemPrompt,
+			request.Description, ct);
+
 		return Results.Ok(result);
 	}
 

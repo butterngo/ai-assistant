@@ -9,6 +9,7 @@ import {
   ToolsPage,
   KnowledgeBasePage,
   ProfilePage,
+  SkillEditorPage,
 } from "./pages";
 import { conversationLoader } from "./loaders/Conversationloader";
 
@@ -53,6 +54,14 @@ export const router = createBrowserRouter([
         // Skills inside an agent
         path: "agents/:agentId/skills",
         element: <AgentSkillsPage />,
+      },
+      {
+        path: "agents/:agentId/skills/new",
+        element: <SkillEditorPage />
+      },
+      {
+        path: "agents/:agentId/skills/:skillId/edit",
+        element: <SkillEditorPage />
       },
       {
         path: "tools",

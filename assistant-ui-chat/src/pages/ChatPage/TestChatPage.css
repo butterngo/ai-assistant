@@ -160,3 +160,22 @@
     font-size: 13px;
   }
 }
+/* Main content container */
+.test-content {
+  display: flex;
+  height: calc(100vh - 60px); /* Adjust based on your header height */
+  overflow: hidden;
+}
+
+/* Chat area takes remaining space */
+.test-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* If DebugPanel is hidden, chat area takes full width */
+.test-content:not(:has(.debug-panel)) .test-chat-area {
+  width: 100%;
+}

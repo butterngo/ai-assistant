@@ -1,13 +1,15 @@
-﻿using Agent.Core.Abstractions.Persistents;
-using Agent.Core.Implementations.Persistents;
+﻿using Microsoft.Agents.AI;
+using Agent.Core.Abstractions;
 using Agent.Core.VectorRecords;
-using Microsoft.Agents.AI;
 using Microsoft.EntityFrameworkCore;
+using Agent.Core.Abstractions.Persistents;
+using Agent.Core.Implementations.Persistents;
 
 namespace Agent.Core.Implementations.LLM;
 
 internal class AIContextSkillRoutingProvider(IQdrantRepository<SkillRoutingRecord> qdrantRepository,
-	IDbContextFactory<ChatDbContext> dbContextFactory)
+	IDbContextFactory<ChatDbContext> dbContextFactory,
+	ICurrentThreadContext currentThreadContext)
 	: AIContextProvider
 {
 	public override  ValueTask<AIContext> InvokingAsync(InvokingContext context, CancellationToken cancellationToken = default)
@@ -24,16 +26,20 @@ internal class AIContextSkillRoutingProvider(IQdrantRepository<SkillRoutingRecor
 			return aiContext;
 
 		}
+		
+		currentThreadContext.UserMessage = requestMessage.Text;
 
 		var skillRoutingRecords = await qdrantRepository.SearchAsync(requestMessage.Text,
 			top: 5,
-			similarityThreshold: 0.4f,
+			similarityThreshold: currentThreadContext.SimilarityThreshold,
 			cancellationToken: cancellationToken);
 
 		if (!skillRoutingRecords.Any())
 		{
 			return aiContext;
 		}
+
+		currentThreadContext.SkillRoutingRecords = skillRoutingRecords;
 
 		var skillCodes = skillRoutingRecords.Select(x => x.SkillCode).Distinct().ToList();
 
@@ -42,10 +48,21 @@ internal class AIContextSkillRoutingProvider(IQdrantRepository<SkillRoutingRecor
 		var instructions = await dbContext.Skills
 			.Where(x => skillCodes.Contains(x.Code))
 			.Select(x => x.SystemPrompt)
-			.ToArrayAsync(cancellationToken);
+			.FirstOrDefaultAsync(cancellationToken);
 
-		aiContext.Instructions = string.Join("\n\n", instructions);
+		currentThreadContext.Instructions = instructions ?? string.Empty;
+
+		aiContext.Instructions = instructions;
 
 		return aiContext;
+	}
+
+	public override ValueTask InvokedAsync(InvokedContext context, CancellationToken cancellationToken = default)
+	{
+		currentThreadContext.RequestMessages = context.RequestMessages;
+		
+		currentThreadContext.ResponseMessages = context.ResponseMessages;
+
+		return base.InvokedAsync(context, cancellationToken);
 	}
 }

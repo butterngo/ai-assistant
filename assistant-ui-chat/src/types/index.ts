@@ -4,3 +4,4 @@ export * from "./Tool";
 export * from "./Conversation";
 export * from "./PagedResult";
 export * from "./ChatRequest";
+export * from "./DebugContext";

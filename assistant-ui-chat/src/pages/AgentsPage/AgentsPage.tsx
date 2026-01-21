@@ -123,7 +123,7 @@ export const AgentsPage: FC = () => {
         {!loading && !error && agents.length === 0 && (
           <div className="empty-state">
             <LayersIcon size={48} />
-            <h3>No categories yet</h3>
+            <h3>No agents yet</h3>
             <p>Create your first agent to organize your skills.</p>
             <button className="btn btn-primary" onClick={handleCreate}>
               <span>Add Category</span>
@@ -131,9 +131,9 @@ export const AgentsPage: FC = () => {
           </div>
         )}
 
-        {/* Categories List */}
+        {/* agents List */}
         {!loading && agents.length > 0 && (
-          <div className="categories-list">
+          <div className="agents-list">
             {agents.map((agent : Agent) => (
               <div
                 key={agent.id}

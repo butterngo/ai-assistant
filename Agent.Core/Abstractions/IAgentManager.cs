@@ -10,5 +10,7 @@ public interface IAgentManager
 		ChatMessageStoreEnum chatMessageStore = ChatMessageStoreEnum.Postgresql,
 		CancellationToken ct = default);
 
+	ICurrentThreadContext CurrentThreadContext { get; }
+
 	Task<object> DryRunAsync(string userMessage, CancellationToken ct = default);
 }

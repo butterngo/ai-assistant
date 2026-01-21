@@ -1,3 +1,20 @@
+export interface DebugContext {
+  agentId: string;
+  agentName: string;
+  userMessage: string;
+  similarityThreshold: number;
+	skillRoutingRecords: any[];
+	instructions: string
+	requestMessages: any[];
+	responseMessages: any[];
+  createdAt: string;
+  routingCompletedAt?: string;
+  instructionsLoadedAt?: string;
+  executionStartedAt?: string;
+  executionCompletedAt?: string;
+  updatedAt: string;
+}
+
 /**
  * Request body for chat endpoint
  */
@@ -35,6 +52,7 @@ export interface ChatDone {
   isNewConversation: boolean;
   isStreaming: boolean;
   isTestMode: boolean;
+  debugContext?: DebugContext;
 }
 
 /**

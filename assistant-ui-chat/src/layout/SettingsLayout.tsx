@@ -28,11 +28,11 @@ interface MenuItem {
 
 const configurationItems: MenuItem[] = [
   { 
-    path: "/settings/categories", 
+    path: "/settings/agents", 
     label: "Agents", 
     icon: LayersIcon,
     // Also highlight when viewing skills inside a category
-    matchPattern: /^\/settings\/categories/,
+    matchPattern: /^\/settings\/agents/,
   },
   { path: "/settings/tools", label: "Tools", icon: WrenchIcon },
   { path: "/settings/knowledge-base", label: "Knowledge Base", icon: DatabaseIcon },

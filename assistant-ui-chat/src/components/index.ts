@@ -16,9 +16,12 @@ export { ConfirmDialog } from "./ConfirmDialog";
 
 // Feature-specific modals
 export { AgentModal } from "./AgentModal";
-export { SkillModal } from "./SkillModal";
+export { SkillRoutersSection } from "./AgentSkill";
+export { MarkdownEditor } from "./MarkdownEditor";
 
 export { Thread } from "./Thread";
 
 export { SkillsSidebar } from "./TestChat/SkillsSidebar";
 export { SkillInstructionsModal } from "./TestChat/SkillInstructionsModal";
+
+export { DebugPanel } from './DebugPanel';

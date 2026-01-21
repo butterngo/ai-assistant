@@ -3,6 +3,7 @@ import { XIcon } from "lucide-react";
 import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../../types";
 import "./AgentModal.css";
 import { FormField } from "../Form";
+import { MarkdownEditor } from "../MarkdownEditor";
 
 // =============================================================================
 // Types
@@ -28,6 +29,7 @@ export const AgentModal: FC<AgentModalProps> = ({
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState("");
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -41,6 +43,7 @@ export const AgentModal: FC<AgentModalProps> = ({
       setCode(agent?.code || "");
       setName(agent?.name || "");
       setDescription(agent?.description || "");
+      setSystemPrompt(agent?.systemPrompt || "");
       setErrors({});
     }
   }, [isOpen, agent]);
@@ -66,6 +69,7 @@ export const AgentModal: FC<AgentModalProps> = ({
         code: code.trim(),
         name: name.trim(),
         description: description.trim() || null,
+        systemPrompt: systemPrompt.trim() || null,
       });
       onClose();
     } catch (e) {
@@ -90,7 +94,7 @@ export const AgentModal: FC<AgentModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose} onKeyDown={handleKeyDown}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content modal-fullscreen" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
           <h2>{isEdit ? "Edit Agent" : "New Agent"}</h2>
@@ -101,35 +105,53 @@ export const AgentModal: FC<AgentModalProps> = ({
 
         {/* Body */}
         <div className="modal-body">
-          <FormField label="Code" htmlFor="skill-code" required error={errors.code}>
-              <input
-                id="Agent-code"
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter Agent code"
-              />
-          </FormField>
+          <div className="modal-form-grid">
+            {/* Left Column - Basic Info */}
+            <div className="modal-form-column">
+              <FormField label="Code" htmlFor="agent-code" required error={errors.code}>
+                <input
+                  id="agent-code"
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Enter Agent code"
+                />
+              </FormField>
 
-          <FormField label="Name" htmlFor="Agent-name" required error={errors.name}>
-              <input
-                id="Agent-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter Agent name"
+              <FormField label="Name" htmlFor="agent-name" required error={errors.name}>
+                <input
+                  id="agent-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter Agent name"
+                />
+              </FormField>
+              
+              <div className="form-group">
+                <label htmlFor="agent-description">Description</label>
+                <textarea
+                  id="agent-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter Agent description (optional)"
+                  rows={5}
+                />
+              </div>
+            </div>
+
+            {/* Right Column - System Prompt */}
+            <div className="modal-form-column">
+              <MarkdownEditor
+                label="System Prompt"
+                value={systemPrompt}
+                onChange={setSystemPrompt}
+                placeholder="Enter system prompt for this agent..."
+                error={errors.systemPrompt}
+                showModeToggle={true}
+                defaultMode="split"
               />
-          </FormField>
-          
-          <div className="form-group">
-            <label htmlFor="Agent-description">Description</label>
-            <textarea
-              id="Agent-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter Agent description (optional)"
-              rows={3}
-            />
+            </div>
           </div>
         </div>
 

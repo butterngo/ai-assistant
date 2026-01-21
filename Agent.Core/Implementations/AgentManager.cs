@@ -5,13 +5,11 @@ using Agent.Core.Entities;
 using Agent.Core.Enums;
 using Agent.Core.Implementations.LLM;
 using Agent.Core.Implementations.Persistents;
+using Agent.Core.Models;
 using Agent.Core.Specialists;
 using Agent.Core.VectorRecords;
-using Azure.AI.Projects;
-using Microsoft.Agents.AI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace Agent.Core.Implementations;
@@ -24,6 +22,7 @@ public class AgentManager : IAgentManager
 	private readonly ILoggerFactory _loggerFactory;
 	private readonly IIntentClassificationService _intentClassificationService;
 	private readonly IQdrantRepository<SkillRoutingRecord> _qdrandSkillRoutingRecord;
+	public ICurrentThreadContext CurrentThreadContext { get; private set; }
 
 	public AgentManager(ILoggerFactory loggerFactory,
 		ISemanticKernelBuilder kernelBuilder,
@@ -117,6 +116,11 @@ public class AgentManager : IAgentManager
 	{
 		var state = JsonSerializer.SerializeToElement(new { threadId });
 
+		if (chatMessageStore == ChatMessageStoreEnum.Memory)
+		{
+			CurrentThreadContext = new CurrentThreadContext(agentId, threadId);
+		}
+
 		var builder = new AgentBuilder()
 			.WithKernel(_kernelBuilder)
 			.WithMessageStore(_chatMessageStoreFactory.Create(state, chatMessageStore: chatMessageStore));
@@ -132,7 +136,9 @@ public class AgentManager : IAgentManager
 			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000002")
 				=> builder
 				.WithLogger<ProductOwnerAgent>(_loggerFactory)
-				.WithAIContextProvider(new AIContextSkillRoutingProvider(_qdrandSkillRoutingRecord, _dbContextFactory))
+				.WithAIContextProvider(new AIContextSkillRoutingProvider(_qdrandSkillRoutingRecord,
+				_dbContextFactory,
+				CurrentThreadContext))
 				.Build<ProductOwnerAgent>(),
 
 			var id when id == Guid.Parse("00000000-0000-0000-0000-000000000003")
