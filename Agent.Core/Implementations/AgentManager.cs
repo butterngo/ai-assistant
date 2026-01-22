@@ -114,11 +114,21 @@ public class AgentManager : IAgentManager
 		Guid threadId,
 		ChatMessageStoreEnum chatMessageStore)
 	{
+		var agent = _dbContextFactory.CreateDbContext()
+			.Agents
+			.AsNoTracking()
+			.FirstOrDefault(a => a.Id == agentId);
+
+		if (agent == null) 
+		{
+		  throw new ArgumentException($"Agent with ID {agentId} not found.");
+		}
+
 		var state = JsonSerializer.SerializeToElement(new { threadId });
 
 		if (chatMessageStore == ChatMessageStoreEnum.Memory)
 		{
-			CurrentThreadContext = new CurrentThreadContext(agentId, threadId);
+			CurrentThreadContext = new CurrentThreadContext(agentId, threadId, agent.SystemPrompt);
 		}
 
 		var builder = new AgentBuilder()

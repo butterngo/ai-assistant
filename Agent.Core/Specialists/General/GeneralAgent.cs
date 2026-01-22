@@ -30,7 +30,7 @@ public sealed class GeneralAgent : BaseAgent<GeneralAgent>
 				PluginName = "ichibaApi",
 				//Endpoint = "http://localhost:8050/swagger/bff-v1.0/swagger.json",
 				Endpoint = "http://localhost:1234/sse",
-				ToolType = ConnectionToolType.MCP,
+				ToolType = ConnectionToolType.MCP_HTTP,
 			}
 		};
 

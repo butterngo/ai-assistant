@@ -9,9 +9,10 @@ public interface ICurrentThreadContext
 	string AgentName { get; set; }
 	Guid ThreadId { get; set; }
 	string UserMessage { get; set; }
+	string Instructions { get; set; }
 	float? SimilarityThreshold { get; set; }
 	IEnumerable<SkillRoutingRecord> SkillRoutingRecords { get; set; }
-	string Instructions { get; set; }
+	string Skill { get; set; }
 	IEnumerable<ChatMessage> RequestMessages { get; set; }
 	IEnumerable<ChatMessage>? ResponseMessages { get; set; }
 }

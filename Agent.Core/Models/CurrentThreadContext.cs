@@ -16,10 +16,11 @@ internal class CurrentThreadContext : ICurrentThreadContext
 	private IEnumerable<ChatMessage> _requestMessages = new List<ChatMessage>();
 	private IEnumerable<ChatMessage>? _responseMessages = new List<ChatMessage>();
 
-	public CurrentThreadContext(Guid agentId, Guid threadId)
+	public CurrentThreadContext(Guid agentId, Guid threadId, string instructions)
 	{
 		_agentId = agentId;
 		_threadId = threadId;
+		Instructions = instructions;
 		UpdatedAt = DateTime.UtcNow;
 	}
 
@@ -47,6 +48,8 @@ internal class CurrentThreadContext : ICurrentThreadContext
 		set { _userMessage = value; UpdateTimestamp(); }
 	}
 
+	public string Instructions { get; set; }
+
 	public float? SimilarityThreshold
 	{
 		get => _similarityThreshold;
@@ -59,7 +62,7 @@ internal class CurrentThreadContext : ICurrentThreadContext
 		set { _skillRoutingRecords = value; UpdateTimestamp(); }
 	}
 
-	public string Instructions
+	public string Skill
 	{
 		get => _instructions;
 		set { _instructions = value; UpdateTimestamp(); }
@@ -78,7 +81,7 @@ internal class CurrentThreadContext : ICurrentThreadContext
 	}
 
 	public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
-
+	
 	private void UpdateTimestamp()
 	{
 		UpdatedAt = DateTime.UtcNow;

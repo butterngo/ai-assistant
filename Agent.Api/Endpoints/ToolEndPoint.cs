@@ -1,7 +1,7 @@
 ﻿using Agent.Api.Models;
 using Agent.Core.Abstractions.Services;
 using Agent.Core.Entities;
-using System.Text.Json;
+using Agent.Core.Models;
 
 namespace Agent.Api.Endpoints;
 
@@ -41,6 +41,26 @@ public static class ToolEndPoint
 			.WithSummary("Delete a tool")
 			.Produces(StatusCodes.Status204NoContent)
 			.Produces(StatusCodes.Status404NotFound);
+
+		group.MapPost("/test-mcp", async (IConfiguration configuration) => 
+		{
+			var githubTool = new ConnectionTool
+			{
+				PluginName = "github",
+				ToolType = ConnectionToolType.MCP_STDIO,
+				Command = "npx",
+				Arguments = new List<string> { "-y", "@modelcontextprotocol/server-github" },
+				EnvironmentVariables = new Dictionary<string, string?>
+				{
+					["GITHUB_PERSONAL_ACCESS_TOKEN"] = configuration.GetValue<string>("Github_ApiKey")
+				},
+				OnStandardError = (line) => Console.WriteLine($"GitHub MCP: {line}")
+			};
+
+			var tools = await githubTool.GetToolsAsync();
+
+			return Results.Ok(tools);
+		});
 
 		return endpoints;
 	}

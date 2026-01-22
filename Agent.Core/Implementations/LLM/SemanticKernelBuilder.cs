@@ -1,11 +1,52 @@
-﻿using Agent.Core.Abstractions.LLM;
+﻿using Agent.Core.Abstractions;
+using Agent.Core.Abstractions.LLM;
+using Agent.Core.Models;
 using Agent.Core.Options;
 using Anthropic.SDK;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using SharpYaml.Serialization.Logging;
+using System.ClientModel;
+using System.ClientModel.Primitives;
 
 namespace Agent.Core.Implementations.LLM;
+
+internal class LLMLoggingPolicy : PipelinePolicy
+{
+	public override void Process(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
+	{
+		ProcessNext(message, pipeline, currentIndex);
+	}
+
+	public override async ValueTask ProcessAsync(
+		PipelineMessage message,
+		IReadOnlyList<PipelinePolicy> pipeline,
+		int currentIndex)
+	{
+		if (message.Request?.Content != null)
+		{
+			var requestBody = await ReadBinaryContentAsync(message.Request.Content);
+			Console.WriteLine("=== REQUEST TO LLM ===");
+			Console.WriteLine(requestBody);
+		}
+
+		await ProcessNextAsync(message, pipeline, currentIndex);
+	}
+
+	private static async Task<string> ReadBinaryContentAsync(BinaryContent content)
+	{
+		// BinaryContent doesn't have ToStream(), we need to write to a MemoryStream
+		using var memoryStream = new MemoryStream();
+		await content.WriteToAsync(memoryStream, CancellationToken.None);
+		memoryStream.Position = 0;
+
+		using var reader = new StreamReader(memoryStream);
+		return await reader.ReadToEndAsync();
+	}
+}
 
 public class SemanticKernelBuilder(LLMProviderOptions options) : ISemanticKernelBuilder
 {
@@ -23,11 +64,18 @@ public class SemanticKernelBuilder(LLMProviderOptions options) : ISemanticKernel
 	{
 		var provider = options.AzureOpenAI;
 
+		var pipelineOptions = new AzureOpenAIClientOptions();
+
+		// Add your custom logging policy
+		pipelineOptions.AddPolicy(
+			new LLMLoggingPolicy(),
+			PipelinePosition.PerCall  // Runs once per request
+		);
+
 		var chatClient = new AzureOpenAIClient(
 		  new Uri(provider.Endpoint),
-		  new AzureCliCredential())
+		  new AzureCliCredential(), pipelineOptions)
 			.GetChatClient(provider.ModelId);
-
 
 		return chatClient.AsIChatClient();
 	}

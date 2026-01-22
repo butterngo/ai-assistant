@@ -34,26 +34,32 @@ internal class AIContextSkillRoutingProvider(IQdrantRepository<SkillRoutingRecor
 			similarityThreshold: currentThreadContext.SimilarityThreshold,
 			cancellationToken: cancellationToken);
 
-		if (!skillRoutingRecords.Any())
-		{
-			return aiContext;
-		}
+		//if (!skillRoutingRecords.Any())
+		//{
+		//	return aiContext;
+		//}
 
-		currentThreadContext.SkillRoutingRecords = skillRoutingRecords;
+		//currentThreadContext.SkillRoutingRecords = skillRoutingRecords;
 
-		var skillCodes = skillRoutingRecords.Select(x => x.SkillCode).Distinct().ToList();
+		//var skillCodes = skillRoutingRecords.Select(x => x.SkillCode).Distinct().ToList();
 
-		var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+		//var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-		var instructions = await dbContext.Skills
-			.Where(x => skillCodes.Contains(x.Code))
-			.Select(x => x.SystemPrompt)
-			.FirstOrDefaultAsync(cancellationToken);
+		//var instructions = await dbContext.Skills
+		//	.Where(x => skillCodes.Contains(x.Code))
+		//	.Select(x => x.SystemPrompt)
+		//	.FirstOrDefaultAsync(cancellationToken);
 
-		currentThreadContext.Instructions = instructions ?? string.Empty;
+		//currentThreadContext.Skill = instructions ?? string.Empty;
 
-		aiContext.Instructions = instructions;
+		var builder = new System.Text.StringBuilder();
 
+		builder.AppendLine(currentThreadContext.Instructions);
+
+		aiContext.Instructions = builder.ToString();
+
+		Console.WriteLine("=== AI CONTEXT INSTRUCTIONS ===");
+		Console.WriteLine(aiContext.Instructions);
 		return aiContext;
 	}
 

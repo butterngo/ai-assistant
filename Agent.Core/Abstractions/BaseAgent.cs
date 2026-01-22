@@ -2,7 +2,9 @@
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using OpenAI.Chat;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace Agent.Core.Abstractions;
 
@@ -43,9 +45,10 @@ public abstract class BaseAgent<T> : IAgent
 		});
 	}
 
-	protected virtual void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions options) 
+	protected virtual void SetAgentOptions(IChatClient chatClient, ChatClientAgentOptions chatClientAgentOptions) 
 	{
-		// Override in derived classes to set specific options
+
+      
 	}
 
 	protected virtual (ChatClientAgent agent, AgentThread thread) CreateAgent(ChatClientAgentOptions options)

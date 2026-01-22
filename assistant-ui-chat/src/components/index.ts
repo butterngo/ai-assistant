@@ -6,9 +6,6 @@ export { Sidebar } from "./Sidebar/";
 export { DataTable } from "./DataTable";
 export type { Column, DataTableProps } from "./DataTable";
 
-export { Modal } from "./Modal";
-export type { ModalProps } from "./Modal";
-
 export { FormField } from "./Form";
 export type { FormFieldProps } from "./Form";
 

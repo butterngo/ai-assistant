@@ -22,21 +22,19 @@ export function TestChatPage() {
   // Get test context from URL/state
   const agentId = searchParams.get("agents");
   const skillId = searchParams.get("skill");
-  console.log(location.state);
   const categoryName = location.state?.categoryName || "Agent";
   const skillName = location.state?.skillName;
   
   const [threadId, setThreadId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [debugPanelOpen, setDebugPanelOpen] = useState(true);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [debugContext, setDebugContext] = useState<DebugContext | null>(null);
 
   // ===========================================================================
   // Use Skills Hook
   // ===========================================================================
-
-  console.log("Loading skills for agentId:", agentId);
 
   const {
     skills,
@@ -93,7 +91,6 @@ export function TestChatPage() {
 
   const handleDone = useCallback((done: ChatDone) => {
     console.log("✅ Test chat completed:", done);
-    setDebugContext(done.debugContext as DebugContext || null);
     setIsStreaming(false);
   }, []);
 
@@ -112,6 +109,10 @@ export function TestChatPage() {
 
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleToggleDebugPanel = () => {
+    setDebugPanelOpen(!debugPanelOpen);
   };
 
   const handleViewSkill = (skill: Skill) => {
@@ -243,10 +244,21 @@ export function TestChatPage() {
             </div>
           </div>
           
-          <button className="close-test-btn" onClick={handleClose}>
-            <XIcon size={16} />
-            Close Test
-          </button>
+          <div className="test-header-right">
+            <button 
+              className="debug-toggle-btn"
+              onClick={handleToggleDebugPanel}
+              title={debugPanelOpen ? "Hide debug panel" : "Show debug panel"}
+            >
+              🐛 Debug
+              {debugPanelOpen ? <ChevronRightIcon size={16} /> : <ChevronLeftIcon size={16} />}
+            </button>
+            
+            <button className="close-test-btn" onClick={handleClose}>
+              <XIcon size={16} />
+              Close Test
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
@@ -272,7 +284,7 @@ export function TestChatPage() {
           </div>
 
           {/* Debug Panel - Right Side */}
-          <DebugPanel debugContext={debugContext} />
+          {debugPanelOpen && <DebugPanel debugContext={debugContext} />}
         </div>
 
         {/* Skill Instructions Modal */}
