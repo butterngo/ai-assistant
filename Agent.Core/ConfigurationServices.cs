@@ -7,6 +7,7 @@ using Agent.Core.Implementations.Persistents;
 using Agent.Core.Implementations.Persistents.Vectors;
 using Agent.Core.Implementations.Services;
 using Agent.Core.Models;
+using Agent.Core.Services;
 using Agent.Core.VectorRecords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,7 +28,7 @@ public static class ConfigurationServices
 		services.AddMemoryCache();
 
 		// Register DbContext with pooling for better performance
-		services.AddPooledDbContextFactory<ChatDbContext>(options =>
+		services.AddPooledDbContextFactory<AgentDbContext>(options =>
 		{
 			options.UseNpgsql(connectionString, npgsqlOptions =>
 			{
@@ -48,7 +49,7 @@ public static class ConfigurationServices
 		// Register the factory as singleton (it's stateless, uses DbContextFactory internally)
 		services.AddSingleton<IChatMessageStoreFactory>(sp =>
 		{
-			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<ChatDbContext>>();
+			var dbContextFactory = sp.GetRequiredService<IDbContextFactory<AgentDbContext>>();
 			var memoryCache = sp.GetRequiredService<IMemoryCache>();
 			return new ChatMessageStoreFactory(dbContextFactory, memoryCache, maxMessages);
 		});
@@ -107,7 +108,9 @@ public static class ConfigurationServices
 	{
 		services.AddScoped<IIntentClassificationService, IntentClassificationService>();
 		services.AddScoped<IAgentService, AgentService>();
-		services.AddScoped<IToolService, ToolService>();
+		services.AddScoped<IConnectionToolService, ConnectionToolService>();
+		services.AddScoped<IDiscoveredToolService, DiscoveredToolService>();
+		services.AddScoped<ISkillConnectionToolService, SkillConnectionToolService>();
 		services.AddScoped<ISkillService, SkillService>();
 		services.AddScoped<ISkillRouterService, SkillRouterService>();
 

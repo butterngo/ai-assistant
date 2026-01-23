@@ -9,11 +9,11 @@ namespace Agent.Core.Implementations.Services;
 
 public class SkillService : ISkillService
 {
-	private readonly ChatDbContext _dbContext;
+	private readonly AgentDbContext _dbContext;
 	private readonly IQdrantRepository<SkillRoutingRecord> _skillRoutingRepo;
 
 	public SkillService(
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		IQdrantRepository<SkillRoutingRecord> skillRoutingRepo)
 	{
 		_dbContext = dbContextFactory.CreateDbContext();

@@ -7,9 +7,9 @@ namespace Agent.Core.Implementations.Services;
 
 public class AgentService : IAgentService
 {
-	private readonly ChatDbContext _dbContext;
+	private readonly AgentDbContext _dbContext;
 
-	public AgentService(IDbContextFactory<ChatDbContext> dbContextFactory)
+	public AgentService(IDbContextFactory<AgentDbContext> dbContextFactory)
 	{
 		_dbContext = dbContextFactory.CreateDbContext();
 	}

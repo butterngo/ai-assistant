@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Agent.Core.Implementations.Persistents;
 
-public class ChatDbContext : DbContext
+public class AgentDbContext : DbContext
 {
-	public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
+	public AgentDbContext(DbContextOptions<AgentDbContext> options) : base(options)
 	{
 		AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 		AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -15,7 +15,9 @@ public class ChatDbContext : DbContext
 	public DbSet<ChatThreadEntity> ChatThreads => Set<ChatThreadEntity>();
 	public DbSet<AgentEntity> Agents => Set<AgentEntity>();
 	public DbSet<SkillEntity> Skills => Set<SkillEntity>();
-	public DbSet<ToolEntity> Tools => Set<ToolEntity>();
+	public DbSet<ConnectionToolEntity> ConnectionTools => Set<ConnectionToolEntity>();
+	public DbSet<SkillConnectionToolEntity> SkillConnectionTools => Set<SkillConnectionToolEntity>();
+	public DbSet<DiscoveredToolEntity> DiscoveredTools => Set<DiscoveredToolEntity>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

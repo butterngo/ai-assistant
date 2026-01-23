@@ -22,18 +22,56 @@ CREATE TABLE skills (
     UNIQUE(agent_id, code)
 );
 
--- Tools
-CREATE TABLE tools (
+-- Connection Tools
+
+CREATE TABLE connection_tools (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    skill_id UUID NOT NULL REFERENCES skills(id),
-    name VARCHAR(100) NOT NULL,
-    type VARCHAR(50) NOT NULL,  -- 'mcp', 'openapi'
-    endpoint VARCHAR(500) NOT NULL,
+    
+    -- Identity
+    name VARCHAR(100) NOT NULL UNIQUE,
+    type VARCHAR(50) NOT NULL,  -- 'mcp_http', 'mcp_stdio', 'openapi'
     description TEXT,
-    config JSONB DEFAULT '{}',
-    is_prefetch BOOLEAN DEFAULT FALSE,
+    
+    -- Connection details
+    endpoint VARCHAR(500),      -- For MCP_HTTP and OpenAPI
+    command VARCHAR(500),        -- For MCP_STDIO (e.g., "npx")
+    
+    -- Configuration (JSON)
+    config JSONB NOT NULL DEFAULT '{}',
+    -- Contains: arguments, environmentVariables, workingDirectory, shutdownTimeout
+    
+    -- Status
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    -- Timestamps
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- skill_connection_tools
+CREATE TABLE skill_connection_tools (
+    skill_id UUID NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+    connection_tool_id UUID NOT NULL REFERENCES connection_tools(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    
+    PRIMARY KEY (skill_id, connection_tool_id)
+);
+
+CREATE TABLE discovered_tools (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    connection_tool_id UUID NOT NULL REFERENCES connection_tools(id) ON DELETE CASCADE,
+    
+    -- Tool info
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    tool_schema JSONB NOT NULL,  -- Full AITool definition
+    
+    -- Cache metadata
+    discovered_at TIMESTAMP DEFAULT NOW(),
+    last_verified_at TIMESTAMP DEFAULT NOW(),
+    is_available BOOLEAN DEFAULT TRUE,
+    
+    UNIQUE(connection_tool_id, name)
 );
 
 INSERT INTO agents (id, code, name, system_prompt, description, created_at, updated_at)

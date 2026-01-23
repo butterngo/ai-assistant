@@ -40,5 +40,5 @@ public class SkillEntity
 	[JsonIgnore]
 	public AgentEntity Agent { get; set; } = null!;
 
-	public ICollection<ToolEntity> Tools { get; set; } = [];
+	public ICollection<ConnectionToolEntity> Tools { get; set; } = [];
 }

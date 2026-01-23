@@ -9,12 +9,12 @@ namespace Agent.Core.Implementations.Persistents;
 
 internal class ChatMessageStoreFactory : IChatMessageStoreFactory
 {
-	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
+	private readonly IDbContextFactory<AgentDbContext> _dbContextFactory;
 	private readonly IMemoryCache _memoryCache;
 	private readonly int _maxMessages;
 
 	public ChatMessageStoreFactory(
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		IMemoryCache memoryCache,
 		int maxMessages = 50)
 	{

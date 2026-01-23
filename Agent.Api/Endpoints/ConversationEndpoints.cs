@@ -32,7 +32,7 @@ public static class ConversationEndpoints
 	}
 
 	private static async Task<IResult> GetAllConversationsAsync(
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		int page = 1,
 		int pageSize = 20,
 		CancellationToken cancellationToken = default)
@@ -70,7 +70,7 @@ public static class ConversationEndpoints
 
 	private static async Task<IResult> GetConversationByIdAsync(
 		Guid id,
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		CancellationToken cancellationToken = default)
 	{
 		await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -115,7 +115,7 @@ public static class ConversationEndpoints
 
 	private static async Task<IResult> DeleteConversationAsync(
 		Guid id,
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		CancellationToken cancellationToken = default)
 	{
 		await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);

@@ -8,14 +8,14 @@ namespace Agent.Core.Implementations.Persistents;
 
 internal sealed class PostgresChatMessageStore : ChatMessageStore
 {
-	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
+	private readonly IDbContextFactory<AgentDbContext> _dbContextFactory;
 	private readonly int _maxMessages;
 	private Guid _threadId;
 
 	public Guid ThreadId => _threadId;
 
 	protected PostgresChatMessageStore(
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		int maxMessages = 50)
 	{
 		_dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
@@ -23,7 +23,7 @@ internal sealed class PostgresChatMessageStore : ChatMessageStore
 	}
 
 	public PostgresChatMessageStore(
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		JsonElement serializedState,
 		int maxMessages = 50,
 		JsonSerializerOptions? options = null)
@@ -151,7 +151,7 @@ internal sealed class PostgresChatMessageStore : ChatMessageStore
 	}
 
 	private static async Task<long> GetNextSequenceNumberAsync(
-		ChatDbContext dbContext,
+		AgentDbContext dbContext,
 		Guid threadId,
 		CancellationToken cancellationToken)
 	{

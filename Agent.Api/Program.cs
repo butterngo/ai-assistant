@@ -81,7 +81,9 @@ internal class Program
 
 		app.MapAgentEndPoints();
 
-		app.MapToolEndPoints();
+		app.MapConnectionToolEndpoints();
+		app.MapDiscoveredToolEndpoints();
+		app.MapSkillConnectionToolEndpoints();
 
 		app.Run();
 	}

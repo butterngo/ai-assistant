@@ -18,7 +18,7 @@ public class AgentManager : IAgentManager
 {
 	private readonly ISemanticKernelBuilder _kernelBuilder;
 	private readonly IChatMessageStoreFactory _chatMessageStoreFactory;
-	private readonly IDbContextFactory<ChatDbContext> _dbContextFactory;
+	private readonly IDbContextFactory<AgentDbContext> _dbContextFactory;
 	private readonly ILoggerFactory _loggerFactory;
 	private readonly IIntentClassificationService _intentClassificationService;
 	private readonly IQdrantRepository<SkillRoutingRecord> _qdrandSkillRoutingRecord;
@@ -26,7 +26,7 @@ public class AgentManager : IAgentManager
 
 	public AgentManager(ILoggerFactory loggerFactory,
 		ISemanticKernelBuilder kernelBuilder,
-		IDbContextFactory<ChatDbContext> dbContextFactory,
+		IDbContextFactory<AgentDbContext> dbContextFactory,
 		IIntentClassificationService intentClassificationService,
 		IChatMessageStoreFactory chatMessageStoreFactory,
 		IQdrantRepository<SkillRoutingRecord> qdrandSkillRoutingRecord)

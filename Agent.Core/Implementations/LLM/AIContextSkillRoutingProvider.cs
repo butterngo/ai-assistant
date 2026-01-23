@@ -8,7 +8,7 @@ using Agent.Core.Implementations.Persistents;
 namespace Agent.Core.Implementations.LLM;
 
 internal class AIContextSkillRoutingProvider(IQdrantRepository<SkillRoutingRecord> qdrantRepository,
-	IDbContextFactory<ChatDbContext> dbContextFactory,
+	IDbContextFactory<AgentDbContext> dbContextFactory,
 	ICurrentThreadContext currentThreadContext)
 	: AIContextProvider
 {
