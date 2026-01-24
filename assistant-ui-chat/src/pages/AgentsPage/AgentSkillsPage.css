@@ -127,26 +127,3 @@
   justify-content: flex-end;
   gap: 8px;
 }
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  color: #8e8e8e;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-
-.action-btn:hover {
-  background: #2f2f2f;
-  color: #ececec;
-}
-
-.action-btn.danger:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}

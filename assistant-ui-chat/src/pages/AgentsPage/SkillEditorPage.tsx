@@ -1,6 +1,6 @@
 import { type FC, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeftIcon, SaveIcon, FileTextIcon, RouteIcon } from "lucide-react";
+import { ArrowLeftIcon, SaveIcon, FileTextIcon, RouteIcon, WrenchIcon } from "lucide-react";
 import { useSkills, useSkillRouters } from "../../hooks";
 import { MarkdownEditor, SkillRoutersSection } from "../../components";
 import type { CreateSkillRequest, UpdateSkillRequest } from "../../types";
@@ -10,7 +10,7 @@ import "./SkillEditorPage.css";
 // Types
 // =============================================================================
 
-type TabType = "prompt" | "routing";
+type TabType = "prompt" | "routing" | "tools";
 
 // =============================================================================
 // Component
@@ -249,6 +249,15 @@ export const SkillEditorPage: FC = () => {
             <RouteIcon size={16} />
             <span>Routing Queries</span>
             <span className="count-badge">{routers.length}</span>
+          </button>
+          <button
+            className={`tab-btn ${activeTab === "routing" ? "active" : ""}`}
+            onClick={() => setActiveTab("routing")}
+            disabled={!isEditMode}
+          >
+            <WrenchIcon size={16} />
+            <span>Tools</span>
+            <span className="count-badge">{0}</span>
           </button>
         </div>
 

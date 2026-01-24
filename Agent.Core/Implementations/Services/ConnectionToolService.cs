@@ -161,39 +161,6 @@ public class ConnectionToolService : IConnectionToolService
 		_logger.LogInformation("Deleted connection tool: {Id} ({Name})", id, entity.Name);
 	}
 
-	public async Task<IEnumerable<AITool>> DiscoverToolsAsync(Guid id, CancellationToken ct = default)
-	{
-		var entity = await GetByIdAsync(id, ct);
-		if (entity == null)
-		{
-			throw new KeyNotFoundException($"Connection tool with ID {id} not found");
-		}
-
-		_logger.LogInformation("Discovering tools from connection: {Name}", entity.Name);
-
-		try
-		{
-			var connectionTool = entity.ToConnectionTool();
-			var tools = await connectionTool.GetToolsAsync(ct);
-
-			if (tools == null || !tools.Any())
-			{
-				_logger.LogWarning("No tools discovered from connection: {Name}", entity.Name);
-				return Enumerable.Empty<AITool>();
-			}
-
-			_logger.LogInformation("Discovered {Count} tools from connection: {Name}",
-				tools.Count, entity.Name);
-
-			return tools;
-		}
-		catch (Exception ex)
-		{
-			_logger.LogError(ex, "Error discovering tools from connection: {Name}", entity.Name);
-			throw;
-		}
-	}
-
 	public async Task<IEnumerable<AITool>> GetToolsAsync(
 		Guid id,
 		bool useCache = true,
@@ -254,13 +221,46 @@ public class ConnectionToolService : IConnectionToolService
 	{
 		try
 		{
-			var tools = await DiscoverToolsAsync(id, ct);
+			var tools = await DiscoverToolsAsync(id);
 			return tools != null && tools.Any();
 		}
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Connection test failed for {Id}", id);
 			return false;
+		}
+	}
+
+	private async Task<IEnumerable<AITool>> DiscoverToolsAsync(Guid id, CancellationToken ct = default)
+	{
+		var entity = await GetByIdAsync(id, ct);
+		if (entity == null)
+		{
+			throw new KeyNotFoundException($"Connection tool with ID {id} not found");
+		}
+
+		_logger.LogInformation("Discovering tools from connection: {Name}", entity.Name);
+
+		try
+		{
+			var connectionTool = entity.ToConnectionTool();
+			var tools = await connectionTool.GetToolsAsync(ct);
+
+			if (tools == null || !tools.Any())
+			{
+				_logger.LogWarning("No tools discovered from connection: {Name}", entity.Name);
+				return Enumerable.Empty<AITool>();
+			}
+
+			_logger.LogInformation("Discovered {Count} tools from connection: {Name}",
+				tools.Count, entity.Name);
+
+			return tools;
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Error discovering tools from connection: {Name}", entity.Name);
+			throw;
 		}
 	}
 }

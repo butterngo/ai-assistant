@@ -1,16 +1,6 @@
 
 /* Action Buttons */
-.action-btn {
-  padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  background-color: white;
-  color: #374151;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+
 
 .action-btn:hover {
   background-color: #f9fafb;

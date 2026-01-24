@@ -67,11 +67,6 @@ public interface IConnectionToolService
 	Task DeleteAsync(Guid id, CancellationToken ct = default);
 
 	/// <summary>
-	/// Discover AI tools from a connection (fresh discovery, not cached)
-	/// </summary>
-	Task<IEnumerable<AITool>> DiscoverToolsAsync(Guid id, CancellationToken ct = default);
-
-	/// <summary>
 	/// Get AI tools for a connection (uses cache if available, otherwise discovers)
 	/// </summary>
 	Task<IEnumerable<AITool>> GetToolsAsync(Guid id, bool useCache = true, CancellationToken ct = default);
