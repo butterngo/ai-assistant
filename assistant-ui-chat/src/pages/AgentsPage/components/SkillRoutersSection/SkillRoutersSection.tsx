@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import { PlusIcon, XIcon, AlertCircleIcon, RefreshCwIcon } from "lucide-react";
-import type { SkillRouter } from "../../types";
+import type { SkillRouter } from "../../../../types";
 import "./SkillRoutersSection.css";
 
 // =============================================================================

@@ -1,9 +1,8 @@
 import { type FC, useState, useEffect } from "react";
 import { XIcon } from "lucide-react";
-import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../../types";
+import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../../../../types";
 import "./AgentModal.css";
-import { FormField } from "../Form";
-import { MarkdownEditor } from "../MarkdownEditor";
+import { FormField, MarkdownEditor } from "../../../../components";
 
 // =============================================================================
 // Types

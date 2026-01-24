@@ -10,7 +10,7 @@ import {
   MessageSquareIcon,
 } from "lucide-react";
 import { useAgents } from "../../hooks";
-import { AgentModal, ConfirmDialog } from "../../components";
+import { AgentModal, ConfirmDialog  } from "./components";
 import type { Agent, CreateAgentRequest, UpdateAgentRequest } from "../../types";
 import "../SettingsPage.css";
 import "./AgentsPage.css";

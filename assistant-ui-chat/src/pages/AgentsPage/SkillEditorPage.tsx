@@ -2,7 +2,7 @@ import { type FC, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon, SaveIcon, FileTextIcon, RouteIcon, WrenchIcon } from "lucide-react";
 import { useSkills, useSkillRouters } from "../../hooks";
-import { MarkdownEditor, SkillRoutersSection } from "../../components";
+import { MarkdownEditor, SkillRoutersSection } from "./components";
 import type { CreateSkillRequest, UpdateSkillRequest } from "../../types";
 import "./SkillEditorPage.css";
 
