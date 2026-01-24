@@ -76,7 +76,6 @@ public class SkillService : ISkillService
 	{
 		return await _dbContext.Skills
 			.Include(s => s.Agent)
-			.Include(s => s.Tools)
 			.FirstOrDefaultAsync(s => s.Id == id, ct);
 	}
 

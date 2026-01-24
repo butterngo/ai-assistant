@@ -197,12 +197,15 @@ public static class ConnectionToolEndpoint
 
 	private static async Task<IResult> DiscoverToolsAsync(
 		Guid id,
-		IConnectionToolService service,
+		IConnectionToolService connectionToolService,
+		IDiscoveredToolService discoveredToolService,
 		CancellationToken ct)
 	{
 		try
 		{
-			var tools = await service.DiscoverToolsAsync(id, ct);
+			var tools = await connectionToolService.DiscoverToolsAsync(id, ct);
+
+			await discoveredToolService.SaveDiscoveredToolsAsync(id, tools, ct);
 
 			// Convert AITool to simple object for JSON response
 			var toolsResponse = tools.Select(t => new

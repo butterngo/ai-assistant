@@ -1,5 +1,5 @@
 import type { Agent } from "./Agent";
-import type { Tool } from "./Tool";
+//import type { Tool } from "./connectionTool";
 
 export interface Skill {
   id: string;
@@ -14,7 +14,7 @@ export interface Skill {
 
 export interface SkillWithRelations extends Skill {
   agent?: Agent;
-  tools?: Tool[];
+  //tools?: Tool[];
 }
 
 export interface CreateSkillRequest {

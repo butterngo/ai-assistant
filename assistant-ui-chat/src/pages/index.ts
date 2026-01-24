@@ -4,5 +4,6 @@ export { AgentsPage } from "./AgentsPage/AgentsPage";
 export { AgentSkillsPage } from "./AgentsPage/AgentSkillsPage";
 export { SkillEditorPage } from "./AgentsPage/SkillEditorPage";
 export { ToolsPage } from "./ToolsPage/ToolsPage";
+export { ConnectionDetailsPage } from "./ToolsPage/ConnectionDetailsPage";
 export { KnowledgeBasePage } from "./KnowledgeBasePage/KnowledgeBasePage";
 export { ProfilePage } from "./ProfilePage/ProfilePage";

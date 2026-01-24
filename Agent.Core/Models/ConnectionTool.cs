@@ -127,30 +127,21 @@ public class ConnectionTool
 				"Endpoint is required for MCP_HTTP connection type");
 		}
 
-		try
+		// Create HTTP transport
+		var clientTransport = new HttpClientTransport(new HttpClientTransportOptions
 		{
-			// Create HTTP transport
-			var clientTransport = new HttpClientTransport(new HttpClientTransportOptions
-			{
-				Name = PluginName,
-				Endpoint = new Uri(Endpoint)
-			});
+			Name = PluginName,
+			Endpoint = new Uri(Endpoint)
+		});
 
-			// Create MCP client
-			var client = await McpClient.CreateAsync(clientTransport, cancellationToken: cancellationToken);
+		// Create MCP client
+		var client = await McpClient.CreateAsync(clientTransport, cancellationToken: cancellationToken);
 
-			// Discover tools from the MCP server
-			var mcpTools = await client.ListToolsAsync(cancellationToken: cancellationToken);
+		// Discover tools from the MCP server
+		var mcpTools = await client.ListToolsAsync(cancellationToken: cancellationToken);
 
-			// Convert to AITool list
-			return mcpTools?.Cast<AITool>().ToList();
-		}
-		catch (Exception ex)
-		{
-			// Log error (you can inject ILogger if needed)
-			Console.WriteLine($"[{PluginName}] Error discovering MCP HTTP tools: {ex.Message}");
-			return null;
-		}
+		// Convert to AITool list
+		return mcpTools?.Cast<AITool>().ToList();
 	}
 
 	/// <summary>
@@ -165,39 +156,29 @@ public class ConnectionTool
 				"Command is required for MCP_STDIO connection type");
 		}
 
-		try
+		// Create stdio transport options
+		var options = new StdioClientTransportOptions
 		{
-			// Create stdio transport options
-			var options = new StdioClientTransportOptions
-			{
-				Name = PluginName,
-				Command = Command,
-				Arguments = Arguments,
-				WorkingDirectory = WorkingDirectory,
-				EnvironmentVariables = EnvironmentVariables,
-				ShutdownTimeout = ShutdownTimeout,
-				StandardErrorLines = OnStandardError ?? DefaultStandardErrorHandler
-			};
+			Name = PluginName,
+			Command = Command,
+			Arguments = Arguments,
+			WorkingDirectory = WorkingDirectory,
+			EnvironmentVariables = EnvironmentVariables,
+			ShutdownTimeout = ShutdownTimeout,
+			StandardErrorLines = OnStandardError ?? DefaultStandardErrorHandler
+		};
 
-			// Create stdio transport
-			var clientTransport = new StdioClientTransport(options);
+		// Create stdio transport
+		var clientTransport = new StdioClientTransport(options);
 
-			// Create MCP client
-			var client = await McpClient.CreateAsync(clientTransport, cancellationToken: cancellationToken);
+		// Create MCP client
+		var client = await McpClient.CreateAsync(clientTransport, cancellationToken: cancellationToken);
 
-			// Discover tools from the MCP server
-			var mcpTools = await client.ListToolsAsync(cancellationToken: cancellationToken);
+		// Discover tools from the MCP server
+		var mcpTools = await client.ListToolsAsync(cancellationToken: cancellationToken);
 
-			// Convert to AITool list
-			return mcpTools?.Cast<AITool>().ToList();
-		}
-		catch (Exception ex)
-		{
-			// Log error
-			Console.WriteLine($"[{PluginName}] Error discovering MCP STDIO tools: {ex.Message}");
-			Console.WriteLine($"[{PluginName}] Command: {Command} {string.Join(" ", Arguments ?? Array.Empty<string>())}");
-			return null;
-		}
+		// Convert to AITool list
+		return mcpTools?.Cast<AITool>().ToList();
 	}
 
 	#endregion
@@ -216,34 +197,24 @@ public class ConnectionTool
 				"Endpoint is required for OpenApi connection type");
 		}
 
-		try
-		{
-			cancellationToken.ThrowIfCancellationRequested();
+		cancellationToken.ThrowIfCancellationRequested();
 
-			// Create a temporary kernel to import the OpenAPI plugin
-			var kernel = Kernel.CreateBuilder().Build();
+		// Create a temporary kernel to import the OpenAPI plugin
+		var kernel = Kernel.CreateBuilder().Build();
 
-			// Import OpenAPI plugin
-			await kernel.ImportPluginFromOpenApiAsync(
-				pluginName: PluginName,
-				uri: new Uri(Endpoint),
-				executionParameters: new OpenApiFunctionExecutionParameters());
+		// Import OpenAPI plugin
+		await kernel.ImportPluginFromOpenApiAsync(
+			pluginName: PluginName,
+			uri: new Uri(Endpoint),
+			executionParameters: new OpenApiFunctionExecutionParameters());
 
-			// Extract AI tools from the imported plugin
-			var tools = kernel.Plugins
-				.SelectMany(plugin => plugin)
-				.Cast<AITool>()
-				.ToList();
+		// Extract AI tools from the imported plugin
+		var tools = kernel.Plugins
+			.SelectMany(plugin => plugin)
+			.Cast<AITool>()
+			.ToList();
 
-			return tools;
-		}
-		catch (Exception ex)
-		{
-			// Log error
-			Console.WriteLine($"[{PluginName}] Error discovering OpenAPI tools: {ex.Message}");
-			Console.WriteLine($"[{PluginName}] Endpoint: {Endpoint}");
-			return null;
-		}
+		return tools;
 	}
 
 	#endregion

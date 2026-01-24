@@ -39,6 +39,4 @@ public class SkillEntity
 	[ForeignKey(nameof(AgentId))]
 	[JsonIgnore]
 	public AgentEntity Agent { get; set; } = null!;
-
-	public ICollection<ConnectionToolEntity> Tools { get; set; } = [];
 }

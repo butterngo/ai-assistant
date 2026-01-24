@@ -22,5 +22,49 @@ public class AgentDbContext : DbContext
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
+
+		// Composite key for junction table
+		modelBuilder.Entity<SkillConnectionToolEntity>()
+			.HasKey(e => new { e.SkillId, e.ConnectionToolId });
+
+		//// Unique indexes
+		//modelBuilder.Entity<AgentEntity>()
+		//	.HasIndex(e => e.Code)
+		//	.IsUnique();
+
+		//modelBuilder.Entity<SkillEntity>()
+		//	.HasIndex(e => e.Code)
+		//	.IsUnique();
+
+		//modelBuilder.Entity<SkillEntity>()
+		//	.HasIndex(e => new { e.AgentId, e.Code })
+		//	.IsUnique();
+
+		//modelBuilder.Entity<ConnectionToolEntity>()
+		//	.HasIndex(e => e.Name)
+		//	.IsUnique();
+
+		//modelBuilder.Entity<DiscoveredToolEntity>()
+		//	.HasIndex(e => new { e.ConnectionToolId, e.Name })
+		//	.IsUnique();
+
+		//// Additional indexes for performance
+		//modelBuilder.Entity<ConnectionToolEntity>()
+		//	.HasIndex(e => e.Type);
+
+		//modelBuilder.Entity<ConnectionToolEntity>()
+		//	.HasIndex(e => e.IsActive);
+
+		//modelBuilder.Entity<DiscoveredToolEntity>()
+		//	.HasIndex(e => e.ConnectionToolId);
+
+		//modelBuilder.Entity<DiscoveredToolEntity>()
+		//	.HasIndex(e => e.IsAvailable);
+
+		//modelBuilder.Entity<SkillConnectionToolEntity>()
+		//	.HasIndex(e => e.SkillId);
+
+		//modelBuilder.Entity<SkillConnectionToolEntity>()
+		//	.HasIndex(e => e.ConnectionToolId);
 	}
 }

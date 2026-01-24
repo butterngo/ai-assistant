@@ -13,13 +13,19 @@ namespace Agent.Core.Extensions;
 
 public static class ConnectionToolExtensions
 {
+	private static readonly JsonSerializerOptions JsonOptions = new()
+	{
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+	};
+
 	/// <summary>
 	/// Convert ConnectionToolEntity to ConnectionTool model
 	/// </summary>
 	public static ConnectionTool ToConnectionTool(this ConnectionToolEntity entity)
 	{
+
 		var config = entity.Config != null
-			? JsonSerializer.Deserialize<ToolConfig>(entity.Config.RootElement.GetRawText())
+			? JsonSerializer.Deserialize<ToolConfig>(entity.Config.RootElement.GetRawText(), JsonOptions)
 			: new ToolConfig();
 
 		var toolType = entity.Type.ToLower() switch

@@ -1,0 +1,94 @@
+.delete-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.warning-icon {
+  font-size: 48px;
+  text-align: center;
+}
+
+.warning-text {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  color: #f9fafb;
+}
+
+.connection-info {
+  background-color: #1f1f1f;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #2d2d2d;
+  color: #e5e7eb;
+}
+
+.connection-info strong {
+  color: #f9fafb;
+}
+
+.impact-info {
+  margin: 0;
+}
+
+.impact-info p {
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #f9fafb;
+}
+
+.impact-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.impact-info li {
+  margin-bottom: 4px;
+  color: #9ca3af;
+}
+
+.warning-message {
+  background-color: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.secondary-btn,
+.danger-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.secondary-btn {
+  background-color: #2d2d2d;
+  color: #e5e7eb;
+}
+
+.secondary-btn:hover:not(:disabled) {
+  background-color: #3d3d3d;
+}
+
+.danger-btn {
+  background-color: #dc2626;
+  color: white;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.secondary-btn:disabled,
+.danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

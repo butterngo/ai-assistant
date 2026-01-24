@@ -22,3 +22,5 @@ export { SkillsSidebar } from "./TestChat/SkillsSidebar";
 export { SkillInstructionsModal } from "./TestChat/SkillInstructionsModal";
 
 export { DebugPanel } from './DebugPanel';
+
+export { Modal } from './Modal';

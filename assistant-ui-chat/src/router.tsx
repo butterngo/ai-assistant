@@ -10,6 +10,7 @@ import {
   KnowledgeBasePage,
   ProfilePage,
   SkillEditorPage,
+  ConnectionDetailsPage
 } from "./pages";
 import { conversationLoader } from "./loaders/Conversationloader";
 
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
       {
         path: "tools",
         element: <ToolsPage />,
+      },
+      {
+        path: "tools/:id",
+        element: <ConnectionDetailsPage />
       },
       {
         path: "knowledge-base",

@@ -66,12 +66,12 @@ public class ConnectionToolEntity
 	[Column("updated_at")]
 	public DateTime UpdatedAt { get; set; }
 
-	// Navigation properties
-	[JsonIgnore]
-	public ICollection<SkillConnectionToolEntity> SkillConnectionTools { get; set; }
-		= new List<SkillConnectionToolEntity>();
+	//// Navigation properties
+	//[JsonIgnore]
+	//public ICollection<SkillConnectionToolEntity> SkillConnectionTools { get; set; }
+	//	= new List<SkillConnectionToolEntity>();
 
-	[JsonIgnore]
-	public ICollection<DiscoveredToolEntity> DiscoveredTools { get; set; }
-		= new List<DiscoveredToolEntity>();
+	//[JsonIgnore]
+	//public ICollection<DiscoveredToolEntity> DiscoveredTools { get; set; }
+	//	= new List<DiscoveredToolEntity>();
 }
