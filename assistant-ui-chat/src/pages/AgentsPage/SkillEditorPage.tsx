@@ -2,15 +2,10 @@ import { type FC, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon, SaveIcon, FileTextIcon, RouteIcon, WrenchIcon } from "lucide-react";
 import { useSkills, useSkillRouters } from "../../hooks";
-import { MarkdownEditor, SkillRoutersSection } from "./components";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/Tabs";
+import { MarkdownEditor, SkillRoutersSection, SkillToolsTab } from "./components";
 import type { CreateSkillRequest, UpdateSkillRequest } from "../../types";
 import "./SkillEditorPage.css";
-
-// =============================================================================
-// Types
-// =============================================================================
-
-type TabType = "prompt" | "routing" | "tools";
 
 // =============================================================================
 // Component
@@ -47,7 +42,7 @@ export const SkillEditorPage: FC = () => {
   const [systemPrompt, setSystemPrompt] = useState("");
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [activeTab, setActiveTab] = useState<TabType>("prompt");
+  const [activeTab, setActiveTab] = useState("prompt");
 
   const currentSkill = skills.find((s) => s.id === skillId);
 
@@ -231,39 +226,41 @@ export const SkillEditorPage: FC = () => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="skill-editor-tabs">
-          <button
-            className={`tab-btn ${activeTab === "prompt" ? "active" : ""}`}
-            onClick={() => setActiveTab("prompt")}
-          >
-            <FileTextIcon size={16} />
-            <span>System Prompt</span>
-            {errors.systemPrompt && <span className="error-dot" />}
-          </button>
-          <button
-            className={`tab-btn ${activeTab === "routing" ? "active" : ""}`}
-            onClick={() => setActiveTab("routing")}
-            disabled={!isEditMode}
-          >
-            <RouteIcon size={16} />
-            <span>Routing Queries</span>
-            <span className="count-badge">{routers.length}</span>
-          </button>
-          <button
-            className={`tab-btn ${activeTab === "routing" ? "active" : ""}`}
-            onClick={() => setActiveTab("routing")}
-            disabled={!isEditMode}
-          >
-            <WrenchIcon size={16} />
-            <span>Tools</span>
-            <span className="count-badge">{0}</span>
-          </button>
-        </div>
+        {/* Tabs - NEW IMPLEMENTATION */}
+        <Tabs value={activeTab} onChange={setActiveTab}>
+          <TabsList>
+            {/* System Prompt Tab */}
+            <TabsTrigger 
+              value="prompt" 
+              icon={<FileTextIcon size={16} />}
+            >
+              System Prompt
+              {errors.systemPrompt && <span className="error-indicator">●</span>}
+            </TabsTrigger>
 
-        {/* Tab Content */}
-        <div className="skill-editor-content">
-          {activeTab === "prompt" && (
+            {/* Routing Queries Tab */}
+            <TabsTrigger 
+              value="routing" 
+              icon={<RouteIcon size={16} />}
+              badge={routers.length}
+              disabled={!isEditMode}
+            >
+              Routing Queries
+            </TabsTrigger>
+
+            {/* Tools Tab - NEW */}
+            <TabsTrigger 
+              value="tools" 
+              icon={<WrenchIcon size={16} />}
+              badge={currentSkill?.connectedToolsCount || 0}
+              disabled={!isEditMode}
+            >
+              Tools
+            </TabsTrigger>
+          </TabsList>
+
+          {/* System Prompt Content */}
+          <TabsContent value="prompt">
             <MarkdownEditor
               value={systemPrompt}
               onChange={setSystemPrompt}
@@ -287,9 +284,10 @@ You are a helpful assistant that...
 - Use simple language
 - Avoid technical jargon`}
             />
-          )}
+          </TabsContent>
 
-          {activeTab === "routing" && (
+          {/* Routing Queries Content */}
+          <TabsContent value="routing">
             <SkillRoutersSection
               routers={routers}
               loading={routersLoading}
@@ -299,8 +297,19 @@ You are a helpful assistant that...
               onRemove={handleRemoveRouter}
               onRefresh={handleRefreshRouters}
             />
-          )}
-        </div>
+          </TabsContent>
+
+          {/* Tools Content - NEW */}
+          <TabsContent value="tools">
+            {isEditMode && currentSkill ? (
+              <SkillToolsTab skillId={currentSkill.id} />
+            ) : (
+              <div className="tab-disabled-message">
+                <p>Save the skill first to manage tools</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Footer hint */}

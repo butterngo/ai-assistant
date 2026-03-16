@@ -11,7 +11,7 @@ export interface ConnectionTool {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  
+  connectedToolsCount ?: number;
   // Computed/joined data
   discoveredToolsCount?: number;
   lastTestedAt?: string;

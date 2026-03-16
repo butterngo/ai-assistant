@@ -1,6 +1,8 @@
-import { ConfirmDialog, MarkdownEditor } from "../../../components";
-
 export { AgentModal } from "./AgentModal";
 export { SkillRoutersSection } from "./SkillRoutersSection";
-
-export { ConfirmDialog, MarkdownEditor }
+export { SkillToolsTab } from "./SkillToolsTab";
+export {
+    ConfirmDialog,
+    MarkdownEditor,
+    Tabs, TabsList, TabsTrigger, TabsContent
+ } from "../../../components";
